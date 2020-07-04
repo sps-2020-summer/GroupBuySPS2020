@@ -23,6 +23,5 @@ const user: { profileObj: ProfileObject } = {
 
 export const UserContext = createContext(user);
 
-export function useUser() {
-    return useContext(UserContext);
-}
+export const useUser = () => useContext(UserContext);
+

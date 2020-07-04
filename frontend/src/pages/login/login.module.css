@@ -1,5 +1,18 @@
 .loginCard {
-    margin: 48px;
-    min-width: 50vw;
-    min-height: 50vh;
+    margin-left: 15vw;
+    margin-right: 15vw;
+
+    text-align: center;
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+    margin-top: 20vh;
 }
+
+.actionArea {
+    margin: auto;
+    width: 35vw;
+    min-height: 10vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+

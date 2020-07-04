@@ -76,8 +76,8 @@ function App() {
   }
 
 
-  return ( <div className="App">
-      <header className="App-header">
+  return (
+      <div className="background">
         <BrowserRouter>
         <AuthContext.Provider
                 value={{
@@ -108,8 +108,8 @@ function App() {
                     </UserContext.Provider>
               </AuthContext.Provider>
         </BrowserRouter>
-      </header>
-    </div>
+      </div>
+
   );
 }
 
