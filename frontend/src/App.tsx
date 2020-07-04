@@ -50,7 +50,7 @@ function App() {
 
   // A wrapper for <Route> that redirects to the login
   // screen if you're not yet authenticated.
-  function PrivateRoute({ Comp, ...rest }) {
+  const PrivateRoute = ({ Comp, ...rest }) => {
       const isAuthenticated = useAuth();
       console.log(isAuthenticated.authTokens === '{}');
       const redirect = isAuthenticated.authTokens === '{}' || isAuthenticated.authTokens === '' ? true: false;
