@@ -23,11 +23,6 @@ const Main: FC<{}> = () => {
    const navToDashboard = () => history.push('/dashboard');
    const handleClick = (e: ClickParam) => e.key === 'dashboard' ? navToDashboard() : setCurrent(e.key);
 
-
-
-
-
-
    return (
       <Content style={{ padding: '0 50px', margin: '48px', backgroundColor: 'white' }}>
          <Menu onClick={handleClick} selectedKeys={[current]} mode="horizontal">
