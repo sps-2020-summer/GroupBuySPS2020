@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { Layout, Tabs, Button, Menu } from "antd";
+import { Layout, Tabs, Button, Menu, Spin } from "antd";
 import { withRouter, useHistory } from "react-router-dom";
 import { ClickParam } from "antd/lib/menu";
 import {
@@ -7,22 +7,27 @@ import {
 	AppstoreOutlined,
 	SettingOutlined,
 } from "@ant-design/icons";
-
 import Request from "./components/requests";
+import { useAuthState } from "react-firebase-hooks/auth";
+import firebase from "firebase";
 
 const { TabPane } = Tabs;
 
 const { Header, Footer, Sider, Content } = Layout;
 
 const Main: FC<{}> = () => {
-	/** State */
+	const history = useHistory();
 	const [current, setCurrent] = useState<string>("request");
+	const [user, loading, error] = useAuthState(firebase.auth());
+	if (loading) return <Spin spinning={true}></Spin>;
+	console.log(user);
+	/** State */
 
 	/** The pages to show on menu click */
 	const childPages = { request: <Request />, offers: <>I am offer</> };
 
 	/** Navigation */
-	const history = useHistory();
+
 	const navToDashboard = () => history.push("/dashboard");
 	const handleClick = (e: ClickParam) =>
 		e.key === "dashboard" ? navToDashboard() : setCurrent(e.key);

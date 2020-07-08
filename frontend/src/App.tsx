@@ -1,119 +1,70 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import "./App.css";
-import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
-import { AuthContext, useAuth } from './context/auth';
-import { UserContext, ProfileObject } from './context/user';
-import { Spin } from 'antd';
-import { Layout } from 'antd';
+import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
+import { AuthContext, useAuth } from "./context/auth";
+import { UserContext, ProfileObject } from "./context/user";
+import { Spin } from "antd";
+import { Layout } from "antd";
+import firebase from "firebase";
 
-const Main = React.lazy(() => import('./pages/main'));
-const Login = React.lazy(() => import('./pages/login'));
-const Dashboard = React.lazy(() => import('./pages/dashboard'));
+import { useAuthState } from "react-firebase-hooks/auth";
 
-function App() {
+const Main = React.lazy(() => import("./pages/main"));
+const Login = React.lazy(() => import("./pages/login"));
+const Dashboard = React.lazy(() => import("./pages/dashboard"));
 
-    const existingProfile = JSON.parse(localStorage.getItem('profileObj') || '{}');
-    const [profileObj, setProfileObject] = useState(existingProfile);
-    const existingTokens: string = JSON.parse(localStorage.getItem('tokens') || '{}');
-    const [authTokens, setAuthTokens] = useState(existingTokens);
+const App = () => {
+	const [user, loading, error] = useAuthState(firebase.auth());
 
-    const setProfile = (data: ProfileObject) => {
-        localStorage.setItem('profileObj', JSON.stringify(data));
-        setProfileObject(data);
-    };
-    const setTokens = (data: string) => {
-        localStorage.setItem('tokens', JSON.stringify(data));
-        setAuthTokens(data);
-    };
+	if (loading) return <Spin></Spin>;
 
-    const removeUserProfile = () => {
-        localStorage.setItem('profileObj', JSON.stringify('{}'));
-        setProfileObject({});
-    };
+	// A wrapper for <Route> that redirects to the login
+	// screen if you're not yet authenticated.
+	const PrivateRoute = ({ Comp, ...rest }) => {
+		const redirect = user === null;
+		return (
+			<Route
+				exact
+				{...rest}
+				render={({ location }) =>
+					redirect ? (
+						<Redirect
+							to={{
+								pathname: "/login",
+								state: { from: location },
+							}}
+						/>
+					) : (
+						<Comp />
+					)
+				}
+			/>
+		);
+	};
 
-    const removeTokens = () => {
-        localStorage.setItem('tokens', JSON.stringify('{}'));
-        setAuthTokens('{}');
-    };
-
-    const login = (history: any, token: string, profile: ProfileObject) => {
-        setTokens(token);
-        setProfile(profile);
-        history.push('/');
-    };
-
-    const logout = (history: any) => {
-        removeUserProfile();
-        removeTokens();
-        history.push('/login');
-    };
-
-    // A wrapper for <Route> that redirects to the login
-    // screen if you're not yet authenticated.
-    const PrivateRoute = ({ Comp, ...rest }) => {
-        const isAuthenticated = useAuth();
-        console.log(isAuthenticated.authTokens === '{}');
-        //const redirect = isAuthenticated.authTokens === '{}' || isAuthenticated.authTokens === '' ? true: false;
-        const redirect = false;
-        console.log(redirect);
-        return (
-            <Route
-                exact
-                {...rest}
-                render={({ location }) =>
-                    redirect ? (
-                        <Redirect
-                            to={{
-                                pathname: '/login',
-                                state: { from: location },
-                            }}
-                        />
-                    )
-                        :
-                        (<Comp />)
-                }
-            />
-        );
-    }
-
-
-    return (
-        <Layout className="background">
-            <BrowserRouter>
-                <AuthContext.Provider
-                    value={{
-                        authTokens,
-                        login: login,
-                        logout: logout,
-                    }}
-                >
-                    <UserContext.Provider
-                        value={{
-                            profileObj: profileObj,
-                        }}
-                    >
-
-                        <React.Suspense
-                            fallback={
-                                <React.Fragment>
-                                    <Spin />
-                                </React.Fragment>
-                            }
-                        >
-                            <Switch>
-                                <PrivateRoute exact path="/" Comp={Main}></PrivateRoute>
-                                <PrivateRoute exact path="/dashboard" Comp={Dashboard}></PrivateRoute>
-                                <Route exact path="/login" component={Login} />
-                            </Switch>
-                        </React.Suspense>
-
-                    </UserContext.Provider>
-                </AuthContext.Provider>
-            </BrowserRouter>
-        </Layout>
-
-    );
-}
+	return (
+		<Layout className="background">
+			<BrowserRouter>
+				<React.Suspense
+					fallback={
+						<React.Fragment>
+							<Spin />
+						</React.Fragment>
+					}
+				>
+					<Switch>
+						<PrivateRoute exact path="/" Comp={Main}></PrivateRoute>
+						<PrivateRoute
+							exact
+							path="/dashboard"
+							Comp={Dashboard}
+						></PrivateRoute>
+						<Route exact path="/login" component={Login} />
+					</Switch>
+				</React.Suspense>
+			</BrowserRouter>
+		</Layout>
+	);
+};
 
 export default App;
