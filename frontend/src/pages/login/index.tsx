@@ -4,6 +4,7 @@ import s from "./login.module.css";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase";
 import { AuthContext } from "../../context/auth";
+import { FaUser } from "react-icons/fa";
 
 // Configure FirebaseUI.
 
@@ -18,20 +19,15 @@ const Login: FC<{}> = () => {
 	};
 
 	return (
-		<Card className={s.loginCard}>
-			<h1>Group Buy</h1>
-			<div className={s.actionArea}>
-				<StyledFirebaseAuth
-					uiConfig={uiConfig}
-					firebaseAuth={firebase.auth()}
-				/>
-				<Button type="primary">Google Login</Button>
-				{
-					// guest to login during testing
-				}
-				<Button type="dashed">Guest Login</Button>
-			</div>
-		</Card>
+		<div className={s.loginCard}>
+			<FaUser style={{ fontSize: "10vh" }} />
+			<h1 style={{ fontSize: "8vh" }}>Group Buy</h1>
+
+			<StyledFirebaseAuth
+				uiConfig={uiConfig}
+				firebaseAuth={firebase.auth()}
+			/>
+		</div>
 	);
 };
 
