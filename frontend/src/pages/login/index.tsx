@@ -1,12 +1,8 @@
 import React, { FC, useContext } from "react";
-import { Card, Button } from "antd";
 import s from "./login.module.css";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import firebase from "firebase";
 import { AuthContext } from "../../context/auth";
 import { FaUser } from "react-icons/fa";
-
-// Configure FirebaseUI.
 
 const Login: FC<{}> = () => {
 	const value = useContext(AuthContext);

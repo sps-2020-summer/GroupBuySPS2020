@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./App.css";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
-import { AuthContext, useAuth } from "./context/auth";
-import { UserContext, ProfileObject } from "./context/user";
 import { Spin } from "antd";
 import { Layout } from "antd";
 import firebase from "firebase";
@@ -14,7 +12,7 @@ const Login = React.lazy(() => import("./pages/login"));
 const Dashboard = React.lazy(() => import("./pages/dashboard"));
 
 const App = () => {
-	const [user, loading, error] = useAuthState(firebase.auth());
+	const [user, loading] = useAuthState(firebase.auth());
 
 	if (loading) return <Spin></Spin>;
 
@@ -48,7 +46,7 @@ const App = () => {
 				<React.Suspense
 					fallback={
 						<React.Fragment>
-							<Spin />
+							<Spin style={{ margin: "auto" }} />
 						</React.Fragment>
 					}
 				>

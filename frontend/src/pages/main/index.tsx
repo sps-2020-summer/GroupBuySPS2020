@@ -1,24 +1,18 @@
 import React, { FC, useState } from "react";
-import { Layout, Tabs, Button, Menu, Spin } from "antd";
+import { Layout, Menu, Spin } from "antd";
 import { withRouter, useHistory } from "react-router-dom";
 import { ClickParam } from "antd/lib/menu";
-import {
-	MailOutlined,
-	AppstoreOutlined,
-	SettingOutlined,
-} from "@ant-design/icons";
+import { MailOutlined, AppstoreOutlined } from "@ant-design/icons";
 import Request from "./components/requests";
 import { useAuthState } from "react-firebase-hooks/auth";
 import firebase from "firebase";
 
-const { TabPane } = Tabs;
-
-const { Header, Footer, Sider, Content } = Layout;
+const { Content } = Layout;
 
 const Main: FC<{}> = () => {
 	const history = useHistory();
 	const [current, setCurrent] = useState<string>("request");
-	const [user, loading, error] = useAuthState(firebase.auth());
+	const [user, loading] = useAuthState(firebase.auth());
 	if (loading) return <Spin spinning={true}></Spin>;
 	console.log(user);
 	/** State */
