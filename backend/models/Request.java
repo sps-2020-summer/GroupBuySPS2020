@@ -2,7 +2,7 @@ package backend.models;
 
 import backend.utilities.Utilities;
 import com.google.cloud.firestore.Exclude;
-import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 /** Represents a request which a person makes when s/he needs help with a purchase. */
 public class Request {
@@ -22,6 +22,14 @@ public class Request {
         this.taskId = taskId;
     }
 
+    /** @throws IllegalArgumentException if any parameter is {@code null} or empty. */
+    public Request(String id, String taskId, Task task) throws IllegalArgumentException {
+        Utilities.ensureNonNull(id, taskId);
+        this.id = id;
+        this.taskId = taskId;
+        this.task = task;
+    }
+
     /** 
      * Creates a {@code Request} by using the given {@code id} and {@code taskId}. {@code jsonString} should contain
      * the required parameters to create a {@code Task} that is associated with the request created.
@@ -30,8 +38,9 @@ public class Request {
      *         or parameter value is invalid.
      */
     public static Request fromJson(String jsonString, String id, String taskId) throws IllegalArgumentException {
-        // TODO: throw an error when any property cannot be found
-        throw new UnsupportedOperationException("TODO: Implement this method.");
+        Request request = new Request(id, taskId);
+        request.setTask(Task.fromJson(jsonString, taskId));
+        return request;
     }
 
     /** Assigns task to the person represented in @{code jsonString}. */

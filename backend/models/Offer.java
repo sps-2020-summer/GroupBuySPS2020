@@ -1,7 +1,9 @@
 package backend.models;
 
+import java.io.StringReader;
+
 import backend.utilities.Utilities;
-import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 /** Represents an offer that is made when a person wants to help others to make a purchase. */
 public class Offer {
@@ -29,16 +31,54 @@ public class Offer {
      *         or parameter value is invalid.
      */
     public static Offer fromJson(String jsonString, String id) throws IllegalArgumentException {
-        // TODO: throw an error when any property cannot be found
-        throw new UnsupportedOperationException("TODO: Implement this method.");
+        String expectedDeliveryTime;
+        String shopLocation;
+
+        JsonReader reader = new JsonReader(new StringReader(jsonString));
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (name.equals("shopLocation")) {
+                shopLocation = reader.nextString();
+            } else if (name.equals("expectedDeliveryTime")) {
+                expectedDeliveryTime = reader.nextString();
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+        
+        return new Offer(id, shopLocation, expectedDeliveryTime, Status.OPEN); // since created offers are open
     }
 
     /** 
-     * Adds a request to offer by returning a request that meet the conditions specified by this
-     * task.
+     * Creates a {@code Request} instance with id {@code requestId}. The resulting task that is associated with
+     * the request created will have {@code taskId} id and will satisfy the conditions specified by this offer.
      */
-    public Request addRequest(Request request) {
-        throw new UnsupportedOperationException("TODO: implement this");
+    public Request addRequest(String jsonString, String requestId, String taskId, String doerName) {
+        String item;
+        String payerName;
+        double fee;
+        
+        JsonReader reader = new JsonReader(new StringReader(jsonString));
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (name.equals("item")) {
+                item = reader.nextString();
+            } else if (name.equals("payerName")) {
+                payerName = reader.nextString();
+            } else if (name.equals("fee")) {
+                fee = reader.nextDouble();
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+
+        Task task = new Task(taskId, shopLocation, expectedDeliveryTime, item, payerName, fee, 
+                Status.PENDING, doerName); // status is set to 'pending' since payer and doer are both well-defined
+        return new Request(requestId, taskId, task);
     }
 
     /** 
