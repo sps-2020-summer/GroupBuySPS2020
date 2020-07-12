@@ -2,12 +2,32 @@ package backend.models;
 
 /** Represents a request which a person makes when s/he needs help with a purchase. */
 public class Request {
-    private final String id; 
+    private String id; 
     private String taskId;
+
+    public Request() {
+        // no argument constructor for Firestore purposes
+    }
     
     public Request(String id, String taskId) {
         // TODO: ensure that id and taskId are non-null/empty
         this.id = id;
+        this.taskId = taskId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
@@ -67,7 +87,7 @@ public class Request {
             this.owner = task.getPayerName();
             this.fee = String.format("%.2f", task.getFee());
             this.status = task.getStatus().toString();
-            this.assignee = task.getDoerName().orElse("");
+            this.assignee = task.getDoerName();
         }
     }
 }
