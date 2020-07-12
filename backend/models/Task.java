@@ -7,14 +7,18 @@ import java.util.Optional;
  * the task cannot be completed.
  */
 public class Task {
-    private final String id;
-    private final String shopLocation;
-    private final String expectedDeliveryTime;
-    private final String item;
-    private final String payerName;
-    private final double fee;
+    private String id;
+    private String shopLocation;
+    private String expectedDeliveryTime;
+    private String item;
+    private String payerName;
+    private double fee;
     private Optional<String> doerName;
     private Status status;
+
+    public Task() {
+        // no argument constructor for Firestore purposes
+    }
 
     public Task(String id, String shopLocation, String expectedDeliveryTime, String item, String payerName, 
         double fee, Status status, String doerName) {
@@ -35,18 +39,72 @@ public class Task {
         this(id, shopLocation, expectedDeliveryTime, item, payerName, fee, Status.OPEN, null);
     }
 
-    /** 
-     * Converts a JSON string representation of task to a {@code Task}. Assumes that all properties
-     * of {@code Task}, except {@code doerName}, can be found in {@code jsonString}. 
-     */
-    public static Task fromJson(String jsonString) {
-        // TODO: throw an error if required properties cannot be found in jsonString
-        throw new UnsupportedOperationException("TODO: Implement this method.");
+    public String getId() {
+        return id;
     }
 
-    /** Converts a JSON string representation of task to a {@code Task} such that it has {@code id}. */
-    public static Task fromJson(String jsonString, String id) {
-        throw new UnsupportedOperationException("TODO: Implement this method.");
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getShopLocation() {
+        return shopLocation;
+    }
+
+    public void setShopLocation(String shopLocation) {
+        this.shopLocation = shopLocation;
+    }
+
+    public String getExpectedDeliveryTime() {
+        return expectedDeliveryTime;
+    }
+
+    public void setExpectedDeliveryTime(String expectedDeliveryTime) {
+        this.expectedDeliveryTime = expectedDeliveryTime;
+    }
+
+    public String getItem() {
+        return item;
+    }
+
+    public void setItem(String item) {
+        this.item = item;
+    }
+
+    public String getPayerName() {
+        return payerName;
+    }
+
+    public void setPayerName(String payerName) {
+        this.payerName = payerName;
+    }
+
+    public double getFee() {
+        return fee;
+    }
+
+    public void setFee(double fee) {
+        this.fee = fee;
+    }
+
+    /** Returns doer name as string, if present; otherwise, returns empty string. */
+    public String getDoerName() {
+        return doerName.orElse("");
+    }
+
+    public void setDoerName(String doerName) {
+        this.doerName = doerName.isEmpty() ? Optional.empty() : Optional.of(doerName);
+    }
+
+    /** Returns status as a string. */
+    public String getStatus() {
+        return status.toString();
+    }
+
+    /** Sets status using a string. */
+    public void setStatus(String status) {
+        // TODO: add validation
+        this.status = Status.valueOf(status);
     }
 
     /** Cancels the task. */
@@ -57,38 +115,6 @@ public class Task {
     /** Marks the task as complete. */
     public void markAsComplete() {
         status = Status.DONE;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getShopLocation() {
-        return shopLocation;
-    }
-
-    public String getExpectedDeliveryTime() {
-        return expectedDeliveryTime;
-    }
-
-    public String getItem() {
-        return item;
-    }
-
-    public String getPayerName() {
-        return payerName;
-    }
-
-    public double getFee() {
-        return fee;
-    }
-
-    public Optional<String> getDoerName() {
-        return doerName;
-    }
-
-    public Status getStatus() {
-        return status;
     }
 
     /** 
