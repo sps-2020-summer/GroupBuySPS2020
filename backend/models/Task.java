@@ -3,6 +3,7 @@ package backend.models;
 import java.util.Optional;
 
 import backend.utilities.Utilities;
+import com.google.gson.Gson;
 
 /** 
  * Represents a task. Note that it is possible for Task to not have a doer. In this case, 
@@ -24,7 +25,7 @@ public class Task {
 
     /** @throws IllegalArgumentException if any parameter, except {@code doerName}, is {@code null} or empty */
     public Task(String id, String shopLocation, String expectedDeliveryTime, String item, String payerName, 
-        double fee, Status status, String doerName) {
+        double fee, Status status, String doerName) throws IllegalArgumentException {
         Utilities.ensureNonNull(id, shopLocation, expectedDeliveryTime, item, payerName, fee, status);
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
@@ -40,6 +41,39 @@ public class Task {
     public Task(String id, String shopLocation, String expectedDeliveryTime, String item, String payerName,
         double fee) {
         this(id, shopLocation, expectedDeliveryTime, item, payerName, fee, Status.OPEN, null);
+    }
+
+    /** 
+     * Creates a {@code Task} by using parameters found in {@code jsonString} and the given {@code id}. 
+     * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
+     *         or parameter value is invalid.
+     */
+    public static Task fromJson(String jsonString, String id) throws IllegalArgumentException {
+        // TODO: throw an error when any property cannot be found
+        throw new UnsupportedOperationException("TODO: Implement this method.");
+    }
+
+    /** 
+     * Reopens the task by creating a new task with a different {@code taskId} and sets doer to be empty,
+     * if it has been cancelled; otherwise, the current task will be returned.
+     * 
+     * @param taskId The id of the new task that is associated with this task.
+     */
+    public Task reopenTask(String taskId) {
+        if (!status.equals(Status.CANCELLED)) {
+            return this;
+        }
+        return new Task(taskId, shopLocation, expectedDeliveryTime, item, payerName, fee);
+    }
+
+    /** Cancels the task. */
+    public void cancel() {
+        status = Status.CANCELLED;
+    }
+
+    /** Marks the task as complete. */
+    public void markAsComplete() {
+        status = Status.DONE;
     }
 
     public String getId() {
@@ -107,29 +141,6 @@ public class Task {
     /** Sets status using a string. */
     public void setStatus(String status) {
         this.status = Status.valueOf(status);
-    }
-
-    /** Cancels the task. */
-    public void cancel() {
-        status = Status.CANCELLED;
-    }
-
-    /** Marks the task as complete. */
-    public void markAsComplete() {
-        status = Status.DONE;
-    }
-
-    /** 
-     * Reopens the task by creating a new task with a different {@code taskId} and sets doer to be empty,
-     * if it has been cancelled; otherwise, the current task will be returned.
-     * 
-     * @param taskId The id of the new task that is associated with this task.
-     */
-    public Task reopenTask(String taskId) {
-        if (!status.equals(Status.CANCELLED)) {
-            return this;
-        }
-        return new Task(taskId, shopLocation, expectedDeliveryTime, item, payerName, fee);
     }
 
      /** Represents a task that is view-only (i.e. changes are not allowed). */

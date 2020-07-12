@@ -1,6 +1,7 @@
 package backend.models;
 
 import backend.utilities.Utilities;
+import com.google.gson.Gson;
 
 /** Represents an offer that is made when a person wants to help others to make a purchase. */
 public class Offer {
@@ -14,12 +15,45 @@ public class Offer {
     }
 
     /** @throws IllegalArgumentException if any parameter is {@code null} or empty. */
-    public Offer(String id, String shopLocation, String expectedDeliveryTime, Status status) {
+    public Offer(String id, String shopLocation, String expectedDeliveryTime, Status status) throws IllegalArgumentException {
         Utilities.ensureNonNull(id, shopLocation, expectedDeliveryTime, status);
         this.id = id;
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
         this.status = status;
+    }
+
+    /** 
+     * Creates an {@code Offer} by using parameters found in {@code jsonString} and the given {@code id}. 
+     * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
+     *         or parameter value is invalid.
+     */
+    public static Offer fromJson(String jsonString, String id) throws IllegalArgumentException {
+        // TODO: throw an error when any property cannot be found
+        throw new UnsupportedOperationException("TODO: Implement this method.");
+    }
+
+    /** 
+     * Adds a request to offer by returning a request that meet the conditions specified by this
+     * task.
+     */
+    public Request addRequest(Request request) {
+        throw new UnsupportedOperationException("TODO: implement this");
+    }
+
+    /** 
+     * Cancels this offer and returns the updated offer. Note that this does not cancel the requests
+     * and tasks that were created by users who accepted this offer.
+     */
+    public Offer cancel() {
+        status = Status.CANCELLED;
+        return this;
+    }
+
+    /** Reopens this offer (after being closed) and returns the updated offer. */
+    public Offer reopen() {
+        status = Status.OPEN;
+        return this;
     }
 
     public String getId() {
@@ -49,29 +83,6 @@ public class Offer {
 
     public void setStatus(String status) {
         this.status = Status.valueOf(status);
-    }
-
-    /** 
-     * Adds a request to offer by returning a request that meet the conditions specified by this
-     * task.
-     */
-    public Request addRequest(Request request) {
-        throw new UnsupportedOperationException("TODO: implement this");
-    }
-
-    /** 
-     * Cancels this offer and returns the updated offer. Note that this does not cancel the requests
-     * and tasks that were created by users who accepted this offer.
-     */
-    public Offer cancel() {
-        status = Status.CANCELLED;
-        return this;
-    }
-
-    /** Reopens this offer and returns the updated offer. */
-    public Offer reopen() {
-        status = Status.OPEN;
-        return this;
     }
 
     /** Returns a view-only representation of this offer. */

@@ -1,11 +1,15 @@
 package backend.models;
 
 import backend.utilities.Utilities;
+import com.google.cloud.firestore.Exclude;
+import com.google.gson.Gson;
 
 /** Represents a request which a person makes when s/he needs help with a purchase. */
 public class Request {
     private String id; 
     private String taskId;
+    /** Remains as {@code null}, if it is not set using {@code setTask}. */
+    private Task task;
 
     public Request() {
         // no argument constructor for Firestore purposes
@@ -18,28 +22,14 @@ public class Request {
         this.taskId = taskId;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
     /** 
-     * Converts a JSON string representation of request to a {@code Request}. 
-     * Note that in this case, {@code id} and {@code taskId} are assumed to be found in 
-     * {@code jsonString}.
+     * Creates a {@code Request} by using the given {@code id} and {@code taskId}. {@code jsonString} should contain
+     * the required parameters to create a {@code Task} that is associated with the request created.
+     * {@code task} of the created request will thus be non-null.
+     * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
+     *         or parameter value is invalid.
      */
-    public static Request fromJson(String jsonString) {
+    public static Request fromJson(String jsonString, String id, String taskId) throws IllegalArgumentException {
         // TODO: throw an error when any property cannot be found
         throw new UnsupportedOperationException("TODO: Implement this method.");
     }
@@ -62,6 +52,32 @@ public class Request {
      */
     public Request reopen() {
         throw new UnsupportedOperationException("TODO: Implement this method.");
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    /** Returns task associated with this request. Note that it may be {@code null}. */
+    @Exclude
+    public Task getTask() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
     }
 
     /** Returns a view-only representation of this request that is associated with {@code Task}. */
