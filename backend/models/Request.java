@@ -1,5 +1,7 @@
 package backend.models;
 
+import backend.utilities.Utilities;
+
 /** Represents a request which a person makes when s/he needs help with a purchase. */
 public class Request {
     private String id; 
@@ -9,8 +11,9 @@ public class Request {
         // no argument constructor for Firestore purposes
     }
     
-    public Request(String id, String taskId) {
-        // TODO: ensure that id and taskId are non-null/empty
+    /** @throws IllegalArgumentException if any parameter is {@code null} or empty. */
+    public Request(String id, String taskId) throws IllegalArgumentException {
+        Utilities.ensureNonNull(id, taskId);
         this.id = id;
         this.taskId = taskId;
     }

@@ -2,6 +2,8 @@ package backend.models;
 
 import java.util.Optional;
 
+import backend.utilities.Utilities;
+
 /** 
  * Represents a task. Note that it is possible for Task to not have a doer. In this case, 
  * the task cannot be completed.
@@ -20,9 +22,10 @@ public class Task {
         // no argument constructor for Firestore purposes
     }
 
+    /** @throws IllegalArgumentException if any parameter, except {@code doerName}, is {@code null} or empty */
     public Task(String id, String shopLocation, String expectedDeliveryTime, String item, String payerName, 
         double fee, Status status, String doerName) {
-        // TODO: ensure that all fields, except doerName, are non-null
+        Utilities.ensureNonNull(id, shopLocation, expectedDeliveryTime, item, payerName, fee, status);
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
         this.item = item;
@@ -103,7 +106,6 @@ public class Task {
 
     /** Sets status using a string. */
     public void setStatus(String status) {
-        // TODO: add validation
         this.status = Status.valueOf(status);
     }
 

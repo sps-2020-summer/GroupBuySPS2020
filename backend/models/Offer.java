@@ -1,5 +1,7 @@
 package backend.models;
 
+import backend.utilities.Utilities;
+
 /** Represents an offer that is made when a person wants to help others to make a purchase. */
 public class Offer {
     private String id;
@@ -11,8 +13,9 @@ public class Offer {
         // no argument constructor for Firestore purposes
     }
 
+    /** @throws IllegalArgumentException if any parameter is {@code null} or empty. */
     public Offer(String id, String shopLocation, String expectedDeliveryTime, Status status) {
-        // TODO: ensure that all arguments are not empty
+        Utilities.ensureNonNull(id, shopLocation, expectedDeliveryTime, status);
         this.id = id;
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
@@ -45,7 +48,6 @@ public class Offer {
     }
 
     public void setStatus(String status) {
-        // TODO: add validation
         this.status = Status.valueOf(status);
     }
 
