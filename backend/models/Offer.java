@@ -85,15 +85,13 @@ public class Offer {
      * Cancels this offer and returns the updated offer. Note that this does not cancel the requests
      * and tasks that were created by users who accepted this offer.
      */
-    public Offer cancel() {
+    public void cancel() {
         status = Status.CANCELLED;
-        return this;
     }
 
     /** Reopens this offer (after being closed) and returns the updated offer. */
-    public Offer reopen() {
+    public void reopen() {
         status = Status.OPEN;
-        return this;
     }
 
     public String getId() {

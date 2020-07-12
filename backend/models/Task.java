@@ -186,6 +186,10 @@ public class Task {
         this.status = Status.valueOf(status);
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
      /** Represents a task that is view-only (i.e. changes are not allowed). */
     public class ViewableTask {
         private final String id;

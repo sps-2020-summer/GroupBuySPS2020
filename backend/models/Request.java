@@ -1,5 +1,7 @@
 package backend.models;
 
+import java.io.StringReader;
+
 import backend.utilities.Utilities;
 import com.google.cloud.firestore.Exclude;
 import com.google.gson.stream.JsonReader;
@@ -43,24 +45,66 @@ public class Request {
         return request;
     }
 
-    /** Assigns task to the person represented in @{code jsonString}. */
+    /** 
+     * Assigns task to the person represented in @{code jsonString} and returns the updated task. 
+     * Assumes that {@code task} is not null. To set {@code task}, {@see setTask}.
+     */
     public Task assign(String jsonString) {
-        throw new UnsupportedOperationException("TODO: Implement this method.");
-    }
+        if (task == null) {
+            throw new IllegalStateException("Unable to assign doer to request when task is not defined." 
+                + "Call setTask before calling this method.");
+        }
 
-    /** Cancels the request and hence associated task, and returns updated request. */
-    public Request cancel() {
-        throw new UnsupportedOperationException("TODO: Implement this method.");
+        String doerName;
+        JsonReader reader = new JsonReader(new StringReader(jsonString));
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (name.equals("doerName")) {
+                doerName = reader.nextString();
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+
+        task.setDoerName(doerName);
+        task.setStatus(Status.PENDING);
+        return task;
     }
 
     /** 
-     * Reopens request by getting a new but representative task, if the request has been closed. 
-     * The updated request will be returned.
-     * 
-     * @param taskId Id of the new task that should be associated with request.
+     * Cancels the request and hence associated task, and returns updated request. 
+     * Assumes that {@code task} is not null. To set {@code task}, {@see setTask}.
+     * @return Updated task.
      */
-    public Request reopen() {
-        throw new UnsupportedOperationException("TODO: Implement this method.");
+    public Task cancel() {
+        if (task == null) {
+            throw new IllegalStateException("Unable to cancel request when task associated with this request is not defined." 
+                + "Call setTask before calling this method.");
+        }
+
+        task.cancel();
+        return task;
+    }
+
+    /** 
+     * Reopens request by getting a new but representative task, if the request has been cancelled. 
+     * Assumes that the previous task {@code task} is not null. To set {@code task}, {@see setTask}.
+     * @param taskId Id of the new task that should be associated with request.
+     * @return Updated task.
+     */
+    public Task reopen(String taskId) {
+        if (task == null) {
+            throw new IllegalStateException("Unable to reopen request when previous task is not defined." 
+                + "Call setTask before calling this method.");
+        } else if (Status.valueOf(task.getStatus()) != Status.CANCELLED) {
+            return task;
+        }
+
+        task.setId(taskId);
+        task.setStatus(Status.OPEN);
+        return task;
     }
 
     public String getId() {
