@@ -58,9 +58,7 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
 						dataSource={requests}
 						renderItem={(item) => (
 							<List.Item>
-								<Card title={item.name}>
-									<RequestItem name={item.name} />
-								</Card>
+								<RequestItem name={item.name} />
 							</List.Item>
 						)}
 					/>

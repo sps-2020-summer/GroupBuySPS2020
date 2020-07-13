@@ -56,9 +56,7 @@ const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
 							dataSource={tasks}
 							renderItem={(item) => (
 								<List.Item>
-									<Card title={item.name}>
-										<TaskItem name={item.name} />
-									</Card>
+									<TaskItem name={item.name} />
 								</List.Item>
 							)}
 						/>

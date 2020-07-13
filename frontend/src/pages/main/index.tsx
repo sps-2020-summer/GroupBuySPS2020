@@ -6,7 +6,7 @@ import { MailOutlined, AppstoreOutlined } from "@ant-design/icons";
 import Request from "./components/requests";
 import { useAuthState } from "react-firebase-hooks/auth";
 import firebase from "firebase";
-
+import s from "./main.module.css";
 const { Content } = Layout;
 
 const Main: FC<{}> = () => {
@@ -28,6 +28,7 @@ const Main: FC<{}> = () => {
 
 	return (
 		<Content
+			className={s.cardStyle}
 			style={{
 				padding: "0 50px",
 				margin: "48px",

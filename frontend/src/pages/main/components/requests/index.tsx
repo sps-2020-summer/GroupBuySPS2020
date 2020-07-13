@@ -3,6 +3,7 @@ import s from "./request.module.css";
 import { Button, Modal, Form, Input, DatePicker } from "antd";
 import { FormInstance } from "antd/lib/form";
 import TextArea from "antd/lib/input/TextArea";
+import UserRequest from "../../../dashboard/user-request";
 
 const { RangePicker } = DatePicker;
 
@@ -111,6 +112,7 @@ const Request: FC<{}> = () => {
 			<div className={s.requestBoard}>
 				{" "}
 				Requests will be displayed here
+				<UserRequest userUid={"0"} />
 			</div>
 		</div>
 	);
