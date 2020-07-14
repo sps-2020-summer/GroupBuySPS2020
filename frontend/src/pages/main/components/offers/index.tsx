@@ -3,15 +3,15 @@ import s from "../../main.module.css";
 import { Button, Modal, Form, Input, DatePicker, Typography } from "antd";
 import { FormInstance } from "antd/lib/form";
 import TextArea from "antd/lib/input/TextArea";
-import UserRequest from "../../../dashboard/user-request";
-import MainRequest from "../main-request";
+
 import { MoneyCollectOutlined } from "@ant-design/icons";
 import { userInfo } from "os";
+import MainOffer from "../main-offer";
 
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
-const UserCreateRequestComponent: FC<{}> = () => {
+const UserCreateOfferComponent: FC<{}> = () => {
 	const formRef = React.createRef<FormInstance>();
 
 	const [visible, setVisible] = useState<boolean>(false);
@@ -37,7 +37,7 @@ const UserCreateRequestComponent: FC<{}> = () => {
 		<>
 			<Typography>
 				<Title>Welcome</Title>
-				<Paragraph>What does your heart desire?</Paragraph>
+				<Paragraph>Will you be a nice person today?</Paragraph>
 			</Typography>
 			<Button
 				type="primary"
@@ -46,27 +46,27 @@ const UserCreateRequestComponent: FC<{}> = () => {
 				className={s.userActionBtn}
 				icon={<MoneyCollectOutlined />}
 			>
-				New Request
+				New Offer
 			</Button>
 			<Typography>
 				<Title>You</Title>
-				<Paragraph>You currently have 0 requests open</Paragraph>
+				<Paragraph>You currently have 0 offers open</Paragraph>
 			</Typography>
 			<Form onFinish={onFinish}>
 				<Modal
-					title="New Request"
+					title="New Offer"
 					visible={visible}
 					onOk={handleOk}
 					onCancel={handleCancel}
 				>
 					{" "}
 					<Form.Item
-						label="Title of Request"
+						label="Title of Offer"
 						name="title"
 						rules={[
 							{
 								required: true,
-								message: "Please input your task",
+								message: "Please input your offer",
 							},
 						]}
 					>
@@ -106,20 +106,20 @@ const UserCreateRequestComponent: FC<{}> = () => {
 	);
 };
 
-const Request: FC<{}> = () => {
+const Offer: FC<{}> = () => {
 	return (
 		<div className={s.content}>
 			<div className={s.userActions}>
 				<div className={s.column}>
-					<UserCreateRequestComponent />
+					<UserCreateOfferComponent />
 				</div>
 			</div>
 
 			<div className={s.requestBoard}>
-				<MainRequest />
+				<MainOffer />
 			</div>
 		</div>
 	);
 };
 
-export default Request;
+export default Offer;

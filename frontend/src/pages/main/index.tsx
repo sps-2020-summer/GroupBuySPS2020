@@ -7,6 +7,7 @@ import Request from "./components/requests";
 import { useAuthState } from "react-firebase-hooks/auth";
 import firebase from "firebase";
 import s from "./main.module.css";
+import Offer from "./components/offers";
 const { Content } = Layout;
 
 const Main: FC<{}> = () => {
@@ -18,7 +19,7 @@ const Main: FC<{}> = () => {
 	/** State */
 
 	/** The pages to show on menu click */
-	const childPages = { request: <Request />, offers: <>I am offer</> };
+	const childPages = { request: <Request />, offers: <Offer /> };
 
 	/** Navigation */
 
