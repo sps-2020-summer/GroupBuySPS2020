@@ -1,6 +1,10 @@
 package backend.models;
 
+import java.io.StringReader;
 import java.util.Optional;
+
+import backend.utilities.Utilities;
+import com.google.gson.stream.JsonReader;
 
 /** 
  * Represents a task. Note that it is possible for Task to not have a doer. In this case, 
@@ -20,13 +24,16 @@ public class Task {
         // no argument constructor for Firestore purposes
     }
 
+    /** @throws IllegalArgumentException if any parameter, except {@code doerName}, is {@code null} or empty */
     public Task(String id, String shopLocation, String expectedDeliveryTime, String item, String payerName, 
-        double fee, Status status, String doerName) {
-        // TODO: ensure that all fields, except doerName, are non-null
+        double fee, Status status, String doerName) throws IllegalArgumentException {
+        Utilities.ensureNonNull(id, shopLocation, expectedDeliveryTime, item, payerName, fee, status);
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
         this.item = item;
-        this.doerName = doerName == "" ? Optional.empty() : Optional.ofNullable(doerName);
+        this.doerName = (doerName == null || doerName == "") 
+                ? Optional.empty() 
+                : Optional.ofNullable(doerName);
         this.payerName = payerName;
         this.status = status;
         this.fee = fee;
@@ -37,6 +44,79 @@ public class Task {
     public Task(String id, String shopLocation, String expectedDeliveryTime, String item, String payerName,
         double fee) {
         this(id, shopLocation, expectedDeliveryTime, item, payerName, fee, Status.OPEN, null);
+    }
+
+    /** 
+     * Creates a {@code Task} by using parameters found in {@code jsonString} and the given {@code id}. 
+     * If {@code status} of this task is not specified, it defaults to {@code OPEN}.
+     * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
+     *         or parameter value is invalid.
+     */
+    public static Task fromJson(String jsonString, String id) throws IllegalArgumentException {
+        return Task.fromJson(jsonString, id, Status.OPEN);
+    }
+
+    /** 
+     * Creates a {@code Task} by using parameters found in {@code jsonString} and the given {@code id}. 
+     * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
+     *         or any parameter value provided is invalid.
+     */
+    public static Task fromJson(String jsonString, String id, Status status) throws IllegalArgumentException {
+        String shopLocation;
+        String expectedDeliveryTime;
+        String item;
+        String payerName;
+        double fee;
+        String doerName;
+
+        JsonReader reader = new JsonReader(new StringReader(jsonString));
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (name.equals("shopLocation")) {
+                shopLocation = reader.nextString();
+            } else if (name.equals("expectedDeliveryTime")) {
+                expectedDeliveryTime = reader.nextString();
+            } else if (name.equals("item")) {
+                item = reader.nextString();
+            } else if (name.equals("payerName")) {
+                payerName = reader.nextString();
+            } else if (name.equals("fee")) {
+                fee = reader.nextDouble();
+            } else if (name.equals("doerName")) {
+                doerName = reader.nextString();
+            } else if (name.equals("status")) {
+                status = Status.valueOf(String.upperCase(reader.nextString()));
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+        
+        return new Task(id, shopLocation, expectedDeliveryTime, item, payerName, fee, status, doerName);
+    }
+
+    /** 
+     * Reopens the task by creating a new task with a different {@code taskId} and sets doer to be empty,
+     * if it has been cancelled; otherwise, the current task will be returned.
+     * 
+     * @param taskId The id of the new task that is associated with this task.
+     */
+    public Task reopenTask(String taskId) {
+        if (!status.equals(Status.CANCELLED)) {
+            return this;
+        }
+        return new Task(taskId, shopLocation, expectedDeliveryTime, item, payerName, fee);
+    }
+
+    /** Cancels the task. */
+    public void cancel() {
+        status = Status.CANCELLED;
+    }
+
+    /** Marks the task as complete. */
+    public void markAsComplete() {
+        status = Status.DONE;
     }
 
     public String getId() {
@@ -103,31 +183,11 @@ public class Task {
 
     /** Sets status using a string. */
     public void setStatus(String status) {
-        // TODO: add validation
         this.status = Status.valueOf(status);
     }
 
-    /** Cancels the task. */
-    public void cancel() {
-        status = Status.CANCELLED;
-    }
-
-    /** Marks the task as complete. */
-    public void markAsComplete() {
-        status = Status.DONE;
-    }
-
-    /** 
-     * Reopens the task by creating a new task with a different {@code taskId} and sets doer to be empty,
-     * if it has been cancelled; otherwise, the current task will be returned.
-     * 
-     * @param taskId The id of the new task that is associated with this task.
-     */
-    public Task reopenTask(String taskId) {
-        if (!status.equals(Status.CANCELLED)) {
-            return this;
-        }
-        return new Task(taskId, shopLocation, expectedDeliveryTime, item, payerName, fee);
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
      /** Represents a task that is view-only (i.e. changes are not allowed). */
