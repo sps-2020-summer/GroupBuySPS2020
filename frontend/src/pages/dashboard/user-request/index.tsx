@@ -4,15 +4,11 @@ import { Req } from "../../../types";
 import { Slide } from "react-awesome-reveal";
 import { Spin, Card, List } from "antd";
 import RequestItem from "./request-item";
+import Loader from "../../../components/loader";
 
 const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
 	const [loading, setLoading] = useState<boolean>(true);
-	const [requests, setRequests] = useState<Req[]>([
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-	]);
+	const [requests, setRequests] = useState<Req[]>([]);
 
 	useEffect(() => {
 		const fetchRequest = async (userUid: string) => {
@@ -37,33 +33,33 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
 			</Slide>
 			<br />
 			{loading ? (
-				<Spin></Spin>
+				<Loader spin={loading} topMargin={'24px'} />
 			) : (
-				<>
-					{requests.length === 0 ? (
-						<>You currently have no requests opened!</>
-					) : (
-						<></>
-					)}
-					<List
-						grid={{
-							gutter: 16,
-							xs: 1,
-							sm: 2,
-							md: 4,
-							lg: 4,
-							xl: 4,
-							xxl: 3,
-						}}
-						dataSource={requests}
-						renderItem={(item) => (
-							<List.Item>
-								<RequestItem name={item.name} />
-							</List.Item>
-						)}
-					/>
-				</>
-			)}
+					<>
+						{requests.length === 0 ? (
+							<>You currently have no requests opened!</>
+						) : (
+								<></>
+							)}
+						<List
+							grid={{
+								gutter: 16,
+								xs: 1,
+								sm: 2,
+								md: 4,
+								lg: 4,
+								xl: 4,
+								xxl: 3,
+							}}
+							dataSource={requests}
+							renderItem={(item) => (
+								<List.Item>
+									<RequestItem name={item.name} />
+								</List.Item>
+							)}
+						/>
+					</>
+				)}
 		</>
 	);
 };

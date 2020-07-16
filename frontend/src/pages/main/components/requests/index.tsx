@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react";
 import s from "../../main.module.css";
-import { Button, Modal, Form, Input, DatePicker, Typography } from "antd";
+import { Button, Modal, Form, Input, DatePicker, Typography, InputNumber } from "antd";
 import { FormInstance } from "antd/lib/form";
 import TextArea from "antd/lib/input/TextArea";
 import UserRequest from "../../../dashboard/user-request";
@@ -13,7 +13,6 @@ const { RangePicker } = DatePicker;
 
 const UserCreateRequestComponent: FC<{}> = () => {
 	const formRef = React.createRef<FormInstance>();
-
 	const [visible, setVisible] = useState<boolean>(false);
 
 	const handleOk = () => {
@@ -54,8 +53,11 @@ const UserCreateRequestComponent: FC<{}> = () => {
 			</Typography>
 			<Form onFinish={onFinish}>
 				<Modal
+
+					maskClosable={false}
 					title="New Request"
 					visible={visible}
+					okText='Submit request'
 					onOk={handleOk}
 					onCancel={handleCancel}
 				>
@@ -66,6 +68,18 @@ const UserCreateRequestComponent: FC<{}> = () => {
 						rules={[
 							{
 								required: true,
+								message: "Please input your request",
+							},
+						]}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						label={'Task'}
+						name="taskName"
+						rules={[
+							{
+								required: true,
 								message: "Please input your task",
 							},
 						]}
@@ -73,33 +87,34 @@ const UserCreateRequestComponent: FC<{}> = () => {
 						<Input />
 					</Form.Item>
 					<Form.Item
-						label="Description"
-						name="description"
+						label={'Item'}
+						name="item"
 						rules={[
 							{
 								required: true,
-								message: "Please input a description",
+								message: "Please input your item",
 							},
 						]}
 					>
-						<TextArea />
+						<Input />
 					</Form.Item>
 					<Form.Item
-						label="Duration"
-						name="duration"
+						label={'Shop location'}
+						name="shopLocation"
 						rules={[
 							{
 								required: true,
-								message: "Please input a duration",
+								message: "Please input the location of the shop",
 							},
 						]}
 					>
-						<RangePicker
-							{...rangeConfig}
-							showTime
-							format="YYYY-MM-DD HH:mm:ss"
-						/>
+						<Input />
 					</Form.Item>
+					<Form.Item label="fee" name="fee" rules={[]}>
+						<InputNumber />
+					</Form.Item>
+
+
 				</Modal>
 			</Form>
 		</>

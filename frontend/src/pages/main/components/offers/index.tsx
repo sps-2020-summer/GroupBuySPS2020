@@ -1,30 +1,48 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useContext } from "react";
 import s from "../../main.module.css";
-import { Button, Modal, Form, Input, DatePicker, Typography } from "antd";
+import { Button, Modal, Form, Input, DatePicker, Typography, message } from "antd";
 import { FormInstance } from "antd/lib/form";
 import TextArea from "antd/lib/input/TextArea";
 
 import { MoneyCollectOutlined } from "@ant-design/icons";
 import { userInfo } from "os";
 import MainOffer from "../main-offer";
-
+import firebase from 'firebase';
+import { FirebaseContext } from "../../../../context/firebase-context";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
-const UserCreateOfferComponent: FC<{}> = () => {
+const UserCreateOfferComponent: FC = () => {
+	const firebaseContext = useContext(FirebaseContext);
+	const { firebaseApp } = firebaseContext;
+	const db = firebase.firestore(firebaseApp as firebase.app.App);
+
+
 	const formRef = React.createRef<FormInstance>();
 
 	const [visible, setVisible] = useState<boolean>(false);
 
 	const handleOk = () => {
+		console.log(formRef.current);
 		formRef.current?.submit();
+
 	};
 
 	const showModal = () => setVisible(true);
 	const handleCancel = () => setVisible(false);
 
-	const onFinish = (values) => {
+	const onFinish = async (values) => {
 		console.log("Success:", values);
+		try {
+			await db.collection('offer').add({
+				...values,
+				duration: 0,
+			})
+
+		} catch (err) {
+			console.log(err)
+		}
+
 	};
 
 	const rangeConfig = {
@@ -52,7 +70,7 @@ const UserCreateOfferComponent: FC<{}> = () => {
 				<Title>You</Title>
 				<Paragraph>You currently have 0 offers open</Paragraph>
 			</Typography>
-			<Form onFinish={onFinish}>
+			<Form ref={formRef} onFinish={onFinish} >
 				<Modal
 					title="New Offer"
 					visible={visible}
@@ -85,7 +103,19 @@ const UserCreateOfferComponent: FC<{}> = () => {
 						<TextArea />
 					</Form.Item>
 					<Form.Item
-						label="Duration"
+						label={'Shop location'}
+						name="shopLocation"
+						rules={[
+							{
+								required: true,
+								message: "Please input the location of the shop",
+							},
+						]}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						label="Expected Delivery Time"
 						name="duration"
 						rules={[
 							{

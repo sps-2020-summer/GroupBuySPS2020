@@ -6,28 +6,15 @@ import { Spin, List, Card } from "antd";
 import s from "./s.module.css";
 import RequestItem from "../user-request/request-item";
 import TaskItem from "../user-task/task-item";
+import Loader from "../../../components/loader";
 
 const UserHistory: FC<DashboardCompProps> = () => {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [tasks, setTasks] = useState<Task[]>([
-		{ name: "Task 1" },
-		{ name: "Task 1" },
-		{ name: "Task 1" },
-		{ name: "Task 1" },
+
 	]);
 	const [requests, setRequests] = useState<Req[]>([
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
+
 	]);
 
 	useEffect(() => {
@@ -55,46 +42,46 @@ const UserHistory: FC<DashboardCompProps> = () => {
 				</h2>
 			</Slide>
 			{loading ? (
-				<Spin />
+				<Loader spin={loading} topMargin={'24px'} />
 			) : (
-				<div className={s.content}>
-					<div className={s.prevTasks}>
-						<h2>Completed Tasks</h2>
-						<List
-							split={false}
-							dataSource={tasks}
-							renderItem={(item) => (
-								<List.Item>
-									<Card
-										className={s.cardStyle}
-										title={item.name}
-										style={{ width: "100%" }}
-									>
-										<TaskItem name={item.name} />
-									</Card>
-								</List.Item>
-							)}
-						/>
+					<div className={s.content}>
+						<div className={s.prevTasks}>
+							<h2>Completed Tasks</h2>
+							<List
+								split={false}
+								dataSource={tasks}
+								renderItem={(item) => (
+									<List.Item>
+										<Card
+											className={s.cardStyle}
+											title={item.name}
+											style={{ width: "100%" }}
+										>
+											<TaskItem name={item.name} />
+										</Card>
+									</List.Item>
+								)}
+							/>
+						</div>
+						<div className={s.prevRequest}>
+							<h2>Past Requests</h2>
+							<List
+								split={false}
+								dataSource={requests}
+								renderItem={(item) => (
+									<List.Item>
+										<Card
+											title={item.name}
+											style={{ width: "100%" }}
+										>
+											<RequestItem name={item.name} />
+										</Card>
+									</List.Item>
+								)}
+							/>
+						</div>
 					</div>
-					<div className={s.prevRequest}>
-						<h2>Past Requests</h2>
-						<List
-							split={false}
-							dataSource={requests}
-							renderItem={(item) => (
-								<List.Item>
-									<Card
-										title={item.name}
-										style={{ width: "100%" }}
-									>
-										<RequestItem name={item.name} />
-									</Card>
-								</List.Item>
-							)}
-						/>
-					</div>
-				</div>
-			)}
+				)}
 			<br />
 		</>
 	);

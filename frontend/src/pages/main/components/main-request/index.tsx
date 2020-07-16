@@ -10,20 +10,8 @@ const { Title, Paragraph } = Typography;
 
 const MainRequest: FC<{}> = () => {
 	const [loading, setLoading] = useState<boolean>(true);
-	const [requests, setRequests] = useState<Req[]>([
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 123" },
-		{ name: "req 1345" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 321" },
-		{ name: "req 1" },
-		{ name: "req 1" },
-		{ name: "req 31" },
-		{ name: "req 2" },
-	]);
+	const [requests, setRequests] = useState<Req[]>([]);
+
 	const IconText = ({ icon, text }) => (
 		<Space>
 			{React.createElement(icon)}
@@ -57,58 +45,58 @@ const MainRequest: FC<{}> = () => {
 			{loading ? (
 				<Spin></Spin>
 			) : (
-				<>
-					{requests.length === 0 ? (
-						<>You currently have no requests opened!</>
-					) : (
-						<></>
-					)}
-					<List
-						pagination={{
-							onChange: (page) => {
-								console.log(page);
-							},
-							pageSize: 3,
-						}}
-						split={false}
-						dataSource={requests}
-						renderItem={(item, index: number) => (
-							<List.Item
-								key={item.name + index}
-								actions={[
-									<IconText
-										icon={StarOutlined}
-										text="156"
-										key="list-vertical-star-o"
-									/>,
-									<IconText
-										icon={LikeOutlined}
-										text="156"
-										key="list-vertical-like-o"
-									/>,
-									<IconText
-										icon={MessageOutlined}
-										text="2"
-										key="list-vertical-message"
-									/>,
-								]}
-								extra={
-									<img
-										width={272}
-										alt="logo"
-										src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+					<>
+						{requests.length === 0 ? (
+							<>You currently have no requests opened!</>
+						) : (
+								<></>
+							)}
+						<List
+							pagination={{
+								onChange: (page) => {
+									console.log(page);
+								},
+								pageSize: 3,
+							}}
+							split={false}
+							dataSource={requests}
+							renderItem={(item, index: number) => (
+								<List.Item
+									key={item.name + index}
+									actions={[
+										<IconText
+											icon={StarOutlined}
+											text="156"
+											key="list-vertical-star-o"
+										/>,
+										<IconText
+											icon={LikeOutlined}
+											text="156"
+											key="list-vertical-like-o"
+										/>,
+										<IconText
+											icon={MessageOutlined}
+											text="2"
+											key="list-vertical-message"
+										/>,
+									]}
+									extra={
+										<img
+											width={272}
+											alt="logo"
+											src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+										/>
+									}
+								>
+									<List.Item.Meta
+										title={item.name}
+										description={"this the description"}
 									/>
-								}
-							>
-								<List.Item.Meta
-									title={item.name}
-									description={"this the description"}
-								/>
-							</List.Item>
-						)}
-					/>
-				</>
-			)}
+								</List.Item>
+							)}
+						/>
+					</>
+				)}
 		</Card>
 	);
 };

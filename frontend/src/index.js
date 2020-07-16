@@ -15,10 +15,10 @@ const config = {
 	appId: process.env.REACT_APP_APP_ID,
 	measurementId: process.env.REACT_MEASUREMENT_ID,
 };
-firebase.initializeApp(config);
+const firebaseApp = firebase.initializeApp(config);
 
 ReactDOM.render(
-	<FirebaseContext.Provider value={{ firebase: firebase }}>
+	<FirebaseContext.Provider value={{ firebase: firebase, firebaseApp }}>
 		<App />
 	</FirebaseContext.Provider>,
 	document.getElementById("root")

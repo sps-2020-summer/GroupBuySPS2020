@@ -4,15 +4,11 @@ import { List, Card, Spin } from "antd";
 import { Task } from "../../../types";
 import { Slide } from "react-awesome-reveal";
 import TaskItem from "./task-item";
+import Loader from "../../../components/loader";
 
 const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
 	const [loading, setLoading] = useState<boolean>(true);
-	const [tasks, setTasks] = useState<Task[]>([
-		{ name: "Task 1" },
-		{ name: "Task 1" },
-		{ name: "Task 1" },
-		{ name: "Task 1" },
-	]);
+	const [tasks, setTasks] = useState<Task[]>([]);
 
 	useEffect(() => {
 		const fetchTask = async (userUid: string) => {
@@ -37,32 +33,32 @@ const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
 			</Slide>
 			<br />
 			{loading ? (
-				<Spin></Spin>
+				<Loader spin={loading} topMargin={'24px'} />
 			) : (
-				<>
-					{tasks.length === 0 ? (
-						<>You currently have no tasks!</>
-					) : (
-						<List
-							grid={{
-								gutter: 16,
-								xs: 1,
-								sm: 2,
-								md: 4,
-								lg: 4,
-								xl: 4,
-								xxl: 3,
-							}}
-							dataSource={tasks}
-							renderItem={(item) => (
-								<List.Item>
-									<TaskItem name={item.name} />
-								</List.Item>
+					<>
+						{tasks.length === 0 ? (
+							<>You currently have no tasks!</>
+						) : (
+								<List
+									grid={{
+										gutter: 16,
+										xs: 1,
+										sm: 2,
+										md: 4,
+										lg: 4,
+										xl: 4,
+										xxl: 3,
+									}}
+									dataSource={tasks}
+									renderItem={(item) => (
+										<List.Item>
+											<TaskItem name={item.name} />
+										</List.Item>
+									)}
+								/>
 							)}
-						/>
-					)}
-				</>
-			)}
+					</>
+				)}
 		</>
 	);
 };

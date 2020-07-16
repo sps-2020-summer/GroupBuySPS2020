@@ -10,13 +10,8 @@ const { Title, Paragraph } = Typography;
 
 const MainOffer: FC<{}> = () => {
 	const [loading, setLoading] = useState<boolean>(true);
-	const [offers, setOffers] = useState<Offer[]>([
-		{ name: "offer 1" },
-		{ name: "offer 1" },
-		{ name: "offer 1" },
-		{ name: "offer 1" },
-		{ name: "offer 1" },
-	]);
+	const [offers, setOffers] = useState<Offer[]>([]);
+
 	const IconText = ({ icon, text }) => (
 		<Space>
 			{React.createElement(icon)}
@@ -50,58 +45,58 @@ const MainOffer: FC<{}> = () => {
 			{loading ? (
 				<Spin></Spin>
 			) : (
-				<>
-					{offers.length === 0 ? (
-						<>You currently have no offers opened!</>
-					) : (
-						<></>
-					)}
-					<List
-						pagination={{
-							onChange: (page) => {
-								console.log(page);
-							},
-							pageSize: 3,
-						}}
-						split={false}
-						dataSource={offers}
-						renderItem={(item, index: number) => (
-							<List.Item
-								key={item.name + index}
-								actions={[
-									<IconText
-										icon={StarOutlined}
-										text="156"
-										key="list-vertical-star-o"
-									/>,
-									<IconText
-										icon={LikeOutlined}
-										text="156"
-										key="list-vertical-like-o"
-									/>,
-									<IconText
-										icon={MessageOutlined}
-										text="2"
-										key="list-vertical-message"
-									/>,
-								]}
-								extra={
-									<img
-										width={272}
-										alt="logo"
-										src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+					<>
+						{offers.length === 0 ? (
+							<>You currently have no offers opened!</>
+						) : (
+								<></>
+							)}
+						<List
+							pagination={{
+								onChange: (page) => {
+									console.log(page);
+								},
+								pageSize: 3,
+							}}
+							split={false}
+							dataSource={offers}
+							renderItem={(item, index: number) => (
+								<List.Item
+									key={item.name + index}
+									actions={[
+										<IconText
+											icon={StarOutlined}
+											text="156"
+											key="list-vertical-star-o"
+										/>,
+										<IconText
+											icon={LikeOutlined}
+											text="156"
+											key="list-vertical-like-o"
+										/>,
+										<IconText
+											icon={MessageOutlined}
+											text="2"
+											key="list-vertical-message"
+										/>,
+									]}
+									extra={
+										<img
+											width={272}
+											alt="logo"
+											src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+										/>
+									}
+								>
+									<List.Item.Meta
+										title={item.name}
+										description={"this the description"}
 									/>
-								}
-							>
-								<List.Item.Meta
-									title={item.name}
-									description={"this the description"}
-								/>
-							</List.Item>
-						)}
-					/>
-				</>
-			)}
+								</List.Item>
+							)}
+						/>
+					</>
+				)}
 		</Card>
 	);
 };
