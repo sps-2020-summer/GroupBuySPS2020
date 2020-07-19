@@ -26,6 +26,7 @@ import com.google.firebase.FirebaseOptions;
 import java.io.IOException;
 import java.io.FileInputStream;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @WebServlet("/offer")
 public class OfferServlet extends HttpServlet {
@@ -85,7 +87,34 @@ public class OfferServlet extends HttpServlet {
    @Override
    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
        //String json = gson.toJson(xxx);
+       // offer/findByStatus
+       // offer/{offerId}
+       // offer
        response.setContentType("text/html;");
        response.getWriter().println("Hello World!");
+       String pathInfo = request.getPathInfo();
+       Optional<String> uuid = readCookie(request, "uuid");
+
+       if(!uuid.isPresent()) {
+           // not logged in, kick out
+           response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+           return;
+       }
+
+       if(pathInfo == null || pathInfo.equals("/")) {
+           // return all offers
+           response.getWriter().println("return all offers");
+       }
    }
+
+   // TOOD move this to a utils class
+    public Optional<String> readCookie(HttpServletRequest request, String key) {
+        if (request.getCookies() == null) {
+            return Optional.ofNullable(null);
+        }
+        return Arrays.stream(request.getCookies())
+                .filter(c -> key.equals(c.getName()))
+                .map(Cookie::getValue)
+                .findAny();
+    }
 }
