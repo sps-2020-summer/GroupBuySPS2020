@@ -57,7 +57,7 @@
         <version>2.2.0</version>
         <configuration>
           <!-- TODO: set project ID. -->
-          <deploy.projectId>groupbuy2020</deploy.projectId>
+          <deploy.projectId>spsteam10-748f8</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>
