@@ -13,16 +13,18 @@ public class Offer {
     private String id;
     private String shopLocation;
     private String expectedDeliveryTime;
-    private Status status; 
+    private Status status;
+    private String uuid;
+
 
     public Offer() {
         // no argument constructor for Firestore purposes
     }
 
     /** @throws IllegalArgumentException if any parameter is {@code null} or empty. */
-    public Offer(String shopLocation, String expectedDeliveryTime, Status status) throws IllegalArgumentException {
-        Utilities.ensureNonNull(shopLocation, expectedDeliveryTime, status);
-        this.id = id;
+    public Offer(String uuid, String shopLocation, String expectedDeliveryTime, Status status) throws IllegalArgumentException {
+        Utilities.ensureNonNull(uuid, shopLocation, expectedDeliveryTime, status);
+        this.uuid = uuid;
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
         this.status = status;

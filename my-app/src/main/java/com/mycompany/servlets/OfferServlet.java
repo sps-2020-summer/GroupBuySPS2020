@@ -67,11 +67,19 @@ public class OfferServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Optional<String> uuid = readCookie(request, "uuid");
+        if(!uuid.isPresent()) {
+            // not logged in, kick out
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
         String shopLocation = request.getParameter("shopLocation");
         String expectedDeliveryTime = request.getParameter("expectedDeliveryTime");
 
         // TODO use models
         Map<String, Object> data = new HashMap<>();
+        data.put("uuid",  uuid.get());
         data.put("shopLocation", shopLocation);
         data.put("expectedDeliveryTime", expectedDeliveryTime);
         data.put("status", "OPEN"); //default
