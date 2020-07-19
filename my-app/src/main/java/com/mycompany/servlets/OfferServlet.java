@@ -115,7 +115,7 @@ public class OfferServlet extends HttpServlet {
                List<QueryDocumentSnapshot> documents = future.get().getDocuments();
                for (QueryDocumentSnapshot document : documents) {
 //                   System.out.println(document.getId() + " => " + document.toObject(Offer.class));
-                   Offer offer = document.toObject(Offer.class);
+                   Offer offer = document.toObject(Offer.class).withId(document.getId());
                    offers.add(offer);
                }
                response.setContentType("application/json;");
