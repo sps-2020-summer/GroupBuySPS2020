@@ -57,10 +57,15 @@
         <version>2.2.0</version>
         <configuration>
           <!-- TODO: set project ID. -->
-          <deploy.projectId>spsteam10-748f8</deploy.projectId>
+          <deploy.projectId>groupbuy2020</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>
+      <plugin>
+       <groupId>org.eclipse.jetty</groupId>
+       <artifactId>jetty-maven-plugin</artifactId>
+       <version>9.3.7.v20160115</version>
+     </plugin>
 <!--      For test.java -->
 <!--      <plugin>-->
 <!--        <groupId>org.codehaus.mojo</groupId>-->
