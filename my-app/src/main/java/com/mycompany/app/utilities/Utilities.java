@@ -1,4 +1,4 @@
-package backend.utilities;
+package com.mycompany.app.utilities;
 
 /** Supports general operations. */
 public class Utilities {
@@ -13,6 +13,16 @@ public class Utilities {
             } else if (param instanceof String && ((String) param).isEmpty()) {
                 throw new IllegalArgumentException("Given string parameter is empty.");
             }
+        }
+    }
+
+    /** 
+     * Checks whether {@code num} is negative. 
+     * @throws IllegalArgumentException if {@code num} is negative.
+     */
+    public static void ensureNonNegative(Number num) {
+        if (num.doubleValue() < 0) {
+            throw new IllegalArgumentException("Given number is negative.");
         }
     }
 }
