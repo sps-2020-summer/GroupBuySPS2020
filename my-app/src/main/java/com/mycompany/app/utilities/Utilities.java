@@ -1,4 +1,4 @@
-package backend.utilities;
+package com.mycompany.app.utilities;
 
 /** Supports general operations. */
 public class Utilities {

@@ -1,9 +1,10 @@
-package backend.models;
+package com.mycompany.app.models;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Optional;
 
-import backend.utilities.Utilities;
+import com.mycompany.app.utilities.Utilities;
 import com.google.gson.stream.JsonReader;
 
 /** 
@@ -52,7 +53,7 @@ public class Task {
      * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
      *         or parameter value is invalid.
      */
-    public static Task fromJson(String jsonString, String id) throws IllegalArgumentException {
+    public static Task fromJson(String jsonString, String id) throws IllegalArgumentException, IOException {
         return Task.fromJson(jsonString, id, Status.OPEN);
     }
 
@@ -61,13 +62,14 @@ public class Task {
      * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
      *         or any parameter value provided is invalid.
      */
-    public static Task fromJson(String jsonString, String id, Status status) throws IllegalArgumentException {
-        String shopLocation;
-        String expectedDeliveryTime;
-        String item;
-        String payerName;
-        double fee;
-        String doerName;
+    public static Task fromJson(String jsonString, String id, Status status) throws IllegalArgumentException,
+            IOException {
+        String shopLocation = "";
+        String expectedDeliveryTime = "";
+        String item = "";
+        String payerName = "";
+        double fee = -1;
+        String doerName = "";
 
         JsonReader reader = new JsonReader(new StringReader(jsonString));
         reader.beginObject();
@@ -86,12 +88,13 @@ public class Task {
             } else if (name.equals("doerName")) {
                 doerName = reader.nextString();
             } else if (name.equals("status")) {
-                status = Status.valueOf(String.upperCase(reader.nextString()));
+                status = Status.valueOf(reader.nextString().toUpperCase());
             } else {
                 reader.skipValue();
             }
         }
         reader.endObject();
+        reader.close();
         
         return new Task(id, shopLocation, expectedDeliveryTime, item, payerName, fee, status, doerName);
     }
