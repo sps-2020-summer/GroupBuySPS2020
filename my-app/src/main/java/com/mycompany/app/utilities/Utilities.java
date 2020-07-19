@@ -15,4 +15,14 @@ public class Utilities {
             }
         }
     }
+
+    /** 
+     * Checks whether {@code num} is negative. 
+     * @throws IllegalArgumentException if {@code num} is negative.
+     */
+    public static void ensureNonNegative(Number num) {
+        if (num.doubleValue() < 0) {
+            throw new IllegalArgumentException("Given number is negative.");
+        }
+    }
 }

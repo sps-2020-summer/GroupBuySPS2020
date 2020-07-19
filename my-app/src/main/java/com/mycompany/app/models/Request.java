@@ -40,11 +40,10 @@ public class Request {
      * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
      *         or parameter value is invalid.
      */
-    public static Request fromJson(String jsonString, String id, String taskId) throws IllegalArgumentException,
+    public Request(String jsonString, String id, String taskId) throws IllegalArgumentException,
             IOException {
-        Request request = new Request(id, taskId);
-        request.setTask(Task.fromJson(jsonString, taskId));
-        return request;
+        this(id, taskId);
+        this.setTask(new Task(jsonString, taskId));
     }
 
     /** 

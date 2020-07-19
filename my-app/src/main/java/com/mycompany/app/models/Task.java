@@ -29,6 +29,7 @@ public class Task {
     public Task(String id, String shopLocation, String expectedDeliveryTime, String item, String payerName, 
         double fee, Status status, String doerName) throws IllegalArgumentException {
         Utilities.ensureNonNull(id, shopLocation, expectedDeliveryTime, item, payerName, fee, status);
+        Utilities.ensureNonNegative(fee);
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
         this.item = item;
@@ -53,8 +54,8 @@ public class Task {
      * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
      *         or parameter value is invalid.
      */
-    public static Task fromJson(String jsonString, String id) throws IllegalArgumentException, IOException {
-        return Task.fromJson(jsonString, id, Status.OPEN);
+    public Task(String jsonString, String id) throws IllegalArgumentException, IOException {
+        this(jsonString, id, Status.OPEN);
     }
 
     /** 
@@ -62,15 +63,9 @@ public class Task {
      * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
      *         or any parameter value provided is invalid.
      */
-    public static Task fromJson(String jsonString, String id, Status status) throws IllegalArgumentException,
-            IOException {
-        String shopLocation = "";
-        String expectedDeliveryTime = "";
-        String item = "";
-        String payerName = "";
-        double fee = -1;
-        String doerName = "";
-
+    public Task(String jsonString, String id, Status status) throws IllegalArgumentException, IOException {
+        this.id = id;
+        this.status = status;
         JsonReader reader = new JsonReader(new StringReader(jsonString));
         reader.beginObject();
         while (reader.hasNext()) {
@@ -86,9 +81,9 @@ public class Task {
             } else if (name.equals("fee")) {
                 fee = reader.nextDouble();
             } else if (name.equals("doerName")) {
-                doerName = reader.nextString();
+                doerName = Optional.of(reader.nextString());
             } else if (name.equals("status")) {
-                status = Status.valueOf(reader.nextString().toUpperCase());
+                this.status = Status.valueOf(reader.nextString().toUpperCase());
             } else {
                 reader.skipValue();
             }
@@ -96,7 +91,8 @@ public class Task {
         reader.endObject();
         reader.close();
         
-        return new Task(id, shopLocation, expectedDeliveryTime, item, payerName, fee, status, doerName);
+        Utilities.ensureNonNull(this.id, shopLocation, expectedDeliveryTime, item, payerName, this.status);
+        Utilities.ensureNonNegative(fee);
     }
 
     /** 
