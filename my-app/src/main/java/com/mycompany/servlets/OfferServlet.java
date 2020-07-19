@@ -12,32 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.servlets;
+//package com.google.sps.servlets;
+package com.mycompany.servlets;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.WriteResult;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
+import com.google.gson.Gson;
+import com.mycompany.models.Offer;
 
-import java.io.IOException;
-import java.io.FileInputStream;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import com.google.gson.Gson;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 @WebServlet("/offer")
 public class OfferServlet extends HttpServlet {
@@ -86,7 +83,9 @@ public class OfferServlet extends HttpServlet {
 
    @Override
    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-       //String json = gson.toJson(xxx);
+       // TODO: add uuid param in offer model
+
+        //String json = gson.toJson(xxx);
        // offer/findByStatus
        // offer/{offerId}
        // offer
@@ -102,8 +101,16 @@ public class OfferServlet extends HttpServlet {
        }
 
        if(pathInfo == null || pathInfo.equals("/")) {
-           // return all offers
-           response.getWriter().println("return all offers");
+           // get all offers
+           ApiFuture<QuerySnapshot> future = db.collection("offer").get();
+           // future.get() blocks on response
+           List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+           for (QueryDocumentSnapshot document : documents) {
+               System.out.println(document.getId() + " => " + document.toObject(Offer.class));
+           }
+           // [END fs_get_all_docs]
+//           return documents;
+
        }
    }
 
