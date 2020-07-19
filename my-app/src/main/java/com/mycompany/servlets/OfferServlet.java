@@ -25,7 +25,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
-import com.mycompany.models.Offer;
+import com.mycompany.app.models.Offer;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -34,7 +34,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.HashMap;
 
 @WebServlet("/offer")
 public class OfferServlet extends HttpServlet {
@@ -65,10 +70,11 @@ public class OfferServlet extends HttpServlet {
         String shopLocation = request.getParameter("shopLocation");
         String expectedDeliveryTime = request.getParameter("expectedDeliveryTime");
 
+        // TODO use models
         Map<String, Object> data = new HashMap<>();
         data.put("shopLocation", shopLocation);
         data.put("expectedDeliveryTime", expectedDeliveryTime);
-        data.put("status", "open"); //default
+        data.put("status", "OPEN"); //default
 
         System.out.println(shopLocation);
         System.out.println(expectedDeliveryTime);
@@ -102,12 +108,25 @@ public class OfferServlet extends HttpServlet {
 
        if(pathInfo == null || pathInfo.equals("/")) {
            // get all offers
-           ApiFuture<QuerySnapshot> future = db.collection("offer").get();
-           // future.get() blocks on response
-           List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-           for (QueryDocumentSnapshot document : documents) {
-               System.out.println(document.getId() + " => " + document.toObject(Offer.class));
+           try {
+               ApiFuture<QuerySnapshot> future = db.collection("offer").get();
+               // future.get() blocks on response
+               List<Offer> offers = new ArrayList<>();
+               List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+               for (QueryDocumentSnapshot document : documents) {
+//                   System.out.println(document.getId() + " => " + document.toObject(Offer.class));
+                   Offer offer = document.toObject(Offer.class);
+                   offers.add(offer);
+               }
+               response.setContentType("application/json;");
+               response.getWriter().println(gson.toJson(offers));
+           } catch(Exception e) {
+               // TODO log error
+               System.out.println(e);
+               e.printStackTrace();
+               response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
            }
+
            // [END fs_get_all_docs]
 //           return documents;
 

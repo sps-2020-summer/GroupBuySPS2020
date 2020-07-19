@@ -1,13 +1,15 @@
 package com.mycompany.app.models;
 
+import com.google.cloud.firestore.annotation.Exclude;
+import com.google.gson.stream.JsonReader;
+import com.mycompany.app.utilities.Utilities;
+
 import java.io.IOException;
 import java.io.StringReader;
 
-import com.mycompany.app.utilities.Utilities;
-import com.google.gson.stream.JsonReader;
-
 /** Represents an offer that is made when a person wants to help others to make a purchase. */
 public class Offer {
+    @Exclude
     private String id;
     private String shopLocation;
     private String expectedDeliveryTime;
@@ -18,12 +20,17 @@ public class Offer {
     }
 
     /** @throws IllegalArgumentException if any parameter is {@code null} or empty. */
-    public Offer(String id, String shopLocation, String expectedDeliveryTime, Status status) throws IllegalArgumentException {
-        Utilities.ensureNonNull(id, shopLocation, expectedDeliveryTime, status);
+    public Offer(String shopLocation, String expectedDeliveryTime, Status status) throws IllegalArgumentException {
+        Utilities.ensureNonNull(shopLocation, expectedDeliveryTime, status);
         this.id = id;
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
         this.status = status;
+    }
+
+    public Offer withId(final String id) {
+        this.id = id;
+        return this;
     }
 
     /** 
