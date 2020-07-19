@@ -126,6 +126,8 @@ public class Offer {
         return expectedDeliveryTime;
     }
 
+    public String getUuid() { return uuid; }
+
     /** Returns status as string instead of as an enum. */
     public String getStatus() {
         return status.toString();

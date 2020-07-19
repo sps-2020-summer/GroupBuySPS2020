@@ -17,12 +17,7 @@ package com.mycompany.servlets;
 
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
@@ -36,12 +31,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.HashMap;
+import java.util.*;
 
 @WebServlet("/offer/*")
 public class OfferServlet extends HttpServlet {
@@ -122,22 +112,36 @@ public class OfferServlet extends HttpServlet {
            return;
        }
        try {
-//           ApiFuture<QuerySnapshot> future = db.collection("offer").whereEqualTo("uuid", uuid.get()).get();
-           CollectionReference offersRef = db.collection("offer");
-           Query query = offersRef.whereEqualTo("uuid", uuid.get());
+           if(offerId != null) {
+               DocumentReference docRef = db.collection("offer").document(offerId);
+               ApiFuture<DocumentSnapshot> future = docRef.get();
+               DocumentSnapshot document = future.get();
+               if (document.exists()) {
+                   // convert document to POJO
+                   Offer offer = document.toObject(Offer.class).withId(document.getId());
+                   response.getWriter().println(gson.toJson(offer));
+               } else {
+                   System.out.println("No such document!");
+                   response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+               }
+           } else {
+               //           ApiFuture<QuerySnapshot> future = db.collection("offer").whereEqualTo("uuid", uuid.get()).get();
+               CollectionReference offersRef = db.collection("offer");
+               Query query = offersRef.whereEqualTo("uuid", uuid.get());
 
-           if(status != null) {
-               query = query.whereEqualTo("status", status);
-           }
+               if(status != null) {
+                   query = query.whereEqualTo("status", status);
+               }
 
-           List<Offer> offers = new ArrayList<>();
-           List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
-           for (QueryDocumentSnapshot document : documents) {
-               Offer offer = document.toObject(Offer.class).withId(document.getId());
-               offers.add(offer);
+               List<Offer> offers = new ArrayList<>();
+               List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
+               for (QueryDocumentSnapshot document : documents) {
+                   Offer offer = document.toObject(Offer.class).withId(document.getId());
+                   offers.add(offer);
+               }
+               response.setContentType("application/json;");
+               response.getWriter().println(gson.toJson(offers));
            }
-           response.setContentType("application/json;");
-           response.getWriter().println(gson.toJson(offers));
        } catch(Exception e) {
            // TODO log error
            System.out.println(e);
