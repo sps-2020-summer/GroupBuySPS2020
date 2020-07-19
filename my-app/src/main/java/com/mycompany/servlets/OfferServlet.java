@@ -21,6 +21,8 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.Query;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
@@ -41,7 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
 
-@WebServlet("/offer")
+@WebServlet("/offer/*")
 public class OfferServlet extends HttpServlet {
     private final Gson gson = new Gson();
     private Firestore db;
@@ -100,12 +102,18 @@ public class OfferServlet extends HttpServlet {
        // TODO: add uuid param in offer model
 
         //String json = gson.toJson(xxx);
-       // offer/findByStatus
-       // offer/{offerId}
+       // offer?findByStatus={status}
+       // offer?offerId={offerId}
        // offer
        response.setContentType("text/html;");
        response.getWriter().println("Hello World!");
        String pathInfo = request.getPathInfo();
+       String offerId = request.getParameter("offerId");
+       String status = request.getParameter("status");
+
+       System.out.println("path: " + pathInfo);
+       System.out.println("offerId: " + offerId);
+       System.out.println("status: " + status);
        Optional<String> uuid = readCookie(request, "uuid");
 
        if(!uuid.isPresent()) {
@@ -113,31 +121,28 @@ public class OfferServlet extends HttpServlet {
            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
            return;
        }
+       try {
+//           ApiFuture<QuerySnapshot> future = db.collection("offer").whereEqualTo("uuid", uuid.get()).get();
+           CollectionReference offersRef = db.collection("offer");
+           Query query = offersRef.whereEqualTo("uuid", uuid.get());
 
-       if(pathInfo == null || pathInfo.equals("/")) {
-           // get all offers
-           try {
-               ApiFuture<QuerySnapshot> future = db.collection("offer").get();
-               // future.get() blocks on response
-               List<Offer> offers = new ArrayList<>();
-               List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-               for (QueryDocumentSnapshot document : documents) {
-//                   System.out.println(document.getId() + " => " + document.toObject(Offer.class));
-                   Offer offer = document.toObject(Offer.class).withId(document.getId());
-                   offers.add(offer);
-               }
-               response.setContentType("application/json;");
-               response.getWriter().println(gson.toJson(offers));
-           } catch(Exception e) {
-               // TODO log error
-               System.out.println(e);
-               e.printStackTrace();
-               response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+           if(status != null) {
+               query = query.whereEqualTo("status", status);
            }
 
-           // [END fs_get_all_docs]
-//           return documents;
-
+           List<Offer> offers = new ArrayList<>();
+           List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
+           for (QueryDocumentSnapshot document : documents) {
+               Offer offer = document.toObject(Offer.class).withId(document.getId());
+               offers.add(offer);
+           }
+           response.setContentType("application/json;");
+           response.getWriter().println(gson.toJson(offers));
+       } catch(Exception e) {
+           // TODO log error
+           System.out.println(e);
+           e.printStackTrace();
+           response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
        }
    }
 
