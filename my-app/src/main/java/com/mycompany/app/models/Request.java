@@ -1,9 +1,10 @@
-package backend.models;
+package com.mycompany.app.models;
 
+import java.io.IOException;
 import java.io.StringReader;
 
-import backend.utilities.Utilities;
-import com.google.cloud.firestore.Exclude;
+import com.mycompany.app.utilities.Utilities;
+import com.google.cloud.firestore.annotation.Exclude;
 import com.google.gson.stream.JsonReader;
 
 /** Represents a request which a person makes when s/he needs help with a purchase. */
@@ -39,23 +40,23 @@ public class Request {
      * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
      *         or parameter value is invalid.
      */
-    public static Request fromJson(String jsonString, String id, String taskId) throws IllegalArgumentException {
-        Request request = new Request(id, taskId);
-        request.setTask(Task.fromJson(jsonString, taskId));
-        return request;
+    public Request(String jsonString, String id, String taskId) throws IllegalArgumentException,
+            IOException {
+        this(id, taskId);
+        this.setTask(new Task(jsonString, taskId));
     }
 
     /** 
      * Assigns task to the person represented in @{code jsonString} and returns the updated task. 
      * Assumes that {@code task} is not null. To set {@code task}, {@see setTask}.
      */
-    public Task assign(String jsonString) {
+    public Task assign(String jsonString) throws IOException {
         if (task == null) {
             throw new IllegalStateException("Unable to assign doer to request when task is not defined." 
                 + "Call setTask before calling this method.");
         }
 
-        String doerName;
+        String doerName = "";
         JsonReader reader = new JsonReader(new StringReader(jsonString));
         reader.beginObject();
         while (reader.hasNext()) {
@@ -67,6 +68,7 @@ public class Request {
             }
         }
         reader.endObject();
+        reader.close();
 
         task.setDoerName(doerName);
         task.setStatus(Status.PENDING);

@@ -1,8 +1,9 @@
-package backend.models;
+package com.mycompany.app.models;
 
+import java.io.IOException;
 import java.io.StringReader;
 
-import backend.utilities.Utilities;
+import com.mycompany.app.utilities.Utilities;
 import com.google.gson.stream.JsonReader;
 
 /** Represents an offer that is made when a person wants to help others to make a purchase. */
@@ -30,10 +31,8 @@ public class Offer {
      * @throws IllegalArgumentException if any required parameter cannot be found in {@code jsonString}, 
      *         or parameter value is invalid.
      */
-    public static Offer fromJson(String jsonString, String id) throws IllegalArgumentException {
-        String expectedDeliveryTime;
-        String shopLocation;
-
+    public Offer(String jsonString, String id) throws IllegalArgumentException, 
+            IOException {
         JsonReader reader = new JsonReader(new StringReader(jsonString));
         reader.beginObject();
         while (reader.hasNext()) {
@@ -47,18 +46,21 @@ public class Offer {
             }
         }
         reader.endObject();
+        reader.close();
         
-        return new Offer(id, shopLocation, expectedDeliveryTime, Status.OPEN); // since created offers are open
+        status = Status.OPEN; // since created offers are open
+        this.id = id;
+        Utilities.ensureNonNull(this.id, shopLocation, expectedDeliveryTime, status);
     }
 
     /** 
      * Creates a {@code Request} instance with id {@code requestId}. The resulting task that is associated with
      * the request created will have {@code taskId} id and will satisfy the conditions specified by this offer.
      */
-    public Request addRequest(String jsonString, String requestId, String taskId, String doerName) {
-        String item;
-        String payerName;
-        double fee;
+    public Request addRequest(String jsonString, String requestId, String taskId, String doerName) throws IOException {
+        String item = "";
+        String payerName = "";
+        double fee = -1; // initialise to an invalid value
         
         JsonReader reader = new JsonReader(new StringReader(jsonString));
         reader.beginObject();
@@ -75,6 +77,7 @@ public class Offer {
             }
         }
         reader.endObject();
+        reader.close();
 
         Task task = new Task(taskId, shopLocation, expectedDeliveryTime, item, payerName, fee, 
                 Status.PENDING, doerName); // status is set to 'pending' since payer and doer are both well-defined
