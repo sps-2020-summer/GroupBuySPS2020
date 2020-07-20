@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useCallback, useContext } from "react";
 import { Card, Typography, Spin, List, Space } from "antd";
 import s from "../../main.module.css";
 import { Req } from "../../../../types";
@@ -6,10 +6,15 @@ import { Req } from "../../../../types";
 import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
 import { getOpenRequest } from "../../../../api";
 import UserCreateRequestComponent from "./user-request";
+import { FirebaseContext } from "../../../../context/firebase-context";
+import firebase from "firebase";
 
 const { Title, Paragraph } = Typography;
 
 const MainRequest: FC<{}> = () => {
+  const firebaseContext = useContext(FirebaseContext);
+  const { firebaseApp } = firebaseContext;
+  const db = firebase.firestore(firebaseApp as firebase.app.App);
   const [loading, setLoading] = useState<boolean>(true);
   const [requests, setRequests] = useState<Req[]>([]);
 
@@ -20,18 +25,18 @@ const MainRequest: FC<{}> = () => {
     </Space>
   );
 
-  useEffect(() => {
-    const fetchRequest = async () => {
-      try {
-        setLoading(true);
-        const res = await getOpenRequest();
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchRequest = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await getOpenRequest();
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchRequest();
   }, []);
 
@@ -39,7 +44,7 @@ const MainRequest: FC<{}> = () => {
     <div className={s.content}>
       <div className={s.userActions}>
         <div className={s.column}>
-          <UserCreateRequestComponent />
+          <UserCreateRequestComponent fetchRequest={fetchRequest} />
         </div>
       </div>
       <div className={s.requestBoard}>

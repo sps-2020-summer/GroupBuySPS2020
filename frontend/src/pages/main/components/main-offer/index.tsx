@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useCallback, useContext } from "react";
 import { Card, Typography, Spin, List, Space } from "antd";
 import s from "../../main.module.css";
 import UserRequest from "../../../dashboard/user-request";
@@ -7,10 +7,15 @@ import RequestItem from "../../../dashboard/user-request/request-item";
 import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
 import { getOpenOffers } from "../../../../api";
 import UserCreateOfferComponent from "./user-offer";
+import { FirebaseContext } from "../../../../context/firebase-context";
+import firebase from "firebase";
 
 const { Title, Paragraph } = Typography;
 
 const MainOffer: FC<{}> = () => {
+  const firebaseContext = useContext(FirebaseContext);
+  const { firebaseApp } = firebaseContext;
+  const db = firebase.firestore(firebaseApp as firebase.app.App);
   const [loading, setLoading] = useState<boolean>(true);
   const [offers, setOffers] = useState<Offer[]>([]);
 
@@ -20,19 +25,18 @@ const MainOffer: FC<{}> = () => {
       {text}
     </Space>
   );
+  const fetchOffer = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await getOpenOffers();
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchOffer = async () => {
-      try {
-        setLoading(true);
-        const res = await getOpenOffers();
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOffer();
   }, []);
 
@@ -40,7 +44,7 @@ const MainOffer: FC<{}> = () => {
     <div className={s.content}>
       <div className={s.userActions}>
         <div className={s.column}>
-          <UserCreateOfferComponent />
+          <UserCreateOfferComponent fetchOffer={fetchOffer} />
         </div>
       </div>
       <div className={s.requestBoard}>

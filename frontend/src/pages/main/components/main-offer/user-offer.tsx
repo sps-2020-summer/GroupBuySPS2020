@@ -20,7 +20,11 @@ import { FirebaseContext } from "../../../../context/firebase-context";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
-const UserCreateOfferComponent: FC = () => {
+type Props = {
+  fetchOffer: () => Promise<void>;
+};
+
+const UserCreateOfferComponent: FC<Props> = ({ fetchOffer }) => {
   const firebaseContext = useContext(FirebaseContext);
   const { firebaseApp } = firebaseContext;
   const db = firebase.firestore(firebaseApp as firebase.app.App);
@@ -44,6 +48,7 @@ const UserCreateOfferComponent: FC = () => {
         ...values,
         duration: 0,
       });
+      fetchOffer();
     } catch (err) {
       console.log(err);
     }

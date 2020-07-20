@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useContext } from "react";
 import s from "../../main.module.css";
 import {
   Button,
@@ -15,22 +15,41 @@ import UserRequest from "../../../dashboard/user-request";
 import MainRequest from "../main-request";
 import { MoneyCollectOutlined } from "@ant-design/icons";
 import { userInfo } from "os";
+import firebase from "firebase";
+import { FirebaseContext } from "../../../../context/firebase-context";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
-const UserCreateRequestComponent: FC<{}> = () => {
+type Props = {
+  fetchRequest: () => Promise<void>;
+};
+const UserCreateRequestComponent: FC<Props> = ({ fetchRequest }) => {
+  const firebaseContext = useContext(FirebaseContext);
+  const { firebaseApp } = firebaseContext;
+  const db = firebase.firestore(firebaseApp as firebase.app.App);
+
   const formRef = React.createRef<FormInstance>();
   const [visible, setVisible] = useState<boolean>(false);
 
   const handleOk = () => {
+    console.log(formRef.current);
     formRef.current?.submit();
   };
 
   const showModal = () => setVisible(true);
   const handleCancel = () => setVisible(false);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log("Success:", values);
+    try {
+      await db.collection("request").add({
+        ...values,
+        duration: 0,
+      });
+      fetchRequest();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const rangeConfig = {
@@ -56,7 +75,7 @@ const UserCreateRequestComponent: FC<{}> = () => {
         <Title>You</Title>
         <Paragraph>You currently have 0 requests open</Paragraph>
       </Typography>
-      <Form onFinish={onFinish}>
+      <Form ref={formRef} onFinish={onFinish}>
         <Modal
           maskClosable={false}
           title="New Request"
