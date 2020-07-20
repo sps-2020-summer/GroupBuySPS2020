@@ -17,13 +17,13 @@ import java.util.HashMap;
 public class Test {
 
     public static void main(String[] args) throws Exception {
-        FileInputStream serviceAccount = new FileInputStream("./ServiceAccountKey.json");
+        FileInputStream serviceAccount = new FileInputStream("../../../../../../serviceAccountKey.json");
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 // or initialize via the app default credentials
-//                .setCredentials(GoogleCredentials.getApplicationDefault())
-//                .setDatabaseUrl("https://<DATABASE_NAME>.firebaseio.com/")
+                .setCredentials(GoogleCredentials.getApplicationDefault())
+                .setDatabaseUrl("https://spsteam10-748f8.firebaseio.com")
                 .build();
 
         FirebaseApp.initializeApp(options);
