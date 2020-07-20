@@ -33,6 +33,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
+@CrossOriginResourceSharing(
+    allowAllOrigins =true,
+       
+)
+
 @WebServlet("/offer/*")
 public class OfferServlet extends HttpServlet {
     private final Gson gson = new Gson();
@@ -59,19 +64,20 @@ public class OfferServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Optional<String> uuid = readCookie(request, "uuid");
+       response.addHeader("Access-Control-Allow-Origin", "*"));
+       /* Optional<String> uuid = readCookie(request, "uuid");
         if(!uuid.isPresent()) {
             // not logged in, kick out
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
-        }
-
+        }*/
+        String uuid = request.getParameter("uuid");
         String shopLocation = request.getParameter("shopLocation");
         String expectedDeliveryTime = request.getParameter("expectedDeliveryTime");
 
         // TODO use models
         Map<String, Object> data = new HashMap<>();
-        data.put("uuid",  uuid.get());
+        data.put("uuid",  uuid));
         data.put("shopLocation", shopLocation);
         data.put("expectedDeliveryTime", expectedDeliveryTime);
         data.put("status", "OPEN"); //default
@@ -89,6 +95,7 @@ public class OfferServlet extends HttpServlet {
 
    @Override
    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+       response.addHeader("Access-Control-Allow-Origin", "*"));
        // TODO: add uuid param in offer model
 
         //String json = gson.toJson(xxx);
@@ -100,17 +107,17 @@ public class OfferServlet extends HttpServlet {
        String pathInfo = request.getPathInfo();
        String offerId = request.getParameter("offerId");
        String status = request.getParameter("status");
-
+       String uuid = request.getParameter("uuid");
        System.out.println("path: " + pathInfo);
        System.out.println("offerId: " + offerId);
        System.out.println("status: " + status);
-       Optional<String> uuid = readCookie(request, "uuid");
-
+       //Optional<String> uuid = readCookie(request, "uuid");
+    /*
        if(!uuid.isPresent()) {
            // not logged in, kick out
            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
            return;
-       }
+       }*/
        try {
            if(offerId != null) {
                DocumentReference docRef = db.collection("offer").document(offerId);
