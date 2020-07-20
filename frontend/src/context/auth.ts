@@ -1,13 +1,13 @@
-import { createContext, useContext } from 'react';
-import { ProfileObject } from './user';
-
+import { createContext, useContext } from "react";
+import firebase from "firebase";
 // These functions will be created in app.tsx
 export const AuthContext = createContext({
-    authTokens: '',
-    logout: (history: any) => {},
-    login: (history: any, token: string, userProfile: ProfileObject) => {},
+	firebase: firebase,
+	authTokens: "",
+	logout: (history: any) => {},
+	login: (token: string) => {},
 });
 
 export function useAuth() {
-    return useContext(AuthContext);
+	return useContext(AuthContext);
 }

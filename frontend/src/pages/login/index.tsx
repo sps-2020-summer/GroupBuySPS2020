@@ -1,21 +1,30 @@
-import React, { FC } from 'react'
-import { Card, Button } from 'antd';
-import * as s from './login.module.css';
+import React, { FC, useContext } from "react";
+import s from "./login.module.css";
+import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import { AuthContext } from "../../context/auth";
+import { FaUser } from "react-icons/fa";
 
 const Login: FC<{}> = () => {
+	const value = useContext(AuthContext);
+	const { firebase } = value;
 
-    return (
-        <Card className={s['loginCard']}>
-            <h1>Group Buy</h1>
-            
-            <div  className={s['actionArea']}>
-            <Button type='primary'>Google Login</Button>
-            {
-            // guest to login during testing 
-            }
-            <Button type='dashed'>Guest Login</Button>
-            </div>
-        </Card>);
-}
+	const uiConfig = {
+		signInFlow: "popup",
+		signInSuccessUrl: "/dashboard",
+		signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+	};
+
+	return (
+		<div className={s.loginCard}>
+			<FaUser style={{ fontSize: "10vh" }} />
+			<h1 style={{ fontSize: "8vh" }}>Group Buy</h1>
+
+			<StyledFirebaseAuth
+				uiConfig={uiConfig}
+				firebaseAuth={firebase.auth()}
+			/>
+		</div>
+	);
+};
 
 export default Login;
