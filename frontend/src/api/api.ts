@@ -13,7 +13,10 @@ export const Url = {
 
 export const getUserRequest = async (uuid: number, status: string) => {
   return Axios.get(Url.getRequest(), {
-    headers: { "Access-Control-Allow-Origin": "*" },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     withCredentials: true,
     params: {
       id: uuid,
@@ -24,7 +27,10 @@ export const getUserRequest = async (uuid: number, status: string) => {
 
 export const getUserTask = async (uuid: number, status: string) => {
   return Axios.get(Url.offer(), {
-    headers: { "Access-Control-Allow-Origin": "*" },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     withCredentials: true,
     params: {
       uuid: uuid,
@@ -36,7 +42,10 @@ export const getUserTask = async (uuid: number, status: string) => {
 
 export const getOpenOffers = async () => {
   return Axios.get(Url.offer(), {
-    headers: { "Access-Control-Allow-Origin": "*" },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     withCredentials: true,
     params: {
       status: "open",
@@ -65,7 +74,10 @@ export const postRequest = async (params) => {
 export const postOffer = async (params) => {
   return Axios.post(Url.offer(), {
     withCredentials: true,
-    headers: { "Access-Control-Allow-Origin": "*" },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     params: {
       uuid: "1231",
       shopLocation: "dasdsa",
@@ -77,7 +89,11 @@ export const postOffer = async (params) => {
 export const postTask = async (params) => {
   return Axios.post(Url.postTask(), {
     withCredentials: true,
-    headers: { "Access-Control-Allow-Origin": "*" },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/x-www-form-urlencoded",
+    
+    },
     params,
   });
 };

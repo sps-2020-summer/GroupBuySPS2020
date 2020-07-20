@@ -47,6 +47,7 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest }) => {
         duration: 0,
       });
       fetchRequest();
+      setVisible(false);
     } catch (err) {
       console.log(err);
     }

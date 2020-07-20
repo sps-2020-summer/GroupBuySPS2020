@@ -28,7 +28,17 @@ const MainRequest: FC<{}> = () => {
   const fetchRequest = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getOpenRequest();
+      //const res = await getOpenRequest();
+      const res = await db.collection("request").get();
+      const list = [] as any;
+      res.forEach((doc) => {
+        if (doc.exists) {
+          list.push(doc.data());
+        } else {
+          // doc.data() will be undefined in this case
+        }
+      });
+      setRequests(list);
     } catch (e) {
       console.log(e);
     } finally {

@@ -43,12 +43,14 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer }) => {
 
   const onFinish = async (values) => {
     console.log("Success:", values);
+
     try {
       await db.collection("offer").add({
         ...values,
         duration: 0,
       });
       fetchOffer();
+      setVisible(false);
     } catch (err) {
       console.log(err);
     }

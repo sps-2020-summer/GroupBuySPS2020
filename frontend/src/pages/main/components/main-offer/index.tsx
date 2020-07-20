@@ -28,7 +28,17 @@ const MainOffer: FC<{}> = () => {
   const fetchOffer = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getOpenOffers();
+      //const res = await getOpenOffers();
+      const res = await db.collection("offer").get();
+      const list = [] as any;
+      res.forEach((doc) => {
+        if (doc.exists) {
+          list.push(doc.data());
+        } else {
+          // doc.data() will be undefined in this case
+        }
+      });
+      setOffers(list);
     } catch (e) {
       console.log(e);
     } finally {
