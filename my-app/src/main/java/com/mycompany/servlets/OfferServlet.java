@@ -33,11 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
-@CrossOriginResourceSharing(
-    allowAllOrigins =true,
-       
-)
-
 @WebServlet("/offer/*")
 public class OfferServlet extends HttpServlet {
     private final Gson gson = new Gson();
@@ -64,7 +59,7 @@ public class OfferServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-       response.addHeader("Access-Control-Allow-Origin", "*"));
+       response.addHeader("Access-Control-Allow-Origin", "*");
        /* Optional<String> uuid = readCookie(request, "uuid");
         if(!uuid.isPresent()) {
             // not logged in, kick out
@@ -77,7 +72,7 @@ public class OfferServlet extends HttpServlet {
 
         // TODO use models
         Map<String, Object> data = new HashMap<>();
-        data.put("uuid",  uuid));
+        data.put("uuid",  uuid);
         data.put("shopLocation", shopLocation);
         data.put("expectedDeliveryTime", expectedDeliveryTime);
         data.put("status", "OPEN"); //default
@@ -95,7 +90,7 @@ public class OfferServlet extends HttpServlet {
 
    @Override
    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-       response.addHeader("Access-Control-Allow-Origin", "*"));
+       response.addHeader("Access-Control-Allow-Origin", "*");
        // TODO: add uuid param in offer model
 
         //String json = gson.toJson(xxx);
@@ -134,7 +129,7 @@ public class OfferServlet extends HttpServlet {
            } else {
                //           ApiFuture<QuerySnapshot> future = db.collection("offer").whereEqualTo("uuid", uuid.get()).get();
                CollectionReference offersRef = db.collection("offer");
-               Query query = offersRef.whereEqualTo("uuid", uuid.get());
+               Query query = offersRef.whereEqualTo("uuid", uuid);
 
                if(status != null) {
                    query = query.whereEqualTo("status", status);
