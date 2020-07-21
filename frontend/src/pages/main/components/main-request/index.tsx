@@ -1,103 +1,128 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useCallback, useContext } from "react";
 import { Card, Typography, Spin, List, Space } from "antd";
 import s from "../../main.module.css";
-import UserRequest from "../../../dashboard/user-request";
 import { Req } from "../../../../types";
-import RequestItem from "../../../dashboard/user-request/request-item";
+
 import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
+import { getOpenRequest } from "../../../../api";
+import UserCreateRequestComponent from "./user-request";
+import { FirebaseContext } from "../../../../context/firebase-context";
+import firebase from "firebase";
 
 const { Title, Paragraph } = Typography;
 
 const MainRequest: FC<{}> = () => {
-	const [loading, setLoading] = useState<boolean>(true);
-	const [requests, setRequests] = useState<Req[]>([]);
+  const firebaseContext = useContext(FirebaseContext);
+  const { firebaseApp } = firebaseContext;
+  const db = firebase.firestore(firebaseApp as firebase.app.App);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [requests, setRequests] = useState<Req[]>([]);
 
-	const IconText = ({ icon, text }) => (
-		<Space>
-			{React.createElement(icon)}
-			{text}
-		</Space>
-	);
+  const IconText = ({ icon, text }) => (
+    <Space>
+      {React.createElement(icon)}
+      {text}
+    </Space>
+  );
 
-	useEffect(() => {
-		const fetchRequest = async (userUid: string) => {
-			try {
-				setLoading(true);
-			} catch (e) {
-				console.log(e);
-			} finally {
-				setLoading(false);
-			}
-		};
+  const fetchRequest = useCallback(async () => {
+    try {
+      setLoading(true);
+      //const res = await getOpenRequest();
+      const res = await db.collection("request").get();
+      const list = [] as any;
+      res.forEach((doc) => {
+        if (doc.exists) {
+          list.push(doc.data());
+        } else {
+          // doc.data() will be undefined in this case
+        }
+      });
+      setRequests(list);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-		const timer = setTimeout(() => setLoading(false), 2000);
-		return () => clearTimeout(timer);
-	}, []);
+  useEffect(() => {
+    fetchRequest();
+  }, []);
 
-	return (
-		<Card className={s.requestBackground}>
-			<Typography>
-				<Title>Available Requests</Title>
-				<Paragraph>
-					These are the current requests users have posted
-				</Paragraph>
-			</Typography>
-			{loading ? (
-				<Spin></Spin>
-			) : (
-					<>
-						{requests.length === 0 ? (
-							<>You currently have no requests opened!</>
-						) : (
-								<></>
-							)}
-						<List
-							pagination={{
-								onChange: (page) => {
-									console.log(page);
-								},
-								pageSize: 3,
-							}}
-							split={false}
-							dataSource={requests}
-							renderItem={(item, index: number) => (
-								<List.Item
-									key={item.name + index}
-									actions={[
-										<IconText
-											icon={StarOutlined}
-											text="156"
-											key="list-vertical-star-o"
-										/>,
-										<IconText
-											icon={LikeOutlined}
-											text="156"
-											key="list-vertical-like-o"
-										/>,
-										<IconText
-											icon={MessageOutlined}
-											text="2"
-											key="list-vertical-message"
-										/>,
-									]}
-									extra={
-										<img
-											width={272}
-											alt="logo"
-											src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-										/>
-									}
-								>
-									<List.Item.Meta
-										title={item.name}
-										description={"this the description"}
-									/>
-								</List.Item>
-							)}
-						/>
-					</>
-				)}
-		</Card>
-	);
+  return (
+    <div className={s.content}>
+      <div className={s.userActions}>
+        <div className={s.column}>
+          <UserCreateRequestComponent fetchRequest={fetchRequest} />
+        </div>
+      </div>
+      <div className={s.requestBoard}>
+        <Card className={s.requestBackground}>
+          <Typography>
+            <Title>Available Requests</Title>
+            <Paragraph>
+              These are the current requests users have posted
+            </Paragraph>
+          </Typography>
+          {loading ? (
+            <Spin></Spin>
+          ) : (
+            <>
+              {requests.length === 0 ? (
+                <>You currently have no requests opened!</>
+              ) : (
+                <></>
+              )}
+              <List
+                pagination={{
+                  onChange: (page) => {
+                    console.log(page);
+                  },
+                  pageSize: 3,
+                }}
+                split={false}
+                dataSource={requests}
+                renderItem={(item, index: number) => (
+                  <List.Item
+                    key={item.name + index}
+                    actions={[
+                      <IconText
+                        icon={StarOutlined}
+                        text="156"
+                        key="list-vertical-star-o"
+                      />,
+                      <IconText
+                        icon={LikeOutlined}
+                        text="156"
+                        key="list-vertical-like-o"
+                      />,
+                      <IconText
+                        icon={MessageOutlined}
+                        text="2"
+                        key="list-vertical-message"
+                      />,
+                    ]}
+                    extra={
+                      <img
+                        width={272}
+                        alt="logo"
+                        src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                      />
+                    }
+                  >
+                    <List.Item.Meta
+                      title={item.name}
+                      description={"this the description"}
+                    />
+                  </List.Item>
+                )}
+              />
+            </>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
 };
 export default MainRequest;

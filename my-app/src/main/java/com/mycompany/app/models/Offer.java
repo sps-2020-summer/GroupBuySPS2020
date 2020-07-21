@@ -1,29 +1,38 @@
 package com.mycompany.app.models;
 
+import com.google.cloud.firestore.annotation.Exclude;
+import com.google.gson.stream.JsonReader;
+import com.mycompany.app.utilities.Utilities;
+
 import java.io.IOException;
 import java.io.StringReader;
 
-import com.mycompany.app.utilities.Utilities;
-import com.google.gson.stream.JsonReader;
-
 /** Represents an offer that is made when a person wants to help others to make a purchase. */
 public class Offer {
+    @Exclude
     private String id;
     private String shopLocation;
     private String expectedDeliveryTime;
-    private Status status; 
+    private Status status;
+    private String uuid;
+
 
     public Offer() {
         // no argument constructor for Firestore purposes
     }
 
     /** @throws IllegalArgumentException if any parameter is {@code null} or empty. */
-    public Offer(String id, String shopLocation, String expectedDeliveryTime, Status status) throws IllegalArgumentException {
-        Utilities.ensureNonNull(id, shopLocation, expectedDeliveryTime, status);
-        this.id = id;
+    public Offer(String uuid, String shopLocation, String expectedDeliveryTime, Status status) throws IllegalArgumentException {
+        Utilities.ensureNonNull(uuid, shopLocation, expectedDeliveryTime, status);
+        this.uuid = uuid;
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
         this.status = status;
+    }
+
+    public Offer withId(final String id) {
+        this.id = id;
+        return this;
     }
 
     /** 
@@ -116,6 +125,8 @@ public class Offer {
     public String getExpectedDeliveryTime() {
         return expectedDeliveryTime;
     }
+
+    public String getUuid() { return uuid; }
 
     /** Returns status as string instead of as an enum. */
     public String getStatus() {
