@@ -46,11 +46,11 @@ const Dashboard: FC<{}> = () => {
     navToHome();
   };
 
-  console.log(user);
-
+  console.log(user?.uid);
+  /*
   if (user?.photoURL === null) {
     return <>user is null</>;
-  }
+  }*/
 
   return (
     <>
@@ -63,9 +63,9 @@ const Dashboard: FC<{}> = () => {
             color: "white",
           }}
         >
-          <Avatar src={user?.photoURL}></Avatar>
+          <Avatar src={user?.photoURL ?? "Hello Guest user"}></Avatar>
           <br />
-          <p>{user?.email}</p>
+          <p>{user?.email ?? "Guest User"}</p>
         </div>
         <Menu theme={"dark"} defaultSelectedKeys={["tasks"]} mode="inline">
           <Menu.Item
