@@ -11,15 +11,17 @@ export type Task = {
 };
 
 export const enum Status {
-	OPEN = 'open',
-	PENDING = 'pending',
-	DONE = 'done',
-	cancelled = 'cancelled'
+	OPEN = "open",
+	PENDING = "pending",
+	DONE = "done",
+	cancelled = "cancelled",
 }
 
 export type Offer = {
 	id: string;
+	title: string;
 	name: string;
+	description: string;
 	shopLocation: string;
 	expectedDeliveryTime: string;
 	status: Status;
@@ -27,6 +29,8 @@ export type Offer = {
 
 export type Req = {
 	id: string;
+	title: string;
+	taskName: string;
 	taskId: string;
 	name: string;
 	task: Task;
