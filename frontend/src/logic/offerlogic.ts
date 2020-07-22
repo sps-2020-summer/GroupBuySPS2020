@@ -60,13 +60,13 @@ export const getOffers: (uid: string) => Promise<void | Offer[]> = (uid: string)
 
 export const addOffer: (uid: string, shopLocation: string, expectedDeliveryTime: string, status: Status) => Promise<void | Offer> 
     = function(uid, shopLocation, expectedDeliveryTime, status) {
-    if (status === null) {
-        status = Status.OPEN;
+        if (status === null) {
+            status = Status.OPEN;
+        }
+        ensureNonNull(uid, shopLocation, expectedDeliveryTime, status);
+        return db.collection(COLLECTION_USERS).doc(uid).collection(COLLECTION_OFFERS)
+            .add(
+                offerConverter.toFirestore(shopLocation, expectedDeliveryTime, Status[status])
+            )
+            .then(offerRef => new Offer(offerRef.id, shopLocation, expectedDeliveryTime, status));
     }
-    ensureNonNull(uid, shopLocation, expectedDeliveryTime, status);
-    return db.collection(COLLECTION_USERS).doc(uid).collection(COLLECTION_OFFERS)
-        .add(
-            offerConverter.toFirestore(shopLocation, expectedDeliveryTime, Status[status])
-        )
-        .then(offerRef => new Offer(offerRef.id, shopLocation, expectedDeliveryTime, status));
-}
