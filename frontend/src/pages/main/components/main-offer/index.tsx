@@ -10,6 +10,7 @@ import UserCreateOfferComponent from "./user-offer";
 import { FirebaseContext } from "../../../../context/firebase-context";
 import firebase from "firebase";
 import ViewTask from "../../../../components/view-task";
+import CreateRequest from "../../../../components/create-request";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -22,6 +23,7 @@ const MainOffer: FC<{}> = () => {
 
 	const [modalOffer, setModalOffer] = useState<Offer | null>(null);
 	const [visible, setVisible] = useState<boolean>(false);
+	const [requestVisible, setReqVisible] = useState<boolean>(false);
 
 	const IconText = ({ icon, text }) => (
 		<Space>
@@ -63,7 +65,7 @@ const MainOffer: FC<{}> = () => {
 		setVisible(false);
 	};
 	const handleOkay = () => {
-		alert("this will fufil");
+		setReqVisible(true);
 	};
 
 	console.log(offers);
@@ -159,6 +161,11 @@ const MainOffer: FC<{}> = () => {
 					</Paragraph>
 				</Typography>
 			</Modal>
+			<CreateRequest
+				title={"Request to offer"}
+				visible={requestVisible}
+				setVisible={setReqVisible}
+			/>
 		</div>
 	);
 };

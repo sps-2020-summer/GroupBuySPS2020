@@ -1,5 +1,14 @@
 import React, { FC, useEffect, useState, useCallback, useContext } from "react";
-import { Card, Typography, Spin, List, Space, Button, Modal } from "antd";
+import {
+	Card,
+	Typography,
+	Spin,
+	List,
+	Space,
+	Button,
+	Modal,
+	message,
+} from "antd";
 import s from "../../main.module.css";
 import { Req } from "../../../../types";
 
@@ -64,7 +73,7 @@ const MainRequest: FC<{}> = () => {
 		setVisible(false);
 	};
 	const handleOkay = () => {
-		alert("this will fufil");
+		message.success("TASK ADDED CHECK DASHBOARD");
 	};
 
 	return (
