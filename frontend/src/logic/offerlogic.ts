@@ -83,17 +83,18 @@ export const getOffers: (
 	return offers;
 };
 
-/*
 export const addOffer: (
 	uid: string,
 	shopLocation: string,
 	expectedDeliveryTime: string,
-	status: Status
+	status: Status,
+	db: firebase.firestore.Firestore
 ) => Promise<void | Offer> = function (
 	uid,
 	shopLocation,
 	expectedDeliveryTime,
-	status
+	status,
+	db: firebase.firestore.Firestore
 ) {
 	if (status === null) {
 		status = Status.OPEN;
@@ -119,4 +120,4 @@ export const addOffer: (
 					status
 				)
 		);
-};*/
+};
