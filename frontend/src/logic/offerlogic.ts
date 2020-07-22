@@ -24,7 +24,6 @@ class Offer {
     }
 }
 
-/** For firebase purposes. */
 const offerConverter = {
     toFirestore: (shopLocation: string, expectedDeliveryTime: string, status: string) => ({
         shopLocation: shopLocation,
@@ -52,21 +51,17 @@ export const getOffers: (uid: string) => Promise<void | Offer[]> = (uid: string)
                     const offer = offerConverter.fromFirestore(offerSnapshot);
                     offers.push(offer);
                 } catch (e) {
-                    e => console.error("Encountered error while retrieving offers: " + e.message);
+                    e => console.error("Encountered error while retrieving offer: " + e.message);
                 }
             });
         })
 };
 
-export const addOffer: (uid: string, shopLocation: string, expectedDeliveryTime: string, status: Status) => Promise<void | Offer> 
-    = function(uid, shopLocation, expectedDeliveryTime, status) {
-        if (status === null) {
-            status = Status.OPEN;
-        }
+export const addOffer: (uid: string, shopLocation: string, expectedDeliveryTime: string) => Promise<void | Offer> 
+    = function(uid, shopLocation, expectedDeliveryTime) {
+        const status = Status.OPEN;
         ensureNonNull(uid, shopLocation, expectedDeliveryTime, status);
         return db.collection(COLLECTION_USERS).doc(uid).collection(COLLECTION_OFFERS)
-            .add(
-                offerConverter.toFirestore(shopLocation, expectedDeliveryTime, Status[status])
-            )
+            .add(offerConverter.toFirestore(shopLocation, expectedDeliveryTime, Status[status]))
             .then(offerRef => new Offer(offerRef.id, shopLocation, expectedDeliveryTime, status));
     }

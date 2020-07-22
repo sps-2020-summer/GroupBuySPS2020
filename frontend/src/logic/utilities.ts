@@ -4,6 +4,8 @@ export const ensureNonNull = (...objects: any[]) => {
     objects.forEach(o => {
         if (o === null) {
             throw new Error("Parameter is null");
+        } else if (o === undefined) {
+            throw new Error("Parameter is undefined");
         } else if (typeof o === "string" && o === "") {
             throw new Error("Given string parameter is empty");
         } 
