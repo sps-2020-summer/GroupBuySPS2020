@@ -1,4 +1,4 @@
-import { Status } from "./status";
+import { Status } from "../types";
 import { COLLECTION_USERS } from "./userlogic";
 import { db, ensureNonNull } from "./utilities";
 
