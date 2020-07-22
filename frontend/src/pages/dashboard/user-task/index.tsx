@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState, useEffect, useContext } from "react";
 import { DashboardCompProps } from "..";
 import { List } from "antd";
 import { Task } from "../../../types";
@@ -6,27 +6,32 @@ import { Slide } from "react-awesome-reveal";
 import TaskItem from "./task-item";
 import Loader from "../../../components/loader";
 
-import { getUserTask } from "../../../api";
+import { getOffers } from "../../../logic/offerlogic";
+import { FirebaseContext } from "../../../context/firebase-context";
+import firebase from "firebase";
 
 const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
+	const firebaseContext = useContext(FirebaseContext);
+	const { firebaseApp } = firebaseContext;
+	const db = firebase.firestore(firebaseApp as firebase.app.App);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [tasks, setTasks] = useState<Task[]>([]);
 
 	useEffect(() => {
-		const fetchTask = async (userUid: number) => {
+		const fetchTask = async (userUid: string) => {
 			try {
 				setLoading(true);
-
-				const res = await getUserTask(userUid, "open");
+				console.log(userUid);
+				const res = await getOffers(userUid, db);
+				console.log(res);
 			} catch (e) {
 				console.log(e);
 			} finally {
 				setLoading(false);
 			}
 		};
-
-		fetchTask(Number(userUid));
-	}, []);
+		fetchTask(userUid);
+	}, [userUid]);
 
 	return (
 		<>
