@@ -1,5 +1,14 @@
 import React, { FC, useEffect, useState, useCallback, useContext } from "react";
-import { Card, Typography, Spin, List, Space } from "antd";
+import {
+	Card,
+	Typography,
+	Spin,
+	List,
+	Space,
+	Button,
+	Modal,
+	message,
+} from "antd";
 import s from "../../main.module.css";
 import { Req } from "../../../../types";
 
@@ -8,6 +17,7 @@ import { getOpenRequest } from "../../../../api";
 import UserCreateRequestComponent from "./user-request";
 import { FirebaseContext } from "../../../../context/firebase-context";
 import firebase from "firebase";
+import ViewTask from "../../../../components/view-task";
 
 const { Title, Paragraph } = Typography;
 
@@ -17,6 +27,9 @@ const MainRequest: FC<{}> = () => {
 	const db = firebase.firestore(firebaseApp as firebase.app.App);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [requests, setRequests] = useState<Req[]>([]);
+
+	const [modalReq, setModalReq] = useState<Req | null>(null);
+	const [visible, setVisible] = useState<boolean>(false);
 
 	const IconText = ({ icon, text }) => (
 		<Space>
@@ -50,6 +63,19 @@ const MainRequest: FC<{}> = () => {
 		fetchRequest();
 	}, []);
 	console.log(requests);
+
+	const handleClick = (_, item: Req) => {
+		setModalReq(item);
+		setVisible(true);
+	};
+	const handleCancel = () => {
+		setModalReq(null);
+		setVisible(false);
+	};
+	const handleOkay = () => {
+		message.success("TASK ADDED CHECK DASHBOARD");
+	};
+
 	return (
 		<div className={s.content}>
 			<div className={s.userActions}>
@@ -79,7 +105,7 @@ const MainRequest: FC<{}> = () => {
 									onChange: (page) => {
 										console.log(page);
 									},
-									pageSize: 3,
+									pageSize: 4,
 								}}
 								split={false}
 								dataSource={requests}
@@ -87,29 +113,25 @@ const MainRequest: FC<{}> = () => {
 									<List.Item
 										key={item.title + index}
 										actions={[
+											<Button
+												type="primary"
+												onClick={(e) =>
+													handleClick(e, item)
+												}
+											>
+												View
+											</Button>,
 											<IconText
 												icon={StarOutlined}
-												text="156"
+												text=""
 												key="list-vertical-star-o"
 											/>,
 											<IconText
 												icon={LikeOutlined}
-												text="156"
+												text=""
 												key="list-vertical-like-o"
 											/>,
-											<IconText
-												icon={MessageOutlined}
-												text="2"
-												key="list-vertical-message"
-											/>,
 										]}
-										extra={
-											<img
-												width={272}
-												alt="logo"
-												src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-											/>
-										}
 									>
 										<List.Item.Meta
 											title={item.title}
@@ -122,6 +144,20 @@ const MainRequest: FC<{}> = () => {
 					)}
 				</Card>
 			</div>
+			<Modal
+				maskClosable={false}
+				title="View Request"
+				visible={visible}
+				onCancel={handleCancel}
+				onOk={handleOkay}
+				okText="fufil request?"
+			>
+				<Typography>
+					<Title>{modalReq?.title}</Title>
+					<Paragraph>{modalReq?.taskName}</Paragraph>
+					<ViewTask task={modalReq?.task} />
+				</Typography>
+			</Modal>
 		</div>
 	);
 };

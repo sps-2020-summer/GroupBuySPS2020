@@ -13,11 +13,13 @@ export const ensureNonNull = (...objects: any[]) => {
 }
 
 export const ensureNonNegative = (num: number) => {
-    if (num < 0) {
-        throw new Error("Given number is negative");
-    }
-}
+	if (num < 0) {
+		throw new Error("Given number is negative");
+	}
+};
 
 // TODO: set it up
+/*
 const firebaseApp = null;
 export const db: firebase.firestore.Firestore = firebase.firestore(firebaseApp as unknown as firebase.app.App);
+*/

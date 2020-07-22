@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState, useCallback, useContext } from "react";
-import { Card, Typography, Spin, List, Space } from "antd";
+import { Card, Typography, Spin, List, Space, Button, Modal } from "antd";
 import s from "../../main.module.css";
 import UserRequest from "../../../dashboard/user-request";
 import { Req, Offer } from "../../../../types";
@@ -9,8 +9,10 @@ import { getOpenOffers } from "../../../../api";
 import UserCreateOfferComponent from "./user-offer";
 import { FirebaseContext } from "../../../../context/firebase-context";
 import firebase from "firebase";
+import ViewTask from "../../../../components/view-task";
+import CreateRequest from "../../../../components/create-request";
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
 const MainOffer: FC<{}> = () => {
 	const firebaseContext = useContext(FirebaseContext);
@@ -18,6 +20,10 @@ const MainOffer: FC<{}> = () => {
 	const db = firebase.firestore(firebaseApp as firebase.app.App);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [offers, setOffers] = useState<Offer[]>([]);
+
+	const [modalOffer, setModalOffer] = useState<Offer | null>(null);
+	const [visible, setVisible] = useState<boolean>(false);
+	const [requestVisible, setReqVisible] = useState<boolean>(false);
 
 	const IconText = ({ icon, text }) => (
 		<Space>
@@ -49,6 +55,18 @@ const MainOffer: FC<{}> = () => {
 	useEffect(() => {
 		fetchOffer();
 	}, []);
+
+	const handleClick = (_, item: Offer) => {
+		setModalOffer(item);
+		setVisible(true);
+	};
+	const handleCancel = () => {
+		setModalOffer(null);
+		setVisible(false);
+	};
+	const handleOkay = () => {
+		setReqVisible(true);
+	};
 
 	console.log(offers);
 	return (
@@ -88,29 +106,25 @@ const MainOffer: FC<{}> = () => {
 									<List.Item
 										key={item.title + index}
 										actions={[
+											<Button
+												type="primary"
+												onClick={(e) =>
+													handleClick(e, item)
+												}
+											>
+												View
+											</Button>,
 											<IconText
 												icon={StarOutlined}
-												text="156"
+												text=""
 												key="list-vertical-star-o"
 											/>,
 											<IconText
 												icon={LikeOutlined}
-												text="156"
+												text=""
 												key="list-vertical-like-o"
 											/>,
-											<IconText
-												icon={MessageOutlined}
-												text="2"
-												key="list-vertical-message"
-											/>,
 										]}
-										extra={
-											<img
-												width={272}
-												alt="logo"
-												src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-											/>
-										}
 									>
 										<List.Item.Meta
 											title={item.title}
@@ -123,6 +137,35 @@ const MainOffer: FC<{}> = () => {
 					)}
 				</Card>
 			</div>
+			<Modal
+				maskClosable={false}
+				title="View Offer"
+				visible={visible}
+				onCancel={handleCancel}
+				onOk={handleOkay}
+				okText="Open Request?"
+			>
+				<Typography>
+					<Title>{modalOffer?.title}</Title>
+					<Paragraph>
+						<Text strong={true}>Description: </Text>
+						{modalOffer?.description}{" "}
+					</Paragraph>
+					<Paragraph>
+						<Text strong={true}>Shop location: </Text>
+						{modalOffer?.shopLocation}
+					</Paragraph>
+					<Paragraph>
+						<Text strong={true}>Delivery time: </Text>
+						{modalOffer?.expectedDeliveryTime}
+					</Paragraph>
+				</Typography>
+			</Modal>
+			<CreateRequest
+				title={"Request to offer"}
+				visible={requestVisible}
+				setVisible={setReqVisible}
+			/>
 		</div>
 	);
 };
