@@ -5,6 +5,7 @@
 .content {
 	margin: 24px;
 	min-height: 80vh;
+	max-height: 80vh;
 	display: grid;
 	grid-template-areas: "sidebar content";
 	grid-template-columns: 2fr 5fr;
@@ -34,7 +35,8 @@
 .requestBackground {
 	width: 100%;
 	padding: 12px;
-	min-height: 80vh;
+	min-height: 70vh;
+	max-height: 70vh;
 	border-radius: 20px;
 	box-shadow: 0 10px 20px 20px rgba(0.2, 0.2, 0.2, 0.2);
 }
