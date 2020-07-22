@@ -10,7 +10,7 @@ export type Task = {
 	status: Status;
 };
 
-export const enum Status {
+export enum Status {
 	OPEN = "open",
 	PENDING = "pending",
 	DONE = "done",
