@@ -1,7 +1,7 @@
 import { Status } from "../types";
 import { COLLECTION_USERS } from "./userlogic";
 import { ensureNonNull } from "./utilities";
-
+import { db } from "../index";
 // const COLLECTION_OFFERS: string = "offers";
 // i accidentally created test databse in cloud firestore it as offer lol
 const COLLECTION_OFFERS: string = "offer";
