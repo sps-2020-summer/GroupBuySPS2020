@@ -37,12 +37,12 @@ const offerConverter = Object.freeze({
 		uid: string,
 		shopLocation: string,
 		expectedDeliveryTime: string,
-		status: string
+		status: Status
 	) => ({
 		uid: uid,
 		shopLocation: shopLocation,
 		expectedDeliveryTime: expectedDeliveryTime,
-		status: status,
+		status: Status[status],
 	}),
 	fromFirestore: (
 		offerSnapshot: firebase.firestore.DocumentSnapshot
