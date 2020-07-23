@@ -1,17 +1,18 @@
-import { Status } from "../types";
-import { COLLECTION_USERS } from "./userlogic";
-import { ensureNonNull } from "./utilities";
 import { db } from "../index";
-// const COLLECTION_OFFERS: string = "offers";
-// i accidentally created test databse in cloud firestore it as offer lol
+import { Status } from "../types";
+import { ensureNonNull } from "./utilities";
+
 const COLLECTION_OFFERS: string = "offer";
+
 class Offer {
+    uid: string;
 	id: string;
 	shopLocation: string;
 	expectedDeliveryTime: string;
 	status: Status;
 
 	constructor(
+		uid: string,
 		id: string,
 		shopLocation: string,
 		expectedDeliveryTime: string,
@@ -23,6 +24,7 @@ class Offer {
 			throw new Error("Unable to create offer. Reason: " + e.message);
 		}
 
+		this.uid = uid;
 		this.id = id;
 		this.shopLocation = shopLocation;
 		this.expectedDeliveryTime = expectedDeliveryTime;
@@ -32,10 +34,12 @@ class Offer {
 
 const offerConverter = {
 	toFirestore: (
+		uid: string,
 		shopLocation: string,
 		expectedDeliveryTime: string,
 		status: string
 	) => ({
+		uid: uid,
 		shopLocation: shopLocation,
 		expectedDeliveryTime: expectedDeliveryTime,
 		status: status,
@@ -48,6 +52,7 @@ const offerConverter = {
 			throw new Error("Unable to find snapshot for offer.");
 		} else {
 			return new Offer(
+				data.uid,
 				offerSnapshot.id,
 				data.shopLocation,
 				data.expectedDeliveryTime,
@@ -56,17 +61,13 @@ const offerConverter = {
 		}
 	},
 };
-// convert to use async await to wrap
-// else need to wrap in new Promise(resolve, reject) => ......
+
 export const getOffers: (
 	uid: string,
-	db: firebase.firestore.Firestore
-) => Promise<void | Offer[]> = async (
+) => Promise<Offer[]> = async (
 	uid: string,
-	db: firebase.firestore.Firestore
 ) => {
-	console.log(uid);
-	const offersRef = db.collection(COLLECTION_OFFERS).where("uuid", "==", uid);
+	const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
 	const offers: Offer[] = [];
 	const offersQuerySnapshot = await offersRef.get();
 	offersQuerySnapshot.forEach((offerSnapshot) => {
@@ -87,36 +88,32 @@ export const addOffer: (
 	shopLocation: string,
 	expectedDeliveryTime: string,
 	status: Status,
-	db: firebase.firestore.Firestore
-) => Promise<void | Offer> = function (
+) => Promise<Offer> = async function (
 	uid,
 	shopLocation,
 	expectedDeliveryTime,
 	status,
-	db: firebase.firestore.Firestore
 ) {
 	if (status === null) {
 		status = Status.OPEN;
 	}
 	ensureNonNull(uid, shopLocation, expectedDeliveryTime, status);
-	return db
-		.collection(COLLECTION_USERS)
-		.doc(uid)
+	const offersRef = await db
 		.collection(COLLECTION_OFFERS)
 		.add(
 			offerConverter.toFirestore(
+				uid,
 				shopLocation,
 				expectedDeliveryTime,
 				Status[status]
 			)
-		)
-		.then(
-			(offerRef) =>
-				new Offer(
-					offerRef.id,
-					shopLocation,
-					expectedDeliveryTime,
-					status
-				)
 		);
+
+	return new Offer(
+		uid, 
+		offersRef.id,
+		shopLocation,
+		expectedDeliveryTime,
+		status
+	);
 };

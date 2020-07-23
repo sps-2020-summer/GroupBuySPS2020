@@ -1,5 +1,3 @@
-import firebase from "firebase";
-
 export const ensureNonNull = (...objects: any[]) => {
     objects.forEach(o => {
         if (o === null) {
