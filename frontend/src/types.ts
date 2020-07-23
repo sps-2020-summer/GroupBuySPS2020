@@ -1,7 +1,7 @@
 /** Common types */
 export type Task = {
 	id: string;
-	name: string;
+	name?: string;
 	shopLocation: string;
 	item: string;
 	payerName: string;
@@ -28,11 +28,11 @@ export type Offer = {
 	status: Status;
 };
 
-export type Req = {
+export type Request = {
 	id: string;
-	title: string;
-	taskName: string;
-	taskId: string;
-	name: string;
+	title?: string;
+	taskName?: string;
+	taskId?: string;
+	name?: string;
 	task: Task;
 };

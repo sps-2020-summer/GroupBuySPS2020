@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import { DashboardCompProps } from "..";
-import { Req, Task } from "../../../types";
+import { Request, Task } from "../../../types";
 import { Slide } from "react-awesome-reveal";
 import { List, Card } from "antd";
 import s from "./s.module.css";
@@ -12,7 +12,7 @@ import { getUserTask, getUserRequest } from "../../../api";
 const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [requests, setRequests] = useState<Req[]>([]);
+  const [requests, setRequests] = useState<Request[]>([]);
 
   useEffect(() => {
     const fetchUserHistory = async (userUid: number) => {
@@ -39,41 +39,41 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
       {loading ? (
         <Loader spin={loading} topMargin={"24px"} />
       ) : (
-        <div className={s.content}>
-          <div className={s.prevTasks}>
-            <h2>Completed Tasks</h2>
-            <List
-              split={false}
-              dataSource={tasks}
-              renderItem={(item) => (
-                <List.Item>
-                  <Card
-                    className={s.cardStyle}
-                    title={item.name}
-                    style={{ width: "100%" }}
-                  >
-                    <TaskItem name={item.name} />
-                  </Card>
-                </List.Item>
-              )}
-            />
+          <div className={s.content}>
+            <div className={s.prevTasks}>
+              <h2>Completed Tasks</h2>
+              <List
+                split={false}
+                dataSource={tasks}
+                renderItem={(item) => (
+                  <List.Item>
+                    <Card
+                      className={s.cardStyle}
+                      title={item.name}
+                      style={{ width: "100%" }}
+                    >
+                      <TaskItem name={item.name ?? '-'} />
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            </div>
+            <div className={s.prevRequest}>
+              <h2>Past Requests</h2>
+              <List
+                split={false}
+                dataSource={requests}
+                renderItem={(item) => (
+                  <List.Item>
+                    <Card title={item.name} style={{ width: "100%" }}>
+                      <RequestItem name={item.name ?? '-'} />
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            </div>
           </div>
-          <div className={s.prevRequest}>
-            <h2>Past Requests</h2>
-            <List
-              split={false}
-              dataSource={requests}
-              renderItem={(item) => (
-                <List.Item>
-                  <Card title={item.name} style={{ width: "100%" }}>
-                    <RequestItem name={item.name} />
-                  </Card>
-                </List.Item>
-              )}
-            />
-          </div>
-        </div>
-      )}
+        )}
       <br />
     </>
   );

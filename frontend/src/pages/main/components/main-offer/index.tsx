@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState, useCallback, useContext } from "react";
 import { Card, Typography, Spin, List, Space, Button, Modal } from "antd";
 import s from "../../main.module.css";
 import UserRequest from "../../../dashboard/user-request";
-import { Req, Offer } from "../../../../types";
+import { Request, Offer } from "../../../../types";
 import RequestItem from "../../../dashboard/user-request/request-item";
 import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
 import { getOpenOffers } from "../../../../api";
