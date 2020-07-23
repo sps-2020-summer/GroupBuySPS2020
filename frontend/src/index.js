@@ -16,7 +16,7 @@ const config = {
 	measurementId: process.env.REACT_MEASUREMENT_ID,
 };
 const firebaseApp = firebase.initializeApp(config);
-
+export const db = firebase.firestore(firebaseApp);
 ReactDOM.render(
 	<FirebaseContext.Provider value={{ firebase: firebase, firebaseApp }}>
 		<App />

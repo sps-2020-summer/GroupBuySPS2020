@@ -17,9 +17,3 @@ export const ensureNonNegative = (num: number) => {
 		throw new Error("Given number is negative");
 	}
 };
-
-// TODO: set it up
-/*
-const firebaseApp = null;
-export const db: firebase.firestore.Firestore = firebase.firestore(firebaseApp as unknown as firebase.app.App);
-*/
