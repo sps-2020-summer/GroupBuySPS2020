@@ -1,3 +1,6 @@
+import { db } from "../index";
 import { Status } from "../types";
-import { COLLECTION_USERS } from "./userlogic";
-import { db, ensureNonNull, ensureNonNegative } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative } from "./utilities";
+
+class Request
+

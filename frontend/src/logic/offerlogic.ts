@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonNull } from "./utilities";
+import { ensureNonEmpty } from "./utilities";
 
 const COLLECTION_OFFERS: string = "offer";
 
@@ -19,7 +19,7 @@ class Offer {
 		status: Status
 	) {
 		try {
-			ensureNonNull(id, shopLocation, expectedDeliveryTime, status);
+			ensureNonEmpty(id, shopLocation, expectedDeliveryTime, status);
 		} catch (e) {
 			throw new Error("Unable to create offer. Reason: " + e.message);
 		}
@@ -97,7 +97,7 @@ export const addOffer: (
 	if (status === null) {
 		status = Status.OPEN;
 	}
-	ensureNonNull(uid, shopLocation, expectedDeliveryTime, status);
+	ensureNonEmpty(uid, shopLocation, expectedDeliveryTime, status);
 	const offersRef = await db
 		.collection(COLLECTION_OFFERS)
 		.add(

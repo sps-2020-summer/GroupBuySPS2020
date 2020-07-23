@@ -1,22 +1,21 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonNull, ensureNonNegative } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative, isEmptyString } from "./utilities";
 
 const COLLECTION_TASKS: string = "tasks";
 
 class Task {
-    uid: string;
     id: string;
     shopLocation: string;
     expectedDeliveryTime: string;
     item: string;
     payerName: string;
     fee: number;
-    doerName?: string;
     status: Status;
+    uid?: string; // equivalent to doer's id
+    doerName?: string;
 
     constructor(
-        uid: string,
         id: string, 
         shopLocation: string, 
         expectedDeliveryTime: string, 
@@ -24,11 +23,11 @@ class Task {
         payerName: string, 
         fee: number,
         status: Status, 
+        uid?: string,
         doerName?: string
     ) {
-        ensureNonNull(uid, id, expectedDeliveryTime, item, payerName, fee, status);
+        ensureNonEmpty(id, expectedDeliveryTime, item, payerName, fee, status);
         ensureNonNegative(fee);
-        this.uid = uid;
         this.id = id;
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
@@ -37,32 +36,67 @@ class Task {
         this.fee = fee;
         this.status = status;
 
-        if ((doerName === null || doerName === "" || doerName === undefined) && status !== Status.OPEN) {
+        if (Task.isValidDoer(uid, doerName)) {
+            throw new Error("Either task has doer (an owner of task) but no doer's id (i.e. uid) is missing, or" 
+                + " task has doer's id but no doer.");
+        }
+ 
+        if (!Task.isValidState(uid, doerName, status)) {
             throw new Error("Missing doer for task with id " + id);
         }
-        this.id = id;
+
+        this.uid = uid === undefined ? "" : uid;
+        this.doerName = doerName === undefined ? "" : doerName;
     }
+
+    static isValidDoerPresent = (
+        uid: string | undefined,
+        doerName: string | undefined
+    ) => (
+        !isEmptyString(uid) && !isEmptyString(doerName)
+    )
+
+    // doer is only valid when task has a uid (i.e. doer's id) and doer's name
+    static isValidDoer = (
+        uid: string | undefined, 
+        doerName: string | undefined
+    ) => (
+       Task.isValidDoerPresent(uid, doerName)
+    ) || (
+        isEmptyString(uid) && isEmptyString(doerName)
+    );
+
+    // state is invalid if doer information is present but status is OPEN
+    static isValidState = (
+        uid: string | undefined,
+        doerName: string | undefined,
+        status: Status
+    ) => (
+        (Task.isValidDoerPresent(uid, doerName) && status !== Status.OPEN)
+        || 
+        (isEmptyString(uid) && isEmptyString(doerName) && status === Status.OPEN)
+    );
 }
 
 const taskConverter = {
     toFirestore: (
-        uid: string,
         shopLocation: string, 
         expectedDeliveryTime: string, 
         item: string, 
         payerName: string, 
         fee: number,
         status: Status, 
-        doerName?: string
+        uid: string,
+        doerName: string
     ) => ({
-        uid: uid,
         shopLocation: shopLocation,
         expectedDeliveryTime: expectedDeliveryTime,
         item: item,
         payerName: payerName,
         fee: fee,
         status: Status[status],
-        doerName: (doerName === null || doerName === undefined) ? "" : doerName
+        uid: uid,
+        doerName: doerName
     }),
     fromFirestore: (
         taskSnapshot: firebase.firestore.QueryDocumentSnapshot
@@ -72,7 +106,6 @@ const taskConverter = {
             throw new Error("Unable to find snapshot for task.");
         } else {
             return new Task(
-                data.uid, 
                 taskSnapshot.id, 
                 data.shopLocation, 
                 data.expectedDeliveryTime, 
@@ -80,6 +113,7 @@ const taskConverter = {
                 data.payerName, 
                 data.fee, 
                 Status[data.status], 
+                data.uid, 
                 data.doerName
             );
         }
@@ -105,49 +139,70 @@ export const getTasks: (
     return tasks;
 };
 
-export const addTask: (
-    uid: string, 
+/** 
+ * Adds a new task to the database. If a valid doer is present (i.e. both `uid` and `doerName` are given),
+ * task's status will be `PENDING`. If no valid doer is present (i.e. both `uid` and `doerName` are not given),
+ * task's status will be `OPEN`.
+ * @throws Exception if `uid` is present but `doerName` is absent, or vice versa.
+ */
+export const addTask: ( 
     shopLocation: string, 
     expectedDeliveryTime: string, 
     item: string, 
     payerName: string, 
     fee: number,
-    givenStatus?: Status
+    uid?: any,
+    doerName?: any,
 ) => Promise<Task> 
 = async function(
-    uid, 
     shopLocation, 
     expectedDeliveryTime, 
     item, 
     payerName, 
     fee, 
-    givenStatus
+    uid, 
+    doerName,
 ) {
-    const status = givenStatus === undefined ? Status.OPEN : givenStatus;
-    ensureNonNull(uid, shopLocation, expectedDeliveryTime, status, item, payerName, fee);
+    ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerName, fee);
     ensureNonNegative(fee);
+    
+    if (!Task.isValidDoer(uid, doerName)) {
+        throw new Error("Unable to add task. Either task has doer (an owner of task) " 
+                + "but no doer's id (i.e. uid) is missing, or task has doer's id but no doer.");
+    };
+
+    let status;
+    if (Task.isValidDoerPresent(uid, doerName)) {
+        status = Status.PENDING;
+    } else {
+        status = Status.OPEN;
+        uid = "";
+        doerName = "";
+    }
 
     const taskRef = await db.collection(COLLECTION_TASKS)
         .add(
             taskConverter.toFirestore(
-                uid,
                 shopLocation, 
                 expectedDeliveryTime, 
                 item, 
                 payerName, 
                 fee, 
-                Status[status]
+                Status[status],
+                uid,
+                doerName
             )
         );
 
     return new Task(
-        uid, 
         taskRef.id, 
         shopLocation, 
         expectedDeliveryTime, 
         item, 
         payerName, 
         fee, 
-        status
+        status,
+        uid,
+        doerName
     );
 }

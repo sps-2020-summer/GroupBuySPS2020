@@ -1,4 +1,4 @@
-export const ensureNonNull = (...objects: any[]) => {
+export const ensureNonEmpty = (...objects: any[]) => {
     objects.forEach(o => {
         if (o === null) {
             throw new Error("Parameter is null");
@@ -15,3 +15,7 @@ export const ensureNonNegative = (num: number) => {
 		throw new Error("Given number is negative");
 	}
 };
+
+export const isEmptyString = (str: string | undefined | null) => (
+    str === null || str === undefined || str === ""
+);
