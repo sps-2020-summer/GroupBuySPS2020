@@ -10,7 +10,7 @@ import {
 	message,
 } from "antd";
 import s from "../../main.module.css";
-import { Req } from "../../../../types";
+import { Request } from "../../../../types";
 
 import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
 import { getOpenRequest } from "../../../../api";
@@ -26,9 +26,9 @@ const MainRequest: FC<{}> = () => {
 	const { firebaseApp } = firebaseContext;
 	const db = firebase.firestore(firebaseApp as firebase.app.App);
 	const [loading, setLoading] = useState<boolean>(true);
-	const [requests, setRequests] = useState<Req[]>([]);
+	const [requests, setRequests] = useState<Request[]>([]);
 
-	const [modalReq, setModalReq] = useState<Req | null>(null);
+	const [modalReq, setModalReq] = useState<Request | null>(null);
 	const [visible, setVisible] = useState<boolean>(false);
 
 	const IconText = ({ icon, text }) => (
@@ -64,7 +64,7 @@ const MainRequest: FC<{}> = () => {
 	}, []);
 	console.log(requests);
 
-	const handleClick = (_, item: Req) => {
+	const handleClick = (_, item: Request) => {
 		setModalReq(item);
 		setVisible(true);
 	};
@@ -94,54 +94,54 @@ const MainRequest: FC<{}> = () => {
 					{loading ? (
 						<Spin></Spin>
 					) : (
-						<>
-							{requests.length === 0 ? (
-								<>You currently have no requests opened!</>
-							) : (
-								<></>
-							)}
-							<List
-								pagination={{
-									onChange: (page) => {
-										console.log(page);
-									},
-									pageSize: 4,
-								}}
-								split={false}
-								dataSource={requests}
-								renderItem={(item: Req, index: number) => (
-									<List.Item
-										key={item.title + index}
-										actions={[
-											<Button
-												type="primary"
-												onClick={(e) =>
-													handleClick(e, item)
-												}
-											>
-												View
+							<>
+								{requests.length === 0 ? (
+									<>You currently have no requests opened!</>
+								) : (
+										<></>
+									)}
+								<List
+									pagination={{
+										onChange: (page) => {
+											console.log(page);
+										},
+										pageSize: 4,
+									}}
+									split={false}
+									dataSource={requests}
+									renderItem={(item: Request, index: number) => (
+										<List.Item
+											key={item.title ?? '-' + index}
+											actions={[
+												<Button
+													type="primary"
+													onClick={(e) =>
+														handleClick(e, item)
+													}
+												>
+													View
 											</Button>,
-											<IconText
-												icon={StarOutlined}
-												text=""
-												key="list-vertical-star-o"
-											/>,
-											<IconText
-												icon={LikeOutlined}
-												text=""
-												key="list-vertical-like-o"
-											/>,
-										]}
-									>
-										<List.Item.Meta
-											title={item.title}
-											description={item.taskName}
-										/>
-									</List.Item>
-								)}
-							/>
-						</>
-					)}
+												<IconText
+													icon={StarOutlined}
+													text=""
+													key="list-vertical-star-o"
+												/>,
+												<IconText
+													icon={LikeOutlined}
+													text=""
+													key="list-vertical-like-o"
+												/>,
+											]}
+										>
+											<List.Item.Meta
+												title={item.title}
+												description={item.taskName}
+											/>
+										</List.Item>
+									)}
+								/>
+							</>
+						)}
 				</Card>
 			</div>
 			<Modal

@@ -60,7 +60,7 @@ const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
 									dataSource={tasks}
 									renderItem={(item) => (
 										<List.Item>
-											<TaskItem name={item.name} />
+											<TaskItem name={item.name ?? '-'} />
 										</List.Item>
 									)}
 								/>
