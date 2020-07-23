@@ -32,7 +32,7 @@ class Offer {
 	}
 }
 
-const offerConverter = {
+const offerConverter = Object.freeze({
 	toFirestore: (
 		uid: string,
 		shopLocation: string,
@@ -45,22 +45,21 @@ const offerConverter = {
 		status: status,
 	}),
 	fromFirestore: (
-		offerSnapshot: firebase.firestore.QueryDocumentSnapshot
+		offerSnapshot: firebase.firestore.DocumentSnapshot
 	) => {
 		const data = offerSnapshot.data();
 		if (data === undefined) {
 			throw new Error("Unable to find snapshot for offer.");
-		} else {
-			return new Offer(
-				data.uid,
-				offerSnapshot.id,
-				data.shopLocation,
-				data.expectedDeliveryTime,
-				Status[data.status]
-			);
-		}
+		} 
+		return new Offer(
+			data.uid,
+			offerSnapshot.id,
+			data.shopLocation,
+			data.expectedDeliveryTime,
+			Status[data.status]
+		);
 	},
-};
+});
 
 export const getOffers: (
 	uid: string,

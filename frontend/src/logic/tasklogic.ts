@@ -4,7 +4,7 @@ import { ensureNonEmpty, ensureNonNegative, isEmptyString } from "./utilities";
 
 const COLLECTION_TASKS: string = "tasks";
 
-class Task {
+export class Task {
     id: string;
     shopLocation: string;
     expectedDeliveryTime: string;
@@ -78,7 +78,7 @@ class Task {
     );
 }
 
-const taskConverter = {
+const taskConverter = Object.freeze({
     toFirestore: (
         shopLocation: string, 
         expectedDeliveryTime: string, 
@@ -99,33 +99,33 @@ const taskConverter = {
         doerName: doerName
     }),
     fromFirestore: (
-        taskSnapshot: firebase.firestore.QueryDocumentSnapshot
+        taskSnapshot: firebase.firestore.DocumentSnapshot
     ) => {
         const data = taskSnapshot.data();
         if (data === undefined) {
             throw new Error("Unable to find snapshot for task.");
-        } else {
-            return new Task(
-                taskSnapshot.id, 
-                data.shopLocation, 
-                data.expectedDeliveryTime, 
-                data.item, 
-                data.payerName, 
-                data.fee, 
-                Status[data.status], 
-                data.uid, 
-                data.doerName
-            );
-        }
+        } 
+        return new Task(
+            taskSnapshot.id, 
+            data.shopLocation, 
+            data.expectedDeliveryTime, 
+            data.item, 
+            data.payerName, 
+            data.fee, 
+            Status[data.status], 
+            data.uid, 
+            data.doerName
+        );
     }
-}
+});
 
 export const getTasks: (
     uid: string
 ) => Promise<Task[]> = async (
     uid: string
 ) => {
-    const tasksRef = db.collection(COLLECTION_TASKS).where("uid", "==", uid);;
+    ensureNonEmpty(uid);
+    const tasksRef = db.collection(COLLECTION_TASKS).where("uid", "==", uid);
     const tasks: Task[] = [];
     const tasksQuerySnapshot = await tasksRef.get();
     tasksQuerySnapshot.forEach(taskSnapshot => {
@@ -133,11 +133,25 @@ export const getTasks: (
             const task = taskConverter.fromFirestore(taskSnapshot);
             tasks.push(task);
         } catch (e) {
-            e => console.error("Encountered error while retrieving task: " + e.message);
+            e => console.error(`Encountered error while retrieving task: ${e.message}`);
         }
     });
     return tasks;
 };
+
+export const getTaskById: (
+    id: string
+) => Promise<Task> = async (
+    id: string
+) => {
+    ensureNonEmpty(id);
+    const taskRef = db.collection(COLLECTION_TASKS).doc(id);
+    const task = await taskRef.get();
+    if (!task.exists) {
+        throw new Error(`Unable to find task with id ${id}`);
+    }
+    return taskConverter.fromFirestore(task);
+}
 
 /** 
  * Adds a new task to the database. If a valid doer is present (i.e. both `uid` and `doerName` are given),
