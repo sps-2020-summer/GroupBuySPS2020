@@ -9,12 +9,17 @@ class Request {
     id: string;
     task: Task;
 
+    /** @throws Error if `uid`, `id` or `task` is empty. */
     constructor(
         uid: string,
         id: string,
         task: Task
     ) {
-        ensureNonEmpty(uid, id, task);
+        try {
+            ensureNonEmpty(uid, id, task);
+        } catch (e) {
+            throw new Error(`Unable to create request: ${e.message}`);
+        }
         this.uid = uid;
         this.id = id;
         this.task = task;
@@ -22,13 +27,25 @@ class Request {
 }
 
 const requestConverter = Object.freeze({
+    /** 
+     * Assumes that `task` is valid (i.e. exists in db).
+     * @throws Error if `uid` or `task` is invalid/empty. 
+     */
 	toFirestore: (
         uid: string,
         task: Task
-	) => ({
-		uid: uid,
-        taskId: task.id
-	}),
+	) => {
+        try {
+            ensureNonEmpty(uid, task);
+        } catch (e) {
+            throw new Error("Unable to convert request to firestore because uid/task is empty");
+        }
+
+        return {
+            uid: uid,
+            taskId: task.id
+        }
+    },
 	fromFirestore: async (
 		requestSnapshot: firebase.firestore.DocumentSnapshot
 	) => {
@@ -45,12 +62,20 @@ const requestConverter = Object.freeze({
 	},
 });
 
+/**
+ * Gets all requests that are associated with `uid`.
+ * @throws Error if `uid` is empty.
+ */
 export const getRequests: (
     uid: string
 ) => Promise<Request[]> = async (
     uid: string
 ) => {
-    ensureNonEmpty(uid);
+    try {
+        ensureNonEmpty(uid);
+    } catch (e) {
+        throw new Error("Unable to get requests when uid is empty");
+    }
     const requestRef = db.collection(COLLECTION_REQUESTS).where("uid", "==", uid);
     const requests: Request[] = [];
     const requestQuerySnapshot = await requestRef.get();
@@ -65,6 +90,11 @@ export const getRequests: (
     return requests;
 };
 
+/** 
+ * Adds request to database.
+ * @throws Error if `uid` is empty.
+ * @throws Error if given arguments cannot be used to create a valid request.
+ */
 export const addRequest: (
     uid: string,
     payerName: string,
@@ -84,30 +114,38 @@ export const addRequest: (
     doerId, 
     doerName
 ) {
-    ensureNonEmpty(uid);
-    // TODO: handle exceptions
-    const task = await addTask(
-        shopLocation,
-        expectedDeliveryTime,
-        item,
-        payerName,
-        fee,
-        doerId,
-        doerName
-    );
-
-    const requestRef = await db
-        .collection(COLLECTION_REQUESTS)
-        .add(
-            requestConverter.toFirestore(
-                uid,
-                task
-            )
+    try {
+        ensureNonEmpty(uid);
+    } catch (e) {
+        throw new Error("Unable to add request when user id is not specified");
+    }
+    
+    try {
+        const task = await addTask(
+            shopLocation,
+            expectedDeliveryTime,
+            item,
+            payerName,
+            fee,
+            doerId,
+            doerName
         );
     
-    return new Request(
-        uid,
-        requestRef.id,
-        task
-    );
+        const requestRef = await db
+            .collection(COLLECTION_REQUESTS)
+            .add(
+                requestConverter.toFirestore(
+                    uid,
+                    task
+                )
+            );
+        
+        return new Request(
+            uid,
+            requestRef.id,
+            task
+        );
+    } catch (e) {
+        throw new Error(`Unable to add request: ${e.message}`);
+    }
 };

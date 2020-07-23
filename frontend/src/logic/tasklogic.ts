@@ -15,6 +15,11 @@ export class Task {
     uid?: string; // equivalent to doer's id
     doerName?: string;
 
+    /** 
+     * @throws Error if `uid` and `doerName` are not both empty, or are not both non-empty. 
+     * @throws Error if `id`, `shopLocation`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerName` or `status` are empty.
+     * @throws Error if `fee` is not non-negative.
+     */
     constructor(
         id: string, 
         shopLocation: string, 
@@ -26,8 +31,13 @@ export class Task {
         uid?: string,
         doerName?: string
     ) {
-        ensureNonEmpty(id, expectedDeliveryTime, item, payerName, fee, status);
-        ensureNonNegative(fee);
+        try {
+            ensureNonEmpty(id, shopLocation, expectedDeliveryTime, item, payerName, fee, status);
+            ensureNonNegative(fee);
+		} catch (e) {
+			throw new Error(`Unable to create task: e.message`);
+		}
+
         this.id = id;
         this.shopLocation = shopLocation;
         this.expectedDeliveryTime = expectedDeliveryTime;
@@ -49,6 +59,7 @@ export class Task {
         this.doerName = doerName === undefined ? "" : doerName;
     }
 
+    /** Checks if a valid doer is present. */
     static isValidDoerPresent = (
         uid: string | undefined,
         doerName: string | undefined
@@ -56,7 +67,10 @@ export class Task {
         !isEmptyString(uid) && !isEmptyString(doerName)
     )
 
-    // doer is only valid when task has a uid (i.e. doer's id) and doer's name
+    /** 
+     * Checks if doer is valid.
+     * @returns `true` if `uid` (i.e. doer's id) and `doerName` are both empty, or both non-empty. 
+     */
     static isValidDoer = (
         uid: string | undefined, 
         doerName: string | undefined
@@ -66,7 +80,10 @@ export class Task {
         isEmptyString(uid) && isEmptyString(doerName)
     );
 
-    // state is invalid if doer information is present but status is OPEN
+    /** 
+     * Checks if state valid. 
+     * @returns `true` if doer information is present but status is OPEN. 
+     */
     static isValidState = (
         uid: string | undefined,
         doerName: string | undefined,
@@ -79,6 +96,10 @@ export class Task {
 }
 
 const taskConverter = Object.freeze({
+    /** 
+     * @throws Error if `id`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerName` or `status` are empty.
+     * @throws Error if `fee` is not a non-negative number.
+     */
     toFirestore: (
         shopLocation: string, 
         expectedDeliveryTime: string, 
@@ -88,16 +109,26 @@ const taskConverter = Object.freeze({
         status: Status, 
         uid: string,
         doerName: string
-    ) => ({
-        shopLocation: shopLocation,
-        expectedDeliveryTime: expectedDeliveryTime,
-        item: item,
-        payerName: payerName,
-        fee: fee,
-        status: Status[status],
-        uid: uid,
-        doerName: doerName
-    }),
+    ) => {
+        try {
+            ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerName, fee);
+            ensureNonNegative(fee);
+        } catch (e) {
+            throw new Error(`Unable to convert task to firestore. Reason: ${e.message}`);
+        }
+        
+        return {
+            shopLocation: shopLocation,
+            expectedDeliveryTime: expectedDeliveryTime,
+            item: item,
+            payerName: payerName,
+            fee: fee,
+            status: Status[status],
+            uid: uid,
+            doerName: doerName
+        }
+    },
+    /** @throws Error if data associated with `taskSnapshot` cannot be found. */
     fromFirestore: (
         taskSnapshot: firebase.firestore.DocumentSnapshot
     ) => {
@@ -105,6 +136,7 @@ const taskConverter = Object.freeze({
         if (data === undefined) {
             throw new Error("Unable to find snapshot for task.");
         } 
+        // no error should occur here
         return new Task(
             taskSnapshot.id, 
             data.shopLocation, 
@@ -119,12 +151,21 @@ const taskConverter = Object.freeze({
     }
 });
 
+/** 
+ * Gets all tasks which are associated with `uid`. 
+ * @throws Error if `uid` is `null`, `undefined` or `""`.
+ */
 export const getTasks: (
     uid: string
 ) => Promise<Task[]> = async (
     uid: string
 ) => {
-    ensureNonEmpty(uid);
+    try {
+        ensureNonEmpty(uid);
+    } catch (e) {
+        throw new Error(`Unable to get tasks for user with empty uid.`);
+    }
+
     const tasksRef = db.collection(COLLECTION_TASKS).where("uid", "==", uid);
     const tasks: Task[] = [];
     const tasksQuerySnapshot = await tasksRef.get();
@@ -139,12 +180,23 @@ export const getTasks: (
     return tasks;
 };
 
+/**
+ * Gets task by id.
+ * @param id id of task to be retrieved.
+ * @throws Error if `id` is not specified/empty.
+ * @throws Error if no task with `id` can be found.
+ */
 export const getTaskById: (
     id: string
 ) => Promise<Task> = async (
     id: string
 ) => {
-    ensureNonEmpty(id);
+    try {
+        ensureNonEmpty(id);
+    } catch (e) {
+        throw new Error("Unable to get task by id when id is not specified/empty");
+    }
+    
     const taskRef = db.collection(COLLECTION_TASKS).doc(id);
     const task = await taskRef.get();
     if (!task.exists) {
@@ -158,6 +210,8 @@ export const getTaskById: (
  * task's status will be `PENDING`. If no valid doer is present (i.e. both `uid` and `doerName` are not given),
  * task's status will be `OPEN`.
  * @throws Exception if `uid` is present but `doerName` is absent, or vice versa.
+ * @throws Error if `id`, `shopLocation`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerName` or `status` are empty.
+ * @throws Error if `fee` is not non-negative.
  */
 export const addTask: ( 
     shopLocation: string, 
@@ -177,8 +231,13 @@ export const addTask: (
     uid, 
     doerName,
 ) {
-    ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerName, fee);
-    ensureNonNegative(fee);
+    try {
+        ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerName, fee);
+        ensureNonNegative(fee);
+    } catch (e) {
+        throw new Error(`Unable to add task: ${e.message}`);
+    }
+    
     
     if (!Task.isValidDoer(uid, doerName)) {
         throw new Error("Unable to add task. Either task has doer (an owner of task) " 
@@ -194,7 +253,8 @@ export const addTask: (
         doerName = "";
     }
 
-    const taskRef = await db.collection(COLLECTION_TASKS)
+    try {
+        const taskRef = await db.collection(COLLECTION_TASKS)
         .add(
             taskConverter.toFirestore(
                 shopLocation, 
@@ -207,16 +267,18 @@ export const addTask: (
                 doerName
             )
         );
-
-    return new Task(
-        taskRef.id, 
-        shopLocation, 
-        expectedDeliveryTime, 
-        item, 
-        payerName, 
-        fee, 
-        status,
-        uid,
-        doerName
-    );
+        return new Task(
+            taskRef.id, 
+            shopLocation, 
+            expectedDeliveryTime, 
+            item, 
+            payerName, 
+            fee, 
+            status,
+            uid,
+            doerName
+        );
+    } catch (e) {
+        throw new Error(`Unable to add task: ${e.message}`);
+    };
 }
