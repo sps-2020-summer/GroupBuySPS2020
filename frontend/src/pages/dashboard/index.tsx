@@ -13,10 +13,11 @@ import UserTask from "./user-task";
 import UserRequest from "./user-request";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Loader from "../../components/loader";
+import UserOffer from "./user-offer";
 
 const { Sider, Content } = Layout;
 
-type dashboardOptions = "tasks" | "history" | "requests";
+type dashboardOptions = "tasks" | "history" | "requests" | "offers";
 
 export type DashboardCompProps = {
 	userUid: string;
@@ -29,7 +30,7 @@ const Dashboard: FC<{}> = () => {
 	const navToHome = () => history.push("/");
 	const [user] = useAuthState(firebase.auth());
 
-	const [current, setCurrent] = useState<dashboardOptions>("tasks");
+	const [current, setCurrent] = useState<dashboardOptions>("offers");
 	console.log(user);
 	const userUid = user?.uid;
 	if (userUid === undefined) {
@@ -37,6 +38,7 @@ const Dashboard: FC<{}> = () => {
 	}
 	/** The pages to show on menu click */
 	const childPages = {
+		offers: <UserOffer userUid={userUid} />,
 		tasks: <UserTask userUid={userUid} />,
 		requests: <UserRequest userUid={userUid} />,
 		history: <UserHistory userUid={userUid} />,
@@ -71,9 +73,16 @@ const Dashboard: FC<{}> = () => {
 				</div>
 				<Menu
 					theme={"dark"}
-					defaultSelectedKeys={["tasks"]}
+					defaultSelectedKeys={["offers"]}
 					mode="inline"
 				>
+					<Menu.Item
+						key="offers"
+						onClick={() => handleClick("offers")}
+						icon={<PieChartOutlined />}
+					>
+						My Offers
+					</Menu.Item>
 					<Menu.Item
 						key="tasks"
 						onClick={() => handleClick("tasks")}

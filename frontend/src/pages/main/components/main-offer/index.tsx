@@ -14,7 +14,11 @@ import CreateRequest from "../../../../components/create-request";
 
 const { Title, Paragraph, Text } = Typography;
 
-const MainOffer: FC<{}> = () => {
+type Props = {
+	uid: string | undefined
+}
+
+const MainOffer: FC<Props> = ({ uid }) => {
 	const firebaseContext = useContext(FirebaseContext);
 	const { firebaseApp } = firebaseContext;
 	const db = firebase.firestore(firebaseApp as firebase.app.App);
@@ -73,7 +77,7 @@ const MainOffer: FC<{}> = () => {
 		<div className={s.content}>
 			<div className={s.userActions}>
 				<div className={s.column}>
-					<UserCreateOfferComponent fetchOffer={fetchOffer} />
+					<UserCreateOfferComponent uid={uid} fetchOffer={fetchOffer} />
 				</div>
 			</div>
 			<div className={s.requestBoard}>
@@ -87,54 +91,54 @@ const MainOffer: FC<{}> = () => {
 					{loading ? (
 						<Spin></Spin>
 					) : (
-						<>
-							{offers.length === 0 ? (
-								<>You currently have no offers opened!</>
-							) : (
-								<></>
-							)}
-							<List
-								pagination={{
-									onChange: (page) => {
-										console.log(page);
-									},
-									pageSize: 3,
-								}}
-								split={false}
-								dataSource={offers}
-								renderItem={(item, index: number) => (
-									<List.Item
-										key={item.title + index}
-										actions={[
-											<Button
-												type="primary"
-												onClick={(e) =>
-													handleClick(e, item)
-												}
-											>
-												View
+							<>
+								{offers.length === 0 ? (
+									<>You currently have no offers opened!</>
+								) : (
+										<></>
+									)}
+								<List
+									pagination={{
+										onChange: (page) => {
+											console.log(page);
+										},
+										pageSize: 3,
+									}}
+									split={false}
+									dataSource={offers}
+									renderItem={(item, index: number) => (
+										<List.Item
+											key={item.title ?? '' + index}
+											actions={[
+												<Button
+													type="primary"
+													onClick={(e) =>
+														handleClick(e, item)
+													}
+												>
+													View
 											</Button>,
-											<IconText
-												icon={StarOutlined}
-												text=""
-												key="list-vertical-star-o"
-											/>,
-											<IconText
-												icon={LikeOutlined}
-												text=""
-												key="list-vertical-like-o"
-											/>,
-										]}
-									>
-										<List.Item.Meta
-											title={item.title}
-											description={item.description}
-										/>
-									</List.Item>
-								)}
-							/>
-						</>
-					)}
+												<IconText
+													icon={StarOutlined}
+													text=""
+													key="list-vertical-star-o"
+												/>,
+												<IconText
+													icon={LikeOutlined}
+													text=""
+													key="list-vertical-like-o"
+												/>,
+											]}
+										>
+											<List.Item.Meta
+												title={item.title}
+												description={item.description}
+											/>
+										</List.Item>
+									)}
+								/>
+							</>
+						)}
 				</Card>
 			</div>
 			<Modal
