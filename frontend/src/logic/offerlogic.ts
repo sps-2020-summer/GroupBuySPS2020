@@ -5,7 +5,7 @@ import { ensureNonEmpty } from "./utilities";
 const COLLECTION_OFFERS: string = "offer";
 
 class Offer {
-    uid: string;
+	uid: string;
 	id: string;
 	shopLocation: string;
 	expectedDeliveryTime: string;
@@ -66,22 +66,22 @@ export const getOffers: (
 	uid: string,
 ) => Promise<Offer[]> = async (
 	uid: string,
-) => {
-	const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
-	const offers: Offer[] = [];
-	const offersQuerySnapshot = await offersRef.get();
-	offersQuerySnapshot.forEach((offerSnapshot) => {
-		try {
-			const offer = offerConverter.fromFirestore(offerSnapshot);
-			offers.push(offer);
-		} catch (e) {
-			console.log(
-				"Encountered error while retrieving offers: " + e.message
-			);
-		}
-	});
-	return offers;
-};
+	) => {
+		const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
+		const offers: Offer[] = [];
+		const offersQuerySnapshot = await offersRef.get();
+		offersQuerySnapshot.forEach((offerSnapshot) => {
+			try {
+				const offer = offerConverter.fromFirestore(offerSnapshot);
+				offers.push(offer);
+			} catch (e) {
+				console.log(
+					"Encountered error while retrieving offers: " + e.message
+				);
+			}
+		});
+		return offers;
+	};
 
 export const addOffer: (
 	uid: string,
@@ -93,27 +93,36 @@ export const addOffer: (
 	shopLocation,
 	expectedDeliveryTime,
 	status,
-) {
-	if (status === null) {
-		status = Status.OPEN;
-	}
-	ensureNonEmpty(uid, shopLocation, expectedDeliveryTime, status);
-	const offersRef = await db
-		.collection(COLLECTION_OFFERS)
-		.add(
-			offerConverter.toFirestore(
-				uid,
-				shopLocation,
-				expectedDeliveryTime,
-				Status[status]
-			)
-		);
+	) {
+		if (status === null) {
+			status = Status.OPEN;
+		}
+		console.log(uid);
 
-	return new Offer(
-		uid, 
-		offersRef.id,
-		shopLocation,
-		expectedDeliveryTime,
-		status
-	);
-};
+		ensureNonEmpty(uid, shopLocation, expectedDeliveryTime, status);
+		const res = offerConverter.toFirestore(
+			uid,
+			shopLocation,
+			expectedDeliveryTime,
+			status
+		);
+		console.log(res);
+		const offersRef = await db
+			.collection(COLLECTION_OFFERS)
+			.add(
+				offerConverter.toFirestore(
+					uid,
+					shopLocation,
+					expectedDeliveryTime,
+					status
+				)
+			);
+
+		return new Offer(
+			uid,
+			offersRef.id,
+			shopLocation,
+			expectedDeliveryTime,
+			status
+		);
+	};

@@ -8,6 +8,7 @@ import {
   DatePicker,
   Typography,
   message,
+  TimePicker,
 } from "antd";
 import { FormInstance } from "antd/lib/form";
 import TextArea from "antd/lib/input/TextArea";
@@ -17,14 +18,18 @@ import { userInfo } from "os";
 import MainOffer from ".";
 import firebase from "firebase";
 import { FirebaseContext } from "../../../../context/firebase-context";
+import { addOffer } from "../../../../logic/offerlogic";
+import { Status } from "../../../../types";
+import moment from "moment";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 type Props = {
+  uid: string | undefined;
   fetchOffer: () => Promise<void>;
 };
 
-const UserCreateOfferComponent: FC<Props> = ({ fetchOffer }) => {
+const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid }) => {
   const firebaseContext = useContext(FirebaseContext);
   const { firebaseApp } = firebaseContext;
   const db = firebase.firestore(firebaseApp as firebase.app.App);
@@ -43,12 +48,9 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer }) => {
 
   const onFinish = async (values) => {
     console.log("Success:", values);
-
+    const { shopLocation, expectedDeliveryTime } = values;
     try {
-      await db.collection("offer").add({
-        ...values,
-        duration: 0,
-      });
+      await addOffer(uid ?? '-', shopLocation, expectedDeliveryTime.unix(), Status.OPEN);
       fetchOffer();
       setVisible(false);
     } catch (err) {
@@ -126,19 +128,15 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer }) => {
           </Form.Item>
           <Form.Item
             label="Expected Delivery Time"
-            name="duration"
+            name="expectedDeliveryTime"
             rules={[
               {
                 required: true,
-                message: "Please input a duration",
+                message: "Please input a date and time",
               },
             ]}
           >
-            <RangePicker
-              {...rangeConfig}
-              showTime
-              format="YYYY-MM-DD HH:mm:ss"
-            />
+            <DatePicker showTime={true} />
           </Form.Item>
         </Modal>
       </Form>

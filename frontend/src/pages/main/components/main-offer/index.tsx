@@ -14,7 +14,11 @@ import CreateRequest from "../../../../components/create-request";
 
 const { Title, Paragraph, Text } = Typography;
 
-const MainOffer: FC<{}> = () => {
+type Props = {
+	uid: string | undefined
+}
+
+const MainOffer: FC<Props> = ({ uid }) => {
 	const firebaseContext = useContext(FirebaseContext);
 	const { firebaseApp } = firebaseContext;
 	const db = firebase.firestore(firebaseApp as firebase.app.App);
@@ -73,7 +77,7 @@ const MainOffer: FC<{}> = () => {
 		<div className={s.content}>
 			<div className={s.userActions}>
 				<div className={s.column}>
-					<UserCreateOfferComponent fetchOffer={fetchOffer} />
+					<UserCreateOfferComponent uid={uid} fetchOffer={fetchOffer} />
 				</div>
 			</div>
 			<div className={s.requestBoard}>
