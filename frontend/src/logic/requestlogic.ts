@@ -95,7 +95,7 @@ export const getRequests: (
  * @throws Error if `uid` is empty.
  * @throws Error if given arguments cannot be used to create a valid request.
  */
-export const addRequest: (
+const addRequest: (
     uid: string,
     payerName: string,
 	shopLocation: string,
@@ -149,3 +149,51 @@ export const addRequest: (
         throw new Error(`Unable to add request: ${e.message}`);
     }
 };
+
+/** 
+ * Adds a regular request to database.
+ * @throws Error if any argument is empty.
+ */
+export const addRegularRequest: (
+    uid: string,
+    payerName: string,
+	shopLocation: string,
+    expectedDeliveryTime: string,
+    item: string,
+    fee: number
+) => Promise<Request> = async (
+    uid,
+    payerName,
+    shopLocation,
+    expectedDeliveryTime,
+    item, 
+    fee
+) => (
+    addRequest(uid, payerName, shopLocation, expectedDeliveryTime, item, fee)
+);
+
+/**
+ * Adds a pending request, i.e. request with doer information specified.
+ * @throws Error if any argument is empty.
+ */
+ export const addPendingRequest: (
+    uid: string,
+    payerName: string,
+	shopLocation: string,
+    expectedDeliveryTime: string,
+    item: string,
+    fee: number,
+    doerId: string,
+    doerName: string
+) => Promise<Request> = async function (
+    uid,
+    payerName,
+    shopLocation,
+    expectedDeliveryTime,
+    item, 
+    fee,
+    doerId, 
+    doerName
+) {
+    return addRequest(uid, payerName, shopLocation, expectedDeliveryTime, item, fee, doerId, doerName);
+}
