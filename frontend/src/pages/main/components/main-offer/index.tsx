@@ -87,54 +87,54 @@ const MainOffer: FC<{}> = () => {
 					{loading ? (
 						<Spin></Spin>
 					) : (
-						<>
-							{offers.length === 0 ? (
-								<>You currently have no offers opened!</>
-							) : (
-								<></>
-							)}
-							<List
-								pagination={{
-									onChange: (page) => {
-										console.log(page);
-									},
-									pageSize: 3,
-								}}
-								split={false}
-								dataSource={offers}
-								renderItem={(item, index: number) => (
-									<List.Item
-										key={item.title + index}
-										actions={[
-											<Button
-												type="primary"
-												onClick={(e) =>
-													handleClick(e, item)
-												}
-											>
-												View
+							<>
+								{offers.length === 0 ? (
+									<>You currently have no offers opened!</>
+								) : (
+										<></>
+									)}
+								<List
+									pagination={{
+										onChange: (page) => {
+											console.log(page);
+										},
+										pageSize: 3,
+									}}
+									split={false}
+									dataSource={offers}
+									renderItem={(item, index: number) => (
+										<List.Item
+											key={item.title ?? '' + index}
+											actions={[
+												<Button
+													type="primary"
+													onClick={(e) =>
+														handleClick(e, item)
+													}
+												>
+													View
 											</Button>,
-											<IconText
-												icon={StarOutlined}
-												text=""
-												key="list-vertical-star-o"
-											/>,
-											<IconText
-												icon={LikeOutlined}
-												text=""
-												key="list-vertical-like-o"
-											/>,
-										]}
-									>
-										<List.Item.Meta
-											title={item.title}
-											description={item.description}
-										/>
-									</List.Item>
-								)}
-							/>
-						</>
-					)}
+												<IconText
+													icon={StarOutlined}
+													text=""
+													key="list-vertical-star-o"
+												/>,
+												<IconText
+													icon={LikeOutlined}
+													text=""
+													key="list-vertical-like-o"
+												/>,
+											]}
+										>
+											<List.Item.Meta
+												title={item.title}
+												description={item.description}
+											/>
+										</List.Item>
+									)}
+								/>
+							</>
+						)}
 				</Card>
 			</div>
 			<Modal

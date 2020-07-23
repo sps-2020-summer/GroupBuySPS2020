@@ -18,10 +18,11 @@ export enum Status {
 }
 
 export type Offer = {
+	uid: string;
 	id: string;
-	title: string;
-	name: string;
-	description: string;
+	title?: string;
+	name?: string;
+	description?: string;
 	shopLocation: string;
 	expectedDeliveryTime: string;
 	status: Status;
