@@ -11,10 +11,10 @@ export type Task = {
 };
 
 export enum Status {
-	OPEN = "open",
-	PENDING = "pending",
-	DONE = "done",
-	cancelled = "cancelled",
+	OPEN = "OPEN",
+	PENDING = "PENDING",
+	DONE = "DONE",
+	CANCELLED = "CANCELLED",
 }
 
 export type Offer = {
