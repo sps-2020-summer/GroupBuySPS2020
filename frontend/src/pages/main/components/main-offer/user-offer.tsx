@@ -48,9 +48,9 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid }) => {
 
   const onFinish = async (values) => {
     console.log("Success:", values);
-    const { shopLocation, expectedDeliveryTime } = values;
+    const { title, description, shopLocation, expectedDeliveryTime } = values;
     try {
-      await addOffer(uid ?? '-', shopLocation, expectedDeliveryTime.unix(), Status.OPEN);
+      await addOffer(uid ?? '-', title, description, shopLocation, expectedDeliveryTime.unix(), Status.OPEN);
       fetchOffer();
       setVisible(false);
     } catch (err) {

@@ -72,7 +72,6 @@ const MainOffer: FC<Props> = ({ uid }) => {
 		setReqVisible(true);
 	};
 
-	console.log(offers);
 	return (
 		<div className={s.content}>
 			<div className={s.userActions}>
