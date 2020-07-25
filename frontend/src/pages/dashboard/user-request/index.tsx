@@ -16,9 +16,7 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
       try {
         setLoading(true);
         const res = await getRequests(userUid);
-        console.log(requests);
         setRequests(res);
-
       } catch (e) {
         console.log(e);
       } finally {

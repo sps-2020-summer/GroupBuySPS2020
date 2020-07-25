@@ -9,6 +9,7 @@ import Loader from "../../../components/loader";
 import { FirebaseContext } from "../../../context/firebase-context";
 import firebase from "firebase";
 import { getOffers } from "../../../logic/offerlogic";
+import { getTasks } from "../../../logic/tasklogic";
 
 const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
 	const firebaseContext = useContext(FirebaseContext);
@@ -21,9 +22,9 @@ const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
 		const fetchTask = async (userUid: string) => {
 			try {
 				setLoading(true);
-				console.log(userUid);
-				//const res = await getOffers(userUid);
-				//console.log(res);
+				const res = await getTasks(userUid);
+				console.log(res);
+				setTasks(res);
 			} catch (e) {
 				console.log(e);
 			} finally {

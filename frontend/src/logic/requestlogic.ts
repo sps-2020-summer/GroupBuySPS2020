@@ -1,6 +1,7 @@
 import { db } from "../index";
 import { ensureNonEmpty } from "./utilities";
 import { Task, getTaskById, addTask } from "./tasklogic";
+import { Status } from "../types";
 
 const COLLECTION_REQUESTS = "requests";
 
@@ -67,27 +68,44 @@ const requestConverter = Object.freeze({
  * @throws Error if `uid` is empty.
  */
 export const getRequests: (
-  uid: string
+  uid: string,
+  status?: Status
 ) => Promise<Request[]> = async (
-  uid: string
+  uid: string,
+  status?: Status
 ) => {
     try {
       ensureNonEmpty(uid);
     } catch (e) {
       throw new Error("Unable to get requests when uid is empty");
     }
-    const requestRef = db.collection(COLLECTION_REQUESTS).where("uid", "==", uid);
-    const requests: Request[] = [];
-    const requestQuerySnapshot = await requestRef.get();
-    requestQuerySnapshot.forEach(async requestSnapshot => {
-      try {
-        const request = await requestConverter.fromFirestore(requestSnapshot);
-        requests.push(request);
-      } catch (e) {
-        return console.error(`Encountered error while retrieving request: ${e.message}`);
-      }
-    });
-    return requests;
+    if (status) {
+      const requestRef = db.collection(COLLECTION_REQUESTS).where("uid", "==", uid).where("status", '==', status);
+      const requests: Request[] = [];
+      const requestQuerySnapshot = await requestRef.get();
+      requestQuerySnapshot.forEach(async requestSnapshot => {
+        try {
+          const request = await requestConverter.fromFirestore(requestSnapshot);
+          requests.push(request);
+        } catch (e) {
+          return console.error(`Encountered error while retrieving request: ${e.message}`);
+        }
+      });
+      return requests;
+    } else {
+      const requestRef = db.collection(COLLECTION_REQUESTS).where("uid", "==", uid);
+      const requests: Request[] = [];
+      const requestQuerySnapshot = await requestRef.get();
+      requestQuerySnapshot.forEach(async requestSnapshot => {
+        try {
+          const request = await requestConverter.fromFirestore(requestSnapshot);
+          requests.push(request);
+        } catch (e) {
+          return console.error(`Encountered error while retrieving request: ${e.message}`);
+        }
+      });
+      return requests;
+    }
   };
 
 /** 

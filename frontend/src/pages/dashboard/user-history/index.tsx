@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import { DashboardCompProps } from "..";
-import { Request, Task } from "../../../types";
+import { Request, Task, Offer } from "../../../types";
 import { Slide } from "react-awesome-reveal";
 import { List, Card } from "antd";
 import s from "./s.module.css";
@@ -8,18 +8,25 @@ import RequestItem from "../user-request/request-item";
 import TaskItem from "../user-task/task-item";
 import Loader from "../../../components/loader";
 import { getUserTask, getUserRequest } from "../../../api";
+import { getTasks } from "../../../logic/tasklogic";
+import { getRequests } from "../../../logic/requestlogic";
+import { getOffers } from "../../../logic/offerlogic";
 
 const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [offers, setOffers] = useState<Offer[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
 
   useEffect(() => {
-    const fetchUserHistory = async (userUid: number) => {
+    const fetchUserHistory = async (userUid: string) => {
       try {
         setLoading(true);
-        const resTask = await getUserTask(userUid, "close");
-        const resRequest = await getUserRequest(userUid, "close");
+        const resOffer = await getOffers(userUid);
+        const resTask = await getTasks(userUid);
+        const resRequest = await getRequests(userUid);
+        setTasks(resTask);
+        setRequests(resRequest)
       } catch (e) {
         console.log(e);
       } finally {
@@ -27,7 +34,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
       }
     };
 
-    fetchUserHistory(Number(userUid));
+    fetchUserHistory(userUid);
   }, []);
 
   return (
@@ -63,6 +70,20 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
               <List
                 split={false}
                 dataSource={requests}
+                renderItem={(item) => (
+                  <List.Item>
+                    <Card title={item.name} style={{ width: "100%" }}>
+                      <RequestItem name={item.name ?? '-'} />
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            </div>
+            <div className={s.prevOffer}>
+              <h2>Past Offers</h2>
+              <List
+                split={false}
+                dataSource={offers}
                 renderItem={(item) => (
                   <List.Item>
                     <Card title={item.name} style={{ width: "100%" }}>

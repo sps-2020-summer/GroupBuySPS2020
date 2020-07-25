@@ -79,28 +79,47 @@ const offerConverter = Object.freeze({
  */
 export const getOffers: (
 	uid: string,
+	status?: Status,
 ) => Promise<Offer[]> = async (
 	uid: string,
+	status?: Status,
 	) => {
 		try {
 			ensureNonEmpty(uid);
 		} catch {
 			throw new Error("Unable to get offers for user when his/her id is empty");
 		}
-		const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
-		const offers: Offer[] = [];
-		const offersQuerySnapshot = await offersRef.get();
-		offersQuerySnapshot.forEach((offerSnapshot) => {
-			try {
-				const offer = offerConverter.fromFirestore(offerSnapshot);
-				offers.push(offer);
-			} catch (e) {
-				console.log(
-					"Encountered error while retrieving offers: " + e.message
-				);
-			}
-		});
-		return offers;
+		if (status) {
+			const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid).where("status", "==", status);
+			const offers: Offer[] = [];
+			const offersQuerySnapshot = await offersRef.get();
+			offersQuerySnapshot.forEach((offerSnapshot) => {
+				try {
+					const offer = offerConverter.fromFirestore(offerSnapshot);
+					offers.push(offer);
+				} catch (e) {
+					console.log(
+						"Encountered error while retrieving offers: " + e.message
+					);
+				}
+			});
+			return offers;
+		} else {
+			const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
+			const offers: Offer[] = [];
+			const offersQuerySnapshot = await offersRef.get();
+			offersQuerySnapshot.forEach((offerSnapshot) => {
+				try {
+					const offer = offerConverter.fromFirestore(offerSnapshot);
+					offers.push(offer);
+				} catch (e) {
+					console.log(
+						"Encountered error while retrieving offers: " + e.message
+					);
+				}
+			});
+			return offers;
+		}
 	};
 
 /** 
@@ -125,7 +144,7 @@ export const addOffer: (
 		if (status === null) {
 			status = Status.OPEN;
 		}
-		console.log(uid);
+
 
 		try {
 			ensureNonEmpty(uid, shopLocation, expectedDeliveryTime, status);

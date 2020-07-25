@@ -46,7 +46,8 @@ export class Task {
         this.fee = fee;
         this.status = status;
 
-        if (Task.isValidDoer(uid, doerName)) {
+
+        if (!Task.isValidDoer(uid, doerName)) {
             throw new Error("Either task has doer (an owner of task) but no doer's id (i.e. uid) is missing, or"
                 + " task has doer's id but no doer.");
         }
@@ -137,6 +138,7 @@ const taskConverter = Object.freeze({
             throw new Error("Unable to find snapshot for task.");
         }
         // no error should occur here
+        console.log(data);
         return new Task(
             taskSnapshot.id,
             data.shopLocation,
@@ -156,28 +158,44 @@ const taskConverter = Object.freeze({
  * @throws Error if `uid` is `null`, `undefined` or `""`.
  */
 export const getTasks: (
-    uid: string
+    uid: string,
+    status?: Status,
 ) => Promise<Task[]> = async (
-    uid: string
-) => {
+    uid: string,
+    status?: Status,
+    ) => {
         try {
             ensureNonEmpty(uid);
         } catch (e) {
             throw new Error(`Unable to get tasks for user with empty uid.`);
         }
-
-        const tasksRef = db.collection(COLLECTION_TASKS).where("uid", "==", uid);
-        const tasks: Task[] = [];
-        const tasksQuerySnapshot = await tasksRef.get();
-        tasksQuerySnapshot.forEach(taskSnapshot => {
-            try {
-                const task = taskConverter.fromFirestore(taskSnapshot);
-                tasks.push(task);
-            } catch (e) {
-                return console.error(`Encountered error while retrieving task: ${e.message}`);
-            }
-        });
-        return tasks;
+        if (status) {
+            const tasksRef = db.collection(COLLECTION_TASKS).where("uid", "==", uid).where("status", '==', status);
+            const tasks: Task[] = [];
+            const tasksQuerySnapshot = await tasksRef.get();
+            tasksQuerySnapshot.forEach(taskSnapshot => {
+                try {
+                    const task = taskConverter.fromFirestore(taskSnapshot);
+                    tasks.push(task);
+                } catch (e) {
+                    return console.error(`Encountered error while retrieving task: ${e.message}`);
+                }
+            });
+            return tasks;
+        } else {
+            const tasksRef = db.collection(COLLECTION_TASKS).where("uid", "==", uid);
+            const tasks: Task[] = [];
+            const tasksQuerySnapshot = await tasksRef.get();
+            tasksQuerySnapshot.forEach(taskSnapshot => {
+                try {
+                    const task = taskConverter.fromFirestore(taskSnapshot);
+                    tasks.push(task);
+                } catch (e) {
+                    return console.error(`Encountered error while retrieving task: ${e.message}`);
+                }
+            });
+            return tasks;
+        }
     };
 
 /**
