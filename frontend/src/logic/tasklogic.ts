@@ -250,11 +250,6 @@ export const addTask: (
         doerName,
     ) {
         try {
-            console.log(shopLocation);
-            console.log(expectedDeliveryTime);
-            console.log(item);
-            console.log(payerName);
-            console.log(fee);
             ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerName, fee);
             ensureNonNegative(fee);
         } catch (e) {
