@@ -20,8 +20,10 @@ import firebase from "firebase";
 import ViewTask from "../../../../components/view-task";
 
 const { Title, Paragraph } = Typography;
-
-const MainRequest: FC<{}> = () => {
+type Props = {
+	uid: string | undefined
+}
+const MainRequest: FC<Props> = ({uid}) => {
 	const firebaseContext = useContext(FirebaseContext);
 	const { firebaseApp } = firebaseContext;
 	const db = firebase.firestore(firebaseApp as firebase.app.App);
@@ -42,7 +44,7 @@ const MainRequest: FC<{}> = () => {
 		try {
 			setLoading(true);
 			//const res = await getOpenRequest();
-			const res = await db.collection("request").get();
+			const res = await db.collection("requests").get();
 			const list = [] as any;
 			res.forEach((doc) => {
 				if (doc.exists) {
@@ -80,7 +82,7 @@ const MainRequest: FC<{}> = () => {
 		<div className={s.content}>
 			<div className={s.userActions}>
 				<div className={s.column}>
-					<UserCreateRequestComponent fetchRequest={fetchRequest} />
+					<UserCreateRequestComponent uid={uid} fetchRequest={fetchRequest} />
 				</div>
 			</div>
 			<div className={s.requestBoard}>

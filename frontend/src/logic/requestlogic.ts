@@ -129,8 +129,8 @@ const addRequest: (
   expectedDeliveryTime,
   item,
   fee,
-  doerId,
-  doerName
+  doerId?,
+  doerName?
 ) {
     try {
       ensureNonEmpty(uid);
@@ -139,6 +139,7 @@ const addRequest: (
     }
 
     try {
+
       const task = await addTask(
         shopLocation,
         expectedDeliveryTime,
