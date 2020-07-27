@@ -139,6 +139,7 @@ export const addRequestHelper: ( // NOTE: this should not be imported by FE
     }
 
     try {
+
       const task = await addTask(
         shopLocation,
         expectedDeliveryTime,

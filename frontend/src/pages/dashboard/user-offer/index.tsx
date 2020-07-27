@@ -17,7 +17,7 @@ const UserOffer: FC<DashboardCompProps> = ({ userUid }) => {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [offers, setoffers] = useState<Offer[]>([]);
 
-	useEffect(() => {
+	useEffect(() => {   
 		const fetchOffers = async (userUid: string) => {
 			try {
 				setLoading(true);

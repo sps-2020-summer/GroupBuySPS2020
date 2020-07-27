@@ -17,16 +17,19 @@ import { MoneyCollectOutlined } from "@ant-design/icons";
 import { userInfo } from "os";
 import firebase from "firebase";
 import { FirebaseContext } from "../../../../context/firebase-context";
+import { addRegularRequest } from "../../../../logic/requestlogic";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 type Props = {
+  uid: string | undefined;
   fetchRequest: () => Promise<void>;
 };
-const UserCreateRequestComponent: FC<Props> = ({ fetchRequest }) => {
+const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
   const firebaseContext = useContext(FirebaseContext);
   const { firebaseApp } = firebaseContext;
   const db = firebase.firestore(firebaseApp as firebase.app.App);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const formRef = React.createRef<FormInstance>();
   const [visible, setVisible] = useState<boolean>(false);
@@ -38,15 +41,15 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest }) => {
 
   const showModal = () => setVisible(true);
   const handleCancel = () => setVisible(false);
+  // add only payerName , shopLocation, expectedDeliveryTime , item, fee
 
   const onFinish = async (values) => {
     console.log("Success:", values);
     try {
-      await db.collection("request").add({
-        ...values,
-        duration: 0,
-      });
+      setLoading(true);
+      await addRegularRequest(uid ?? '-', values.payerName, values.shopLocation, values.expectedDeliveryTime.unix(), values.item, values.fee);
       fetchRequest();
+      setLoading(false);
       setVisible(false);
     } catch (err) {
       console.log(err);
@@ -84,31 +87,45 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest }) => {
           okText="Submit request"
           onOk={handleOk}
           onCancel={handleCancel}
+          confirmLoading={loading}
         >
-          {" "}
+      
           <Form.Item
-            label="Title of Request"
-            name="title"
+            label="Payer Name"
+            name="payerName"
             rules={[
               {
                 required: true,
-                message: "Please input your request",
+                message: "Please input your name",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+         
+          <Form.Item
+            label={"Shop location"}
+            name="shopLocation"
+            rules={[
+              {
+                required: true,
+                message: "Please input the location of the shop",
               },
             ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            label={"Task"}
-            name="taskName"
+            label="Expected Delivery Time"
+            name="expectedDeliveryTime"
             rules={[
               {
                 required: true,
-                message: "Please input your task",
+                message: "Please input a date and time",
               },
             ]}
           >
-            <Input />
+            <DatePicker showTime={true} />
           </Form.Item>
           <Form.Item
             label={"Item"}
@@ -117,18 +134,6 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest }) => {
               {
                 required: true,
                 message: "Please input your item",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label={"Shop location"}
-            name="shopLocation"
-            rules={[
-              {
-                required: true,
-                message: "Please input the location of the shop",
               },
             ]}
           >
