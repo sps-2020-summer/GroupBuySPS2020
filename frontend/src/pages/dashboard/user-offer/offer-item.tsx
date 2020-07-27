@@ -9,6 +9,7 @@ import {
 
 import s from "./s.module.css";
 import { Offer, cancelOffer } from "../../../logic";
+import { convertToDate } from "../../../logic/utilities";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -38,7 +39,7 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
               </Paragraph>
               <Paragraph>
                 <Text strong={true}>Expected Delivery Time</Text>
-                {offer.expectedDeliveryTime}
+                {convertToDate(offer.expectedDeliveryTime)}
               </Paragraph>
             </Typography>
           }
@@ -82,7 +83,7 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
             </Paragraph>
             <Paragraph>
               <Text strong={true}>Expected Delivery Time</Text>
-              {offer.expectedDeliveryTime}
+              {convertToDate(offer.expectedDeliveryTime)}
             </Paragraph>
           </Typography>
         }

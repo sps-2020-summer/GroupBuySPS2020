@@ -10,6 +10,7 @@ import {
 import s from "./s.module.css";
 import { Task, cancelTask } from "../../../logic/tasklogic";
 import { Status } from "../../../types";
+import { convertToDate } from "../../../logic/utilities";
 
 
 type Props = {
@@ -38,7 +39,7 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
               </Paragraph>
               <Paragraph>
                 <Text strong={true}>Expected Delivery Time</Text>
-                {task.expectedDeliveryTime}
+                {convertToDate(task.expectedDeliveryTime)}
               </Paragraph>
             </Typography>
           }
@@ -79,7 +80,7 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
               </Paragraph>
               <Paragraph>
                 <Text strong={true}>Expected Delivery Time</Text>
-                {task.expectedDeliveryTime}
+                {convertToDate(task.expectedDeliveryTime)}
               </Paragraph>
             </Typography>
           }

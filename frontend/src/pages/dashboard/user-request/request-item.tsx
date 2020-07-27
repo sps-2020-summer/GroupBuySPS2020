@@ -9,6 +9,7 @@ import {
 
 import s from "./s.module.css";
 import { Request, markRequestAsDone } from "../../../logic";
+import { convertToDate } from "../../../logic/utilities";
 const { Title, Text, Paragraph } = Typography;
 
 type Props = {
@@ -39,7 +40,7 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
               </Paragraph>
               <Paragraph>
                 <Text strong={true}>Expected Delivery Time</Text>
-                {request.task.expectedDeliveryTime}
+                {convertToDate(request.task.expectedDeliveryTime)}
               </Paragraph>
             </Typography>
           }
@@ -81,7 +82,7 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
             </Paragraph>
             <Paragraph>
               <Text strong={true}>Expected Delivery Time</Text>
-              {request.task.expectedDeliveryTime}
+              {convertToDate(request.task.expectedDeliveryTime)}
             </Paragraph>
           </Typography>
         }
