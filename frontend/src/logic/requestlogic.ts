@@ -160,7 +160,7 @@ export const addRequestHelper: (
   uid: string,
   payerName: string,
   shopLocation: string,
-  expectedDeliveryTime: string,
+  expectedDeliveryTime: number,
   item: string,
   fee: number,
   doerUid?: string,
@@ -210,7 +210,7 @@ export const addRequest: (
   uid: string,
   payerName: string,
   shopLocation: string,
-  expectedDeliveryTime: string,
+  expectedDeliveryTime: number,
   item: string,
   fee: number
 ) => Promise<Request> = async (

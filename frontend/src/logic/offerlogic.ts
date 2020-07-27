@@ -12,7 +12,7 @@ export class Offer {
   title: string;
   description: string;
   shopLocation: string;
-  expectedDeliveryTime: string;
+  expectedDeliveryTime: number;
   status: Status;
   doerName: string;
 
@@ -22,7 +22,7 @@ export class Offer {
     title: string,
     description: string,
     shopLocation: string,
-    expectedDeliveryTime: string,
+    expectedDeliveryTime: number,
     status: Status,
     doerName: string
   ) {
@@ -57,7 +57,7 @@ const offerConverter = Object.freeze({
     title: string,
     description: string,
     shopLocation: string,
-    expectedDeliveryTime: string,
+    expectedDeliveryTime: number,
     status: Status,
     doerName: string
   ) => ({
@@ -168,7 +168,7 @@ export const addOffer: (
   title: string,
   description: string,
   shopLocation: string,
-  expectedDeliveryTime: string,
+  expectedDeliveryTime: number,
   status: Status,
   doerName: string
 ) => Promise<Offer> = async function (
