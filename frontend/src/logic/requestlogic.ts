@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { ensureNonEmpty } from "./utilities";
-import { Task, getTaskById, addTask, addDoerToTask, markTaskAsDone } from "./tasklogic";
+import { Task, getTaskById, addTask, addDoerToTask, markTaskAsDone, cancelTask } from "./tasklogic";
 import { Status } from "../types";
 
 const COLLECTION_REQUESTS = "requests";
@@ -249,4 +249,30 @@ export const markRequestAsDone: (
     }
 
     markTaskAsDone(taskId);
+}
+
+/**
+ * Cancels request with id `id`.
+ * Note no checks are performed to ensure that the request is not `DONE`.
+ */
+export const cancelRequest: (
+    id: string
+) => Promise<void> = async (
+    id
+) => {
+    try {
+        ensureNonEmpty(id);
+    } catch (e) {
+        throw new Error("Unable to cancel request when its id is not provided");
+    }
+
+    const requestRef = db.collection(COLLECTION_REQUESTS).doc(id);
+    const requestSnapshot = await requestRef.get();
+    const taskId = requestSnapshot.get("taskId");
+    
+    if (taskId === undefined) {
+        throw new Error("Unable to find specified request, or request has missing task");
+    }
+
+    cancelTask(id);
 }
