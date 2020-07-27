@@ -10,7 +10,7 @@ import {
 import s from "./s.module.css";
 import { Task, cancelTask } from "../../../logic/tasklogic";
 import { Status } from "../../../types";
-import { CANCELLED } from "dns";
+
 
 type Props = {
   task: Task;
@@ -20,7 +20,7 @@ const { Title, Text, Paragraph } = Typography;
 
 const TaskItem: FC<Props> = ({ task, fetch }) => {
   const [loading, setLoading] = useState(false);
-  if (!fetch) {
+  if (!fetch || task.status === Status.CANCELLED ) {
     return (
       <Card className={s.cardStyle}>
         <Card.Meta
@@ -69,7 +69,6 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
           description={
             <Typography>
               <Title>{task.item}</Title>
-              {task.status === Status.CANCELLED ?<Text>THIS TASK IS CANCELLED</Text> : null}
               <Paragraph>
                 <Text strong={true}>Shop Location: </Text>
                 {task.shopLocation}

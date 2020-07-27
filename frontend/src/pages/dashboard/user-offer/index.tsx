@@ -1,7 +1,7 @@
-import React, { FC, useState, useEffect, useContext } from "react";
+import React, { FC, useState, useEffect, useContext, useCallback} from "react";
 import { DashboardCompProps } from "..";
 import { List } from "antd";
-import { Task, Offer } from "../../../types";
+import { Offer }from '../../../logic'
 import { Slide } from "react-awesome-reveal";
 import TaskItem from "./offer-item";
 import Loader from "../../../components/loader";
@@ -16,23 +16,24 @@ const UserOffer: FC<DashboardCompProps> = ({ userUid }) => {
 	const db = firebase.firestore(firebaseApp as firebase.app.App);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [offers, setoffers] = useState<Offer[]>([]);
+	const fetchOffers = useCallback(async () => {
+		try {
+			setLoading(true);
+			console.log(userUid);
+			const res = await getOffers(userUid);
+			console.log(res);
+			setoffers(res);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setLoading(false);
+		}
+	},[]);
 
 	useEffect(() => {   
-		const fetchOffers = async (userUid: string) => {
-			try {
-				setLoading(true);
-				console.log(userUid);
-				const res = await getOffers(userUid);
-				console.log(res);
-				setoffers(res);
-			} catch (e) {
-				console.log(e);
-			} finally {
-				setLoading(false);
-			}
-		};
-		fetchOffers(userUid);
-	}, [userUid]);
+		
+		fetchOffers();
+	}, []);
 
 	return (
 		<>
@@ -49,11 +50,19 @@ const UserOffer: FC<DashboardCompProps> = ({ userUid }) => {
 							<>You currently have no offers!</>
 						) : (
 								<List
-
+								grid={{
+									gutter: 16,
+									xs: 1,
+									sm: 2,
+									md: 4,
+									lg: 4,
+									xl: 4,
+									xxl: 3,
+								  }}
 									dataSource={offers}
 									renderItem={(item) => (
 										<List.Item>
-											<TaskItem name={item?.name ?? ""} />
+											<TaskItem offer={item} fetch={fetchOffers} />
 										</List.Item>
 									)}
 								/>

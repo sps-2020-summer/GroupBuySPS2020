@@ -126,19 +126,27 @@ export const getRequests: (
     const requestRef = db
       .collection(COLLECTION_REQUESTS)
       .where("uid", "==", uid);
-    const requests: Request[] = [];
+    const requests: firebase.firestore.QueryDocumentSnapshot<
+      firebase.firestore.DocumentData
+    >[] = [];
+    const results: Request[] = [];
     const requestQuerySnapshot = await requestRef.get();
-    requestQuerySnapshot.forEach(async (requestSnapshot) => {
-      try {
-        const request = await requestConverter.fromFirestore(requestSnapshot);
-        requests.push(request);
-      } catch (e) {
-        return console.error(
-          `Encountered error while retrieving request: ${e.message}`
-        );
-      }
+    requestQuerySnapshot.forEach((requestSnapshot) => {
+      requests.push(requestSnapshot);
     });
-    return requests;
+    await Promise.all(
+      requests.map(async (requestSnapshot) => {
+        try {
+          const request = await requestConverter.fromFirestore(requestSnapshot);
+          results.push(request);
+        } catch (e) {
+          return console.error(
+            `Encountered error while retrieving request: ${e.message}`
+          );
+        }
+      })
+    );
+    return results;
   }
 };
 

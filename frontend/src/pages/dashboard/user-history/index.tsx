@@ -12,6 +12,7 @@ import { getUserTask, getUserRequest } from "../../../api";
 import { getTasks } from "../../../logic/tasklogic";
 import { getRequests } from "../../../logic/requestlogic";
 import { getOffers } from "../../../logic/offerlogic";
+import OfferItem from "../user-offer/offer-item";
 
 const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,6 +27,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
         const resOffer = await getOffers(userUid);
         const resTask = await getTasks(userUid);
         const resRequest = await getRequests(userUid);
+        setOffers(resOffer);
         setTasks(resTask);
         setRequests(resRequest)
       } catch (e) {
@@ -74,7 +76,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                 renderItem={(item) => (
                   <List.Item>
                     <Card title={item.task.payerName} style={{ width: "100%" }}>
-                      <RequestItem name={item.task.item ?? '-'} />
+                      <RequestItem request={item} />
                     </Card>
                   </List.Item>
                 )}
@@ -88,7 +90,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                 renderItem={(item) => (
                   <List.Item>
                     <Card title={item.title} style={{ width: "100%" }}>
-                      <RequestItem name={item.description ?? '-'} />
+                      <OfferItem offer={item}/>
                     </Card>
                   </List.Item>
                 )}

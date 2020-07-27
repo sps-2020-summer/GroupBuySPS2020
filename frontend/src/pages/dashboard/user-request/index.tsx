@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import { DashboardCompProps } from "..";
-import { Request } from "../../../types";
+import { Request } from "../../../logic"
 import { Slide } from "react-awesome-reveal";
 import { List } from "antd";
 import RequestItem from "./request-item";
@@ -56,7 +56,7 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
               dataSource={requests}
               renderItem={(item) => (
                 <List.Item>
-                  <RequestItem name={item.name ?? '-'} />
+                  <RequestItem request={item} />
                 </List.Item>
               )}
             />
