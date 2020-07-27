@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { ensureNonEmpty } from "./utilities";
-import { Task, getTaskById, addTask } from "./tasklogic";
+import { Task, getTaskById, addTask, addDoerToTask, markTaskAsDone } from "./tasklogic";
 import { Status } from "../types";
 
 const COLLECTION_REQUESTS = "requests";
@@ -189,3 +189,64 @@ export const addRequest: (
 ) => (
     addRequestHelper(uid, payerName, shopLocation, expectedDeliveryTime, item, fee)
 );
+
+/**
+ * Indicates that doer with the specified user id and name will fulfil the request with the given id.
+ * @param id id of the request that is to be fulfilled
+ * @param uid user id of doer
+ * @param doerName name of doer
+ * @throws Error if any of the arguments is empty
+ * @throws Error if the request with `id` cannot be found
+ */
+export const fulfilRequest: (
+    id: string,
+    uid: string,
+    doerName: string
+) => Promise<void> = async (
+    id,
+    uid,
+    doerName
+) => {
+    try {
+        ensureNonEmpty(id, uid, doerName);
+    } catch (e) {
+        throw new Error(`Unable to fulfil request: ${e.message}`);
+    }
+
+    const requestRef = db.collection(COLLECTION_REQUESTS).doc(id);
+    const requestSnapshot = await requestRef.get();
+    const taskId = requestSnapshot.get("taskId");
+    
+    if (taskId === undefined) {
+        throw new Error("Unable to find specified request, or request has missing task");
+    }
+
+    addDoerToTask(taskId, uid, doerName);
+}
+
+/**
+ * Marks request with id `id` as complete. 
+ * Note no checks are performed to ensure that the request is not `DONE` or `CANCELLED` before the operation.
+ * @throws Error if `id` is empty.
+ */
+export const markRequestAsDone: (
+    id: string
+) => Promise<void> = async (
+    id
+) => {
+    try {
+        ensureNonEmpty(id);
+    } catch (e) {
+        throw new Error("Unable to mark request as done when its id is not provided");
+    }
+
+    const requestRef = db.collection(COLLECTION_REQUESTS).doc(id);
+    const requestSnapshot = await requestRef.get();
+    const taskId = requestSnapshot.get("taskId");
+    
+    if (taskId === undefined) {
+        throw new Error("Unable to find specified request, or request has missing task");
+    }
+
+    markTaskAsDone(taskId);
+}
