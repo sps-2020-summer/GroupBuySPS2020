@@ -7,7 +7,7 @@ const COLLECTION_TASKS: string = "tasks";
 export class Task {
     id: string;
     shopLocation: string;
-    expectedDeliveryTime: string;
+    expectedDeliveryTime: number;
     item: string;
     payerName: string;
     fee: number;
@@ -23,7 +23,7 @@ export class Task {
     constructor(
         id: string,
         shopLocation: string,
-        expectedDeliveryTime: string,
+        expectedDeliveryTime: number,
         item: string,
         payerName: string,
         fee: number,
@@ -103,7 +103,7 @@ const taskConverter = Object.freeze({
      */
     toFirestore: (
         shopLocation: string,
-        expectedDeliveryTime: string,
+        expectedDeliveryTime: number,
         item: string,
         payerName: string,
         fee: number,
@@ -233,7 +233,7 @@ export const getTaskById: (
  */
 export const addTask: (
     shopLocation: string,
-    expectedDeliveryTime: string,
+    expectedDeliveryTime: number,
     item: string,
     payerName: string,
     fee: number,
