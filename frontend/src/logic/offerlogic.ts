@@ -211,7 +211,7 @@ export const cancelOffer: (
 		}
 
 		const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
-		return offerRef.update({status: Status.CANCELLED});
+		return offerRef.update({status: Status[Status.CANCELLED]});
 	} 
 
 /**
