@@ -320,5 +320,5 @@ export const cancelTask: (
 		}
 
         const taskRef = db.collection(COLLECTION_TASKS).doc(id);
-		return taskRef.update({status: Status.CANCELLED});
+		return taskRef.update({status: Status[Status.CANCELLED]});
 	} 
