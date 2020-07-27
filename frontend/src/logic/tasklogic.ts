@@ -322,3 +322,53 @@ export const cancelTask: (
         const taskRef = db.collection(COLLECTION_TASKS).doc(id);
 		return taskRef.update({status: Status[Status.CANCELLED]});
 	} 
+
+
+/** NOTE: the following methods should not be called from FE */
+
+/**
+ * Adds doer to task. 
+ * Note that no checks are performed to ensure that the task does not have an existing doer.
+ * @throws Error if any argument is empty
+ */
+export const addDoerToTask: (
+    id: string,
+    doerId: string,
+    doerName: string
+) => Promise<void> = (
+    id,
+    doerId,
+    doerName
+) => {
+    try {
+        ensureNonEmpty(doerId, id, doerName);
+    } catch (e) {
+        throw new Error("Unable to add doer to task when arguments are missing");
+    }
+
+    const taskRef = db.collection(COLLECTION_TASKS).doc(id);
+    return taskRef.update({
+        uid: doerId,
+        doerName: doerName,
+        status: Status[Status.PENDING]
+    })
+}
+
+/** 
+ * Marks the specified task as done. 
+ * Note that no check is performed to ensure that this operation is valid.
+ */
+export const markTaskAsDone: (
+    id: string
+) => Promise<void> = (
+    id
+) => {
+    try {
+        ensureNonEmpty(id);
+    } catch (e) {
+        throw new Error("Unable to mark task as done when no id is provided");
+    }
+
+    const taskRef = db.collection(COLLECTION_TASKS).doc(id);
+    return taskRef.update({status: Status[Status.DONE]});
+}
