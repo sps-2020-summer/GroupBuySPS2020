@@ -1,7 +1,7 @@
 import { db } from "../index";
 import { Status } from "../types";
 import { ensureNonEmpty, ensureNonNegative } from "./utilities";
-import { addRequestHelper } from "./requestlogic";
+import { addRequestHelper, Request } from "./requestlogic";
 import { addTask } from "./tasklogic";
 
 const COLLECTION_OFFERS: string = "offer";
@@ -239,14 +239,14 @@ const reopenOffer: ( // TODO: if we have time
  * Adds a request to an offer. 
  * @throws Error if any of the argument is empty.
  */
-export const addRequestToOffer/*: ( // TODO: change type?
+export const addRequestToOffer: ( 
 	id: string,
 	doerName: string,
 	payerUid: string, 
 	payerName: string,
 	item: string, 
 	fee: number
-) => Promise<Request>*/ = async (
+) => Promise<Request> = async (
 	id,
 	doerName,
 	payerUid,

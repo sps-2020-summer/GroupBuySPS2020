@@ -5,7 +5,7 @@ import { Status } from "../types";
 
 const COLLECTION_REQUESTS = "requests";
 
-class Request {
+export class Request {
   uid: string;
   id: string;
   task: Task;
