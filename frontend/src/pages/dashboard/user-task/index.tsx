@@ -1,7 +1,7 @@
-import React, { FC, useState, useEffect, useContext } from "react";
+import React, { FC, useState, useEffect, useCallback } from "react";
 import { DashboardCompProps } from "..";
 import { List } from "antd";
-import { Task } from "../../../types";
+import { Task } from  "../../../logic/tasklogic";
 import { Slide } from "react-awesome-reveal";
 import TaskItem from "./task-item";
 import Loader from "../../../components/loader";
@@ -12,27 +12,24 @@ import { getOffers } from "../../../logic/offerlogic";
 import { getTasks } from "../../../logic/tasklogic";
 
 const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
-	const firebaseContext = useContext(FirebaseContext);
-	const { firebaseApp } = firebaseContext;
-	const db = firebase.firestore(firebaseApp as firebase.app.App);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [tasks, setTasks] = useState<Task[]>([]);
+	const fetchTask = useCallback(async () => {
+		try {
+			setLoading(true);
+			const res = await getTasks(userUid);
+			console.log(res);
+			setTasks(res);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setLoading(false);
+		}
+	}, []);
 
 	useEffect(() => {
-		const fetchTask = async (userUid: string) => {
-			try {
-				setLoading(true);
-				const res = await getTasks(userUid);
-				console.log(res);
-				setTasks(res);
-			} catch (e) {
-				console.log(e);
-			} finally {
-				setLoading(false);
-			}
-		};
-		fetchTask(userUid);
-	}, [userUid]);
+		fetchTask();
+	}, []);
 
 	return (
 		<>
@@ -61,7 +58,7 @@ const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
 									dataSource={tasks}
 									renderItem={(item) => (
 										<List.Item>
-											<TaskItem name={item.name ?? '-'} />
+											<TaskItem fetch={fetchTask} task={item} />
 										</List.Item>
 									)}
 								/>

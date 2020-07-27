@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { DashboardCompProps } from "..";
-import { Request, Task, Offer } from "../../../types";
+import {Request, Task, Offer} from '../../../logic';
+
 import { Slide } from "react-awesome-reveal";
 import { List, Card } from "antd";
 import s from "./s.module.css";
@@ -56,10 +57,10 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                   <List.Item>
                     <Card
                       className={s.cardStyle}
-                      title={item.name}
+                      title={item.item}
                       style={{ width: "100%" }}
                     >
-                      <TaskItem name={item.name ?? '-'} />
+                      <TaskItem task={item} />
                     </Card>
                   </List.Item>
                 )}
@@ -72,8 +73,8 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                 dataSource={requests}
                 renderItem={(item) => (
                   <List.Item>
-                    <Card title={item.name} style={{ width: "100%" }}>
-                      <RequestItem name={item.name ?? '-'} />
+                    <Card title={item.task.payerName} style={{ width: "100%" }}>
+                      <RequestItem name={item.task.item ?? '-'} />
                     </Card>
                   </List.Item>
                 )}
@@ -86,8 +87,8 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                 dataSource={offers}
                 renderItem={(item) => (
                   <List.Item>
-                    <Card title={item.name} style={{ width: "100%" }}>
-                      <RequestItem name={item.name ?? '-'} />
+                    <Card title={item.title} style={{ width: "100%" }}>
+                      <RequestItem name={item.description ?? '-'} />
                     </Card>
                   </List.Item>
                 )}
