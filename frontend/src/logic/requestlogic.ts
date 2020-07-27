@@ -57,9 +57,9 @@ const requestConverter = Object.freeze({
 
         const task = await getTaskById(data.taskId);
         return new Request(
-        data.uid,
-        requestSnapshot.id,
-        task);
+            data.uid,
+            requestSnapshot.id,
+            task);
     },
 });
 

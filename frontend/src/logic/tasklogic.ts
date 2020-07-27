@@ -300,3 +300,25 @@ export const addTask: (
             throw new Error(`Unable to add task: ${e.message}`);
         };
     }
+
+/** 
+ * Cancels the task which has the specified id.
+ * Note: No checks are made to ensure that the task's status is not 'DONE'. If it is 'DONE', then cancelling it 
+ * results in a bug.
+ * @param id id of the task that is to be closed.
+ * @throws Error if no `id` is provided.
+ */
+export const cancelTask: (
+	id: string
+) => Promise<void> = async (
+	id
+	) => {
+		try {
+			ensureNonEmpty(id);
+		} catch (e) {
+			throw new Error("Unable to cancel task without its id");
+		}
+
+        const taskRef = db.collection(COLLECTION_TASKS).doc(id);
+		return taskRef.update({status: Status.CANCELLED});
+	} 
