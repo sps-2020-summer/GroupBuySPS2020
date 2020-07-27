@@ -1,27 +1,21 @@
 import React, { FC, useEffect, useState, useCallback, useContext } from "react";
 import { Card, Typography, Spin, List, Space, Button, Modal } from "antd";
 import s from "../../main.module.css";
-import UserRequest from "../../../dashboard/user-request";
-import { Request, Offer } from "../../../../types";
-import RequestItem from "../../../dashboard/user-request/request-item";
-import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
-import { getOpenOffers } from "../../../../api";
+import { Offer, getOpenOffer } from "../../../../logic/offerlogic";
+import { LikeOutlined, StarOutlined } from "@ant-design/icons";
 import UserCreateOfferComponent from "./user-offer";
-import { FirebaseContext } from "../../../../context/firebase-context";
-import firebase from "firebase";
-import ViewTask from "../../../../components/view-task";
 import CreateRequest from "../../../../components/create-request";
 
 const { Title, Paragraph, Text } = Typography;
 
 type Props = {
-	uid: string | undefined
+	uid: string | undefined;
+	email : string | undefined | null;
 }
 
-const MainOffer: FC<Props> = ({ uid }) => {
-	const firebaseContext = useContext(FirebaseContext);
-	const { firebaseApp } = firebaseContext;
-	const db = firebase.firestore(firebaseApp as firebase.app.App);
+const MainOffer: FC<Props> = ({ uid , email}) => {
+
+
 	const [loading, setLoading] = useState<boolean>(true);
 	const [offers, setOffers] = useState<Offer[]>([]);
 
@@ -38,17 +32,8 @@ const MainOffer: FC<Props> = ({ uid }) => {
 	const fetchOffer = useCallback(async () => {
 		try {
 			setLoading(true);
-			//const res = await getOpenOffers();
-			const res = await db.collection("offer").get();
-			const list = [] as any;
-			res.forEach((doc) => {
-				if (doc.exists) {
-					list.push(doc.data());
-				} else {
-					// doc.data() will be undefined in this case
-				}
-			});
-			setOffers(list);
+			const res = await getOpenOffer();
+			setOffers(res);
 		} catch (e) {
 			console.log(e);
 		} finally {
@@ -76,7 +61,7 @@ const MainOffer: FC<Props> = ({ uid }) => {
 		<div className={s.content}>
 			<div className={s.userActions}>
 				<div className={s.column}>
-					<UserCreateOfferComponent uid={uid} fetchOffer={fetchOffer} />
+					<UserCreateOfferComponent email={email} uid={uid} fetchOffer={fetchOffer} />
 				</div>
 			</div>
 			<div className={s.requestBoard}>
@@ -101,7 +86,7 @@ const MainOffer: FC<Props> = ({ uid }) => {
 										onChange: (page) => {
 											console.log(page);
 										},
-										pageSize: 3,
+										pageSize: 4,
 									}}
 									split={false}
 									dataSource={offers}
@@ -159,13 +144,20 @@ const MainOffer: FC<Props> = ({ uid }) => {
 						{modalOffer?.shopLocation}
 					</Paragraph>
 					<Paragraph>
+						<Text strong={true}>Doing Offer: </Text>
+						{modalOffer?.doerName}
+					</Paragraph>
+					<Paragraph>
 						<Text strong={true}>Delivery time: </Text>
 						{modalOffer?.expectedDeliveryTime}
 					</Paragraph>
 				</Typography>
 			</Modal>
 			<CreateRequest
-				title={"Request to offer"}
+				offer={modalOffer}
+				uid={uid}
+				fetch={fetchOffer}
+				title={"Request to this offer"}
 				visible={requestVisible}
 				setVisible={setReqVisible}
 			/>

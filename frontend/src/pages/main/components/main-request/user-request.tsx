@@ -8,16 +8,13 @@ import {
   DatePicker,
   Typography,
   InputNumber,
+  message,
 } from "antd";
 import { FormInstance } from "antd/lib/form";
-import TextArea from "antd/lib/input/TextArea";
-import UserRequest from "../../../dashboard/user-request";
-import MainRequest from "../main-request";
 import { MoneyCollectOutlined } from "@ant-design/icons";
-import { userInfo } from "os";
 import firebase from "firebase";
 import { FirebaseContext } from "../../../../context/firebase-context";
-import { addRegularRequest } from "../../../../logic/requestlogic";
+import { addRequest } from "../../../../logic/requestlogic";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
@@ -47,7 +44,8 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
     console.log("Success:", values);
     try {
       setLoading(true);
-      await addRegularRequest(uid ?? '-', values.payerName, values.shopLocation, values.expectedDeliveryTime.unix(), values.item, values.fee);
+      await addRequest(uid ?? '-', values.payerName, values.shopLocation, values.expectedDeliveryTime.unix(), values.item, values.fee);
+      message.success('Request added successfully');
       fetchRequest();
       setLoading(false);
       setVisible(false);

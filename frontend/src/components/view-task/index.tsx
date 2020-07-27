@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { Spin, Typography } from "antd";
-import { Task } from "../../types";
+import { Task } from "../../logic/tasklogic";
 
 const { Paragraph, Text } = Typography;
 
@@ -15,7 +15,7 @@ const ViewTask: FC<Prop> = ({ task }) => {
 
 	return (
 		<>
-			<Paragraph>{task.name}</Paragraph>
+			<Paragraph>{task.expectedDeliveryTime}</Paragraph>
 		</>
 	);
 };

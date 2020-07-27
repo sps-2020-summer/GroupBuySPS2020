@@ -27,9 +27,10 @@ const { RangePicker } = DatePicker;
 type Props = {
   uid: string | undefined;
   fetchOffer: () => Promise<void>;
+  email : string | undefined | null;
 };
 
-const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid }) => {
+const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
   const firebaseContext = useContext(FirebaseContext);
   const { firebaseApp } = firebaseContext;
   const db = firebase.firestore(firebaseApp as firebase.app.App);
@@ -50,7 +51,11 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid }) => {
     console.log("Success:", values);
     const { title, description, shopLocation, expectedDeliveryTime } = values;
     try {
-      await addOffer(uid ?? '-', title, description, shopLocation, expectedDeliveryTime.unix(), Status.OPEN);
+      let emailName = '';
+			if (email !== null && email !== undefined) {
+				emailName = email;
+			}
+      await addOffer(uid ?? '-', title, description, shopLocation, expectedDeliveryTime.unix(), Status.OPEN, emailName );
       fetchOffer();
       setVisible(false);
     } catch (err) {

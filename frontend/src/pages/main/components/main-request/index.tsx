@@ -10,20 +10,21 @@ import {
 	message,
 } from "antd";
 import s from "../../main.module.css";
-import { Request } from "../../../../types";
 
+import { Request } from '../../../../logic/requestlogic';
 import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
-import { getOpenRequest } from "../../../../api";
 import UserCreateRequestComponent from "./user-request";
 import { FirebaseContext } from "../../../../context/firebase-context";
 import firebase from "firebase";
 import ViewTask from "../../../../components/view-task";
+import { fulfilRequest, getRequests, getOpenRequests } from "../../../../logic/requestlogic";
 
 const { Title, Paragraph } = Typography;
 type Props = {
-	uid: string | undefined
+	uid: string | undefined;
+	email : string | undefined | null;
 }
-const MainRequest: FC<Props> = ({uid}) => {
+const MainRequest: FC<Props> = ({uid, email}) => {
 	const firebaseContext = useContext(FirebaseContext);
 	const { firebaseApp } = firebaseContext;
 	const db = firebase.firestore(firebaseApp as firebase.app.App);
@@ -42,18 +43,9 @@ const MainRequest: FC<Props> = ({uid}) => {
 
 	const fetchRequest = useCallback(async () => {
 		try {
-			setLoading(true);
-			//const res = await getOpenRequest();
-			const res = await db.collection("requests").get();
-			const list = [] as any;
-			res.forEach((doc) => {
-				if (doc.exists) {
-					list.push(doc.data());
-				} else {
-					// doc.data() will be undefined in this case
-				}
-			});
-			setRequests(list);
+            setLoading(true);
+			const res = await getOpenRequests();
+			setRequests(res);
 		} catch (e) {
 			console.log(e);
 		} finally {
@@ -73,10 +65,28 @@ const MainRequest: FC<Props> = ({uid}) => {
 	const handleCancel = () => {
 		setModalReq(null);
 		setVisible(false);
-	};
-	const handleOkay = () => {
-		message.success("TASK ADDED CHECK DASHBOARD");
-	};
+    };
+    
+	const handleOkay = async () => {
+		try {setLoading(true);
+			let emailName = '';
+			if (!modalReq || !uid ) {
+				throw new Error('modalReq undefined');
+			}
+			if (email !== null && email !== undefined) {
+				emailName = email;
+			}
+			await fulfilRequest(modalReq?.id, uid, emailName );
+			
+			setLoading(false);
+		
+		message.success("Request added to dashboard");
+		} catch (err) {
+			message.error(err);
+		}
+    };
+    
+    console.log(requests);
 
 	return (
 		<div className={s.content}>
@@ -113,7 +123,7 @@ const MainRequest: FC<Props> = ({uid}) => {
 									dataSource={requests}
 									renderItem={(item: Request, index: number) => (
 										<List.Item
-											key={item.title ?? '-' + index}
+											key={item.task.item ?? '-' + index}
 											actions={[
 												<Button
 													type="primary"
@@ -136,8 +146,8 @@ const MainRequest: FC<Props> = ({uid}) => {
 											]}
 										>
 											<List.Item.Meta
-												title={item.title}
-												description={item.taskName}
+												title={item.task.item}
+												description={item.task.shopLocation}
 											/>
 										</List.Item>
 									)}
@@ -155,8 +165,8 @@ const MainRequest: FC<Props> = ({uid}) => {
 				okText="fufil request?"
 			>
 				<Typography>
-					<Title>{modalReq?.title}</Title>
-					<Paragraph>{modalReq?.taskName}</Paragraph>
+					<Title>{modalReq?.task.payerName}</Title>
+					<Paragraph>{modalReq?.task.item}</Paragraph>
 					<ViewTask task={modalReq?.task} />
 				</Typography>
 			</Modal>

@@ -18,7 +18,7 @@ const Main: FC<{}> = () => {
 	/** State */
 
 	/** The pages to show on menu click */
-	const childPages = { request: <MainRequest uid={user?.uid} />, offers: <MainOffer uid={user?.uid} /> };
+	const childPages = { request: <MainRequest email={user?.email} uid={user?.uid} />, offers: <MainOffer email={user?.email}  uid={user?.uid} /> };
 
 	/** Navigation */
 

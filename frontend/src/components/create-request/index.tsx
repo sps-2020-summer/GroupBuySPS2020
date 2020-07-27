@@ -7,29 +7,35 @@ import {
 	DatePicker,
 	Typography,
 	InputNumber,
+	message,
 } from "antd";
 import { FormInstance } from "antd/lib/form";
 
 import firebase from "firebase";
 import { FirebaseContext } from "../../context/firebase-context";
+import { addRequestToOffer, Offer } from "../../logic/offerlogic";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 type Props = {
+	uid: string | undefined
 	title: string;
-	fetchRequest?: () => Promise<void>;
+	fetch: () => Promise<void>;
 	visible: boolean;
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	offer: Offer | null;
 };
 const CreateRequest: FC<Props> = ({
+	uid,
 	title,
-	fetchRequest,
+	fetch,
 	visible,
 	setVisible,
+	offer
 }) => {
-	const firebaseContext = useContext(FirebaseContext);
-	const { firebaseApp } = firebaseContext;
-	const db = firebase.firestore(firebaseApp as firebase.app.App);
+
+
+	const [loading, setLoading] = useState<boolean>(false);
 
 	const formRef = React.createRef<FormInstance>();
 
@@ -37,20 +43,23 @@ const CreateRequest: FC<Props> = ({
 		console.log(formRef.current);
 		formRef.current?.submit();
 	};
-
+	
 	const onFinish = async (values) => {
 		console.log("Success:", values);
 		try {
-			await db.collection("request").add({
-				...values,
-				duration: 0,
-			});
-			//fetchRequest();
-			setVisible(false);
+		  setLoading(true);
+			if (offer === null) {
+				throw new Error('offer is nul');
+			}
+		  await addRequestToOffer(offer.id, offer.doerName  ,uid ?? '-', values.payerName, values.item, values.fee);
+		  message.success('Request added successfully');
+		  await fetch();
+		  setLoading(false);
+		  setVisible(false);
 		} catch (err) {
-			console.log(err);
+		  console.log(err);
 		}
-	};
+	  };
 
 	const rangeConfig = {
 		rules: [
@@ -62,69 +71,45 @@ const CreateRequest: FC<Props> = ({
 	return (
 		<>
 			<Form ref={formRef} onFinish={onFinish}>
-				<Modal
-					maskClosable={false}
-					title={title}
-					visible={visible}
-					okText="Submit request"
-					onOk={handleOk}
-					onCancel={handleCancel}
-				>
-					{" "}
-					<Form.Item
-						label="Title of Request"
-						name="title"
-						rules={[
-							{
-								required: true,
-								message: "Please input your request",
-							},
-						]}
-					>
-						<Input />
-					</Form.Item>
-					<Form.Item
-						label={"Task"}
-						name="taskName"
-						rules={[
-							{
-								required: true,
-								message: "Please input your task",
-							},
-						]}
-					>
-						<Input />
-					</Form.Item>
-					<Form.Item
-						label={"Item"}
-						name="item"
-						rules={[
-							{
-								required: true,
-								message: "Please input your item",
-							},
-						]}
-					>
-						<Input />
-					</Form.Item>
-					<Form.Item
-						label={"Shop location"}
-						name="shopLocation"
-						rules={[
-							{
-								required: true,
-								message:
-									"Please input the location of the shop",
-							},
-						]}
-					>
-						<Input />
-					</Form.Item>
-					<Form.Item label="fee" name="fee" rules={[]}>
-						<InputNumber />
-					</Form.Item>
-				</Modal>
-			</Form>
+        <Modal
+          maskClosable={false}
+          title={title}
+          visible={visible}
+          okText="Submit request"
+          onOk={handleOk}
+          onCancel={handleCancel}
+          confirmLoading={loading}
+        >
+			 <Form.Item
+            label="Payer Name"
+            name="payerName"
+            rules={[
+              {
+                required: true,
+                message: "Please input your name",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+       
+          <Form.Item
+            label={"Item"}
+            name="item"
+            rules={[
+              {
+                required: true,
+                message: "Please input your item",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="fee" name="fee" rules={[]}>
+            <InputNumber />
+          </Form.Item>
+        </Modal>
+      </Form>
 		</>
 	);
 };
