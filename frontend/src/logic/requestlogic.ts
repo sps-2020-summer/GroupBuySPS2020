@@ -109,18 +109,18 @@ export const getRequests: (
   };
 
 /** 
- * Adds request to database.
+ * Help function which adds a request to the database.
  * @throws Error if `uid` is empty.
  * @throws Error if given arguments cannot be used to create a valid request.
  */
-const addRequest: (
+export const addRequestHelper: ( // NOTE: this should not be imported by FE
   uid: string,
   payerName: string,
   shopLocation: string,
   expectedDeliveryTime: string,
   item: string,
   fee: number,
-  doerId?: string,
+  doerUid?: string,
   doerName?: string
 ) => Promise<Request> = async function (
   uid,
@@ -129,7 +129,7 @@ const addRequest: (
   expectedDeliveryTime,
   item,
   fee,
-  doerId,
+  doerUid,
   doerName
 ) {
     try {
@@ -145,7 +145,7 @@ const addRequest: (
         item,
         payerName,
         fee,
-        doerId,
+        doerUid,
         doerName
       );
 
@@ -172,7 +172,7 @@ const addRequest: (
  * Adds a regular request to database.
  * @throws Error if any argument is empty.
  */
-export const addRegularRequest: (
+export const addRequest: (
   uid: string,
   payerName: string,
   shopLocation: string,
@@ -187,31 +187,5 @@ export const addRegularRequest: (
   item,
   fee
 ) => (
-      addRequest(uid, payerName, shopLocation, expectedDeliveryTime, item, fee)
+      addRequestHelper(uid, payerName, shopLocation, expectedDeliveryTime, item, fee)
     );
-
-/**
- * Adds a pending request, i.e. request with doer information specified.
- * @throws Error if any argument is empty.
- */
-export const addPendingRequest: (
-  uid: string,
-  payerName: string,
-  shopLocation: string,
-  expectedDeliveryTime: string,
-  item: string,
-  fee: number,
-  doerId: string,
-  doerName: string
-) => Promise<Request> = async function (
-  uid,
-  payerName,
-  shopLocation,
-  expectedDeliveryTime,
-  item,
-  fee,
-  doerId,
-  doerName
-) {
-    return addRequest(uid, payerName, shopLocation, expectedDeliveryTime, item, fee, doerId, doerName);
-  }

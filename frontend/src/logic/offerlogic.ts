@@ -1,6 +1,8 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonEmpty } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative } from "./utilities";
+import { addRequestHelper } from "./requestlogic";
+import { addTask } from "./tasklogic";
 
 const COLLECTION_OFFERS: string = "offer";
 
@@ -189,3 +191,100 @@ export const addOffer: (
 			throw new Error(`Unable to add offer: ${e.message}`);
 		}
 	};
+
+/**
+ * Cancels the offer which has the specified id.
+ * Note: No checks are made to ensure that the offer's status is not 'DONE'. If it is 'DONE', then cancelling it 
+ * results in a bug.
+ * @param id id of the offer that is to be closed.
+ * @throws Error if no `id` is provided.
+ */
+export const cancelOffer: (
+	id: string
+) => Promise<void> = async (
+	id
+	) => {
+		try {
+			ensureNonEmpty(id);
+		} catch (e) {
+			throw new Error("Unable to cancel offer without its id");
+		}
+
+		const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
+		return offerRef.update({status: Status.CANCELLED});
+	} 
+
+/**
+ * Reopens an offer if it is already cancelled. If the offer's `expectedDeliveryTime` has past, no action will be taken.
+ * @param id id of the offer that is to be reopened.
+ * @throws Error if no `id` is provided
+ */
+const reopenOffer: ( // TODO: if we have time
+	id: string
+) => Promise<void> = async (
+	id
+	) => {
+		try {
+			ensureNonEmpty(id);
+		} catch (e) {
+			throw new Error("Unable to reopen offer without its id");
+		}
+
+		const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
+		// TODO: deal with the case in which the offer has expired
+		return offerRef.update({status: Status.OPEN});
+	}
+
+/**
+ * Adds a request to an offer. 
+ * @throws Error if any of the argument is empty.
+ */
+export const addRequestToOffer/*: ( // TODO: change type?
+	id: string,
+	doerName: string,
+	payerUid: string, 
+	payerName: string,
+	item: string, 
+	fee: number
+) => Promise<Request>*/ = async (
+	id,
+	doerName,
+	payerUid,
+	payerName,
+	item,
+	fee
+) => {
+	try {
+		ensureNonEmpty(id, doerName, payerUid, payerName, item, fee);
+		ensureNonNegative(fee);
+	} catch (e) {
+		throw new Error(`Unable to add request to offer: ${e.message}`);
+	}
+
+	const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
+	const offerSnapshot = await offerRef.get();
+	const offer = offerConverter.fromFirestore(offerSnapshot);
+
+	// create and add new task for doer (i.e. owner of offer)
+	addTask(
+		offer.shopLocation, 
+		offer.expectedDeliveryTime, 
+		item, 
+		payerName, 
+		fee, 
+		offer.uid, 
+		doerName)
+	;
+
+	// 	create and add new request for payer
+	return addRequestHelper(
+		payerUid, 
+		payerName, 
+		offer.shopLocation, 
+		offer.expectedDeliveryTime, 
+		item, 
+		fee, 
+		offer.uid, 
+		doerName
+	);
+}
