@@ -12,7 +12,7 @@ class Offer {
 	title: string;
 	description: string;
 	shopLocation: string;
-	expectedDeliveryTime: string;
+	expectedDeliveryTime: number;
 	status: Status;
 
 	constructor(
@@ -21,7 +21,7 @@ class Offer {
 		title: string,
 		description: string,
 		shopLocation: string,
-		expectedDeliveryTime: string,
+		expectedDeliveryTime: number,
 		status: Status
 	) {
 		try {
@@ -46,7 +46,7 @@ const offerConverter = Object.freeze({
 		title: string,
 		description: string,
 		shopLocation: string,
-		expectedDeliveryTime: string,
+		expectedDeliveryTime: number,
 		status: Status
 	) => ({
 		uid: uid,
@@ -133,7 +133,7 @@ export const addOffer: (
 	title: string,
 	description: string,
 	shopLocation: string,
-	expectedDeliveryTime: string,
+	expectedDeliveryTime: number,
 	status: Status,
 ) => Promise<Offer> = async function (
 	uid,
