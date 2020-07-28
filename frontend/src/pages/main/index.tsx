@@ -17,8 +17,9 @@ const Main: FC<{}> = () => {
 	if (loading) return <Spin spinning={true}></Spin>;
 	/** State */
 
+	const email = user?.email ?? user?.displayName ?? "Guest User"
 	/** The pages to show on menu click */
-	const childPages = { request: <MainRequest email={user?.email} uid={user?.uid} />, offers: <MainOffer email={user?.email}  uid={user?.uid} /> };
+	const childPages = { request: <MainRequest email={email} uid={user?.uid} />, offers: <MainOffer email={email}  uid={user?.uid} /> };
 
 	/** Navigation */
 

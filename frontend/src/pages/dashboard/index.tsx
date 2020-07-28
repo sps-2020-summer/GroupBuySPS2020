@@ -69,7 +69,7 @@ const Dashboard: FC<{}> = () => {
 				>
 					<Avatar src={user?.photoURL ?? "Hello Guest user"}></Avatar>
 					<br />
-					<p>{user?.email ?? "Guest User"}</p>
+					<p>{user?.displayName ?? user?.email ?? "Guest User"}</p>
 				</div>
 				<Menu
 					theme={"dark"}
