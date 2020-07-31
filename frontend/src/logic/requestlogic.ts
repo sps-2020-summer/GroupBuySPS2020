@@ -158,22 +158,18 @@ export const getRequests: (
 export const addRequestHelper: (
   // NOTE: this should not be imported by FE
   uid: string,
-  payerName: string,
   shopLocation: string,
   expectedDeliveryTime: number,
   item: string,
   fee: number,
-  doerUid?: string,
-  doerName?: string
+  doerUid?: string
 ) => Promise<Request> = async function (
   uid,
-  payerName,
   shopLocation,
   expectedDeliveryTime,
   item,
   fee,
-  doerUid,
-  doerName
+  doerUid
 ) {
   try {
     ensureNonEmpty(uid);
@@ -186,10 +182,9 @@ export const addRequestHelper: (
       shopLocation,
       expectedDeliveryTime,
       item,
-      payerName,
+      uid,
       fee,
-      doerUid,
-      doerName
+      doerUid
     );
 
     const requestRef = await db
@@ -208,14 +203,12 @@ export const addRequestHelper: (
  */
 export const addRequest: (
   uid: string,
-  payerName: string,
   shopLocation: string,
   expectedDeliveryTime: number,
   item: string,
   fee: number
 ) => Promise<Request> = async (
   uid,
-  payerName,
   shopLocation,
   expectedDeliveryTime,
   item,
@@ -223,7 +216,6 @@ export const addRequest: (
 ) =>
   addRequestHelper(
     uid,
-    payerName,
     shopLocation,
     expectedDeliveryTime,
     item,
@@ -231,20 +223,18 @@ export const addRequest: (
   );
 
 /**
- * Indicates that doer with the specified user id and name will fulfil the request with the given id.
+ * Indicates that doer with the specified user id will fulfil the request with the given id.
  * @param id id of the request that is to be fulfilled
  * @param uid user id of doer
- * @param doerName name of doer
  * @throws Error if any of the arguments is empty
  * @throws Error if the request with `id` cannot be found
  */
 export const fulfilRequest: (
   id: string,
-  uid: string,
-  doerName: string
-) => Promise<void> = async (id, uid, doerName) => {
+  uid: string
+) => Promise<void> = async (id, uid) => {
   try {
-    ensureNonEmpty(id, uid, doerName);
+    ensureNonEmpty(id, uid);
   } catch (e) {
     throw new Error(`Unable to fulfil request: ${e.message}`);
   }
@@ -259,7 +249,7 @@ export const fulfilRequest: (
     );
   }
 
-  addDoerToTask(taskId, uid, doerName);
+  addDoerToTask(taskId, uid);
 };
 
 /**
