@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useState, useCallback, useContext } from "react";
 import { Card, Typography, Spin, List, Space, Button, Modal } from "antd";
 import s from "../../main.module.css";
-import { Offer, getOpenOffer } from "../../../../logic/offerlogic";
+import { Offer, getOpenOffer } from "../../../../../logic/offerlogic";
 import { LikeOutlined, StarOutlined } from "@ant-design/icons";
 import UserCreateOfferComponent from "./user-offer";
-import CreateRequest from "../../../../components/create-request";
+import CreateRequest from "../../../../../components/create-request";
 
 const { Title, Paragraph, Text } = Typography;
 

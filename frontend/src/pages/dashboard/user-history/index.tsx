@@ -8,7 +8,6 @@ import s from "./s.module.css";
 import RequestItem from "../user-request/request-item";
 import TaskItem from "../user-task/task-item";
 import Loader from "../../../components/loader";
-import { getUserTask, getUserRequest } from "../../../api";
 import { getTasks } from "../../../logic/tasklogic";
 import { getRequests } from "../../../logic/requestlogic";
 import { getOffers } from "../../../logic/offerlogic";

@@ -1,10 +1,7 @@
 import React, { FC, useState } from "react";
-import { Card, message, Typography, Spin } from "antd";
+import { Card, message, Typography, Spin, Button } from "antd";
 import {
-  EditOutlined,
-  EllipsisOutlined,
-  SettingOutlined,
-  GoogleOutlined,
+ CloseCircleFilled,
 } from "@ant-design/icons";
 
 import s from "./s.module.css";
@@ -29,7 +26,7 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
           description={
             <Typography>
               <Title>{task.item}</Title>
-              <Paragraph>
+              <Paragraph >
                 <Text strong={true}>Shop Location: </Text>
                 {task.shopLocation}
               </Paragraph>
@@ -63,7 +60,7 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
     <Spin spinning={loading}>
       <Card
         className={s.cardStyle}
-        actions={[<GoogleOutlined onClick={handleCancel} />]}
+        actions={[<Button onClick={handleCancel} >Cancel <CloseCircleFilled/> </Button>]}
       >
         <Card.Meta
           title={task.item}

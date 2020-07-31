@@ -7,36 +7,28 @@ import {
   Input,
   DatePicker,
   Typography,
+  InputNumber,
   message,
-  TimePicker,
 } from "antd";
 import { FormInstance } from "antd/lib/form";
-import TextArea from "antd/lib/input/TextArea";
-
 import { MoneyCollectOutlined } from "@ant-design/icons";
-import { userInfo } from "os";
-import MainOffer from ".";
 import firebase from "firebase";
-import { FirebaseContext } from "../../../../context/firebase-context";
-import { addOffer } from "../../../../logic/offerlogic";
-import { Status } from "../../../../types";
-import moment from "moment";
+import { FirebaseContext } from "../../../../../context/firebase-context";
+import { addRequest } from "../../../../../logic/requestlogic";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 type Props = {
   uid: string | undefined;
-  fetchOffer: () => Promise<void>;
-  email : string | undefined | null;
+  fetchRequest: () => Promise<void>;
 };
-
-const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
+const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
   const firebaseContext = useContext(FirebaseContext);
   const { firebaseApp } = firebaseContext;
   const db = firebase.firestore(firebaseApp as firebase.app.App);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const formRef = React.createRef<FormInstance>();
-
   const [visible, setVisible] = useState<boolean>(false);
 
   const handleOk = () => {
@@ -46,17 +38,16 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
 
   const showModal = () => setVisible(true);
   const handleCancel = () => setVisible(false);
+  // add only payerName , shopLocation, expectedDeliveryTime , item, fee
 
   const onFinish = async (values) => {
     console.log("Success:", values);
-    const { title, description, shopLocation, expectedDeliveryTime } = values;
     try {
-      let emailName = '';
-			if (email !== null && email !== undefined) {
-				emailName = email;
-			}
-      await addOffer(uid ?? '-', title, description, shopLocation, expectedDeliveryTime.unix(), Status.OPEN, emailName );
-      fetchOffer();
+      setLoading(true);
+      await addRequest(uid ?? '-', values.payerName, values.shopLocation, values.expectedDeliveryTime.unix(), values.item, values.fee);
+      message.success('Request added successfully');
+      fetchRequest();
+      setLoading(false);
       setVisible(false);
     } catch (err) {
       console.log(err);
@@ -71,7 +62,7 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
     <>
       <Typography>
         <Title>Welcome</Title>
-        <Paragraph>Will you be a nice person today?</Paragraph>
+        <Paragraph>What does your heart desire?</Paragraph>
       </Typography>
       <Button
         type="primary"
@@ -80,45 +71,36 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
         className={s.userActionBtn}
         icon={<MoneyCollectOutlined />}
       >
-        New Offer
+        New Request
       </Button>
       <Typography>
         <Title>You</Title>
-        <Paragraph>You currently have 0 offers open</Paragraph>
+        <Paragraph>You currently have 0 requests open</Paragraph>
       </Typography>
       <Form ref={formRef} onFinish={onFinish}>
         <Modal
           maskClosable={false}
-          title="New Offer"
+          title="New Request"
           visible={visible}
+          okText="Submit request"
           onOk={handleOk}
           onCancel={handleCancel}
+          confirmLoading={loading}
         >
-          {" "}
+      
           <Form.Item
-            label="Title of Offer"
-            name="title"
+            label="Payer Name"
+            name="payerName"
             rules={[
               {
                 required: true,
-                message: "Please input your offer",
+                message: "Please input your name",
               },
             ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[
-              {
-                required: true,
-                message: "Please input a description",
-              },
-            ]}
-          >
-            <TextArea />
-          </Form.Item>
+         
           <Form.Item
             label={"Shop location"}
             name="shopLocation"
@@ -143,10 +125,25 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
           >
             <DatePicker showTime={true} />
           </Form.Item>
+          <Form.Item
+            label={"Item"}
+            name="item"
+            rules={[
+              {
+                required: true,
+                message: "Please input your item",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="fee" name="fee" rules={[]}>
+            <InputNumber />
+          </Form.Item>
         </Modal>
       </Form>
     </>
   );
 };
 
-export default UserCreateOfferComponent;
+export default UserCreateRequestComponent;

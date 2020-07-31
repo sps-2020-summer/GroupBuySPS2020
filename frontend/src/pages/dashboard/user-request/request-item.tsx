@@ -1,10 +1,8 @@
 import React, { FC, useState } from "react";
-import { Card, Typography, message } from "antd";
+import { Card, Typography, message, Button } from "antd";
 import {
-  EditOutlined,
-  EllipsisOutlined,
-  SettingOutlined,
-  GoogleCircleFilled,
+
+  CloseCircleFilled,
 } from "@ant-design/icons";
 
 import s from "./s.module.css";
@@ -23,10 +21,10 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
     return (
       <Card className={s.cardStyle}>
         <Card.Meta
-          title={request.id}
+     
           description={
             <Typography>
-              <Title>{request.task.item}</Title>
+                <Title>{request.task.item }</Title>
               {request.task.status === "DONE" ? (
                 <Text>THIS request IS DONE</Text>
               ) : null}
@@ -62,13 +60,12 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
   return (
     <Card
       className={s.cardStyle}
-      actions={[<GoogleCircleFilled onClick={handleDone} />]}
+      actions={[<Button onClick={handleDone} >Cancel <CloseCircleFilled/> </Button>]}
     >
       <Card.Meta
-        title={request.id}
         description={
           <Typography>
-            <Title>{request.task.item}</Title>
+            <Title>{request.task.item }</Title>
             {request.task.status === "CANCELLED" ? (
               <Text>THIS request IS Cancelled</Text>
             ) : null}
