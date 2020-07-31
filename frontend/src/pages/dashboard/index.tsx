@@ -15,9 +15,12 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import Loader from "../../components/loader";
 import UserOffer from "./user-offer";
 
+import Main from './market-place';
+
+
 const { Sider, Content } = Layout;
 
-type dashboardOptions = "tasks" | "history" | "requests" | "offers";
+type dashboardOptions = "tasks" | "history" | "requests" | "offers" |"marketplace";
 
 export type DashboardCompProps = {
 	userUid: string;
@@ -42,6 +45,7 @@ const Dashboard: FC<{}> = () => {
 		tasks: <UserTask userUid={userUid} />,
 		requests: <UserRequest userUid={userUid} />,
 		history: <UserHistory userUid={userUid} />,
+		marketplace: <Main />
 	};
 
 	const handleClick = (e: dashboardOptions) => setCurrent(e);
@@ -108,7 +112,7 @@ const Dashboard: FC<{}> = () => {
 					<Menu.Item
 						key={"marketplace"}
 						icon={<ShoppingCartOutlined />}
-						onClick={navToHome}
+						onClick={() => handleClick("marketplace")}
 					>
 						Marketplace
 					</Menu.Item>

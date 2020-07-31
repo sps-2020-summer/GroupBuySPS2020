@@ -8,7 +8,7 @@ import firebase from "firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Loader from "./components/loader";
 
-const Main = React.lazy(() => import("./pages/main"));
+const Main = React.lazy(() => import("./pages/dashboard/market-place"));
 const Login = React.lazy(() => import("./pages/login"));
 const Dashboard = React.lazy(() => import("./pages/dashboard"));
 
@@ -57,12 +57,8 @@ const App = () => {
 					}
 				>
 					<Switch>
-						<PrivateRoute exact path="/" Comp={Main}></PrivateRoute>
-						<PrivateRoute
-							exact
-							path="/dashboard"
-							Comp={Dashboard}
-						></PrivateRoute>
+						<PrivateRoute exact path="/" Comp={Dashboard}></PrivateRoute>
+				
 						<Route exact path="/login" component={Login} />
 					</Switch>
 				</React.Suspense>
