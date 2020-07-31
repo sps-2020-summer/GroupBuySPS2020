@@ -33,7 +33,7 @@ const Dashboard: FC<{}> = () => {
 	const navToHome = () => history.push("/");
 	const [user] = useAuthState(firebase.auth());
 
-	const [current, setCurrent] = useState<dashboardOptions>("offers");
+	const [current, setCurrent] = useState<dashboardOptions>("marketplace");
 	console.log(user);
 	const userUid = user?.uid;
 	if (userUid === undefined) {
@@ -62,7 +62,7 @@ const Dashboard: FC<{}> = () => {
 
 	return (
 		<>
-			<Sider width={"25vw"}>
+			<Sider width={"10vw"}>
 				<div
 					style={{
 						paddingLeft: "24px",
@@ -77,9 +77,16 @@ const Dashboard: FC<{}> = () => {
 				</div>
 				<Menu
 					theme={"dark"}
-					defaultSelectedKeys={["offers"]}
+					defaultSelectedKeys={[current]}
 					mode="inline"
 				>
+						<Menu.Item
+						key={"marketplace"}
+						icon={<ShoppingCartOutlined />}
+						onClick={() => handleClick("marketplace")}
+					>
+						Marketplace
+					</Menu.Item>
 					<Menu.Item
 						key="offers"
 						onClick={() => handleClick("offers")}
@@ -108,15 +115,6 @@ const Dashboard: FC<{}> = () => {
 					>
 						History
 					</Menu.Item>
-
-					<Menu.Item
-						key={"marketplace"}
-						icon={<ShoppingCartOutlined />}
-						onClick={() => handleClick("marketplace")}
-					>
-						Marketplace
-					</Menu.Item>
-
 					<Menu.Item
 						icon={<LogoutOutlined />}
 						key="signOut"
@@ -128,8 +126,8 @@ const Dashboard: FC<{}> = () => {
 			</Sider>
 			<Content
 				style={{
-					padding: "0 50px",
-					margin: "48px 48px 48px 0px",
+					padding: "0 0px",
+					margin: "16px 32px 32px 16px",
 				}}
 			>
 				{childPages[current]}
