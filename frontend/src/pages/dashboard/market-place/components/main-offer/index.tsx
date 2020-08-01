@@ -144,8 +144,8 @@ const MainOffer: FC<Props> = ({ uid , email}) => {
 						{modalOffer?.shopLocation}
 					</Paragraph>
 					<Paragraph>
-						<Text strong={true}>Doing Offer: </Text>
-						{modalOffer?.doerName}
+						<Text strong={true}>Status: </Text>
+						{modalOffer?.status}
 					</Paragraph>
 					<Paragraph>
 						<Text strong={true}>Delivery time: </Text>

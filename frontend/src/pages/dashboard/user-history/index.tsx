@@ -12,6 +12,7 @@ import { getTasks } from "../../../logic/tasklogic";
 import { getRequests } from "../../../logic/requestlogic";
 import { getOffers } from "../../../logic/offerlogic";
 import OfferItem from "../user-offer/offer-item";
+import { Status } from "../../../types";
 
 const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -25,7 +26,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
         setLoading(true);
         const resOffer = await getOffers(userUid);
         const resTask = await getTasks(userUid);
-        const resRequest = await getRequests(userUid);
+        const resRequest = await getRequests(userUid, Status.DONE);
         setOffers(resOffer);
         setTasks(resTask);
         setRequests(resRequest)
@@ -74,7 +75,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                 dataSource={requests}
                 renderItem={(item) => (
                   <List.Item>
-                    <Card title={item.task.payerName} style={{ width: "100%" }}>
+                    <Card title={ `Payer ID: ${item.task.payerUid}`} style={{ width: "100%" }}>
                       <RequestItem request={item} />
                     </Card>
                   </List.Item>

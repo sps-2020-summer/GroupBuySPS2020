@@ -76,7 +76,7 @@ const MainRequest: FC<Props> = ({uid, email}) => {
 			if (email !== null && email !== undefined) {
 				emailName = email;
 			}
-			await fulfilRequest(modalReq?.id, uid, emailName );
+			await fulfilRequest(modalReq?.id, uid );
 			
 			setLoading(false);
 		
@@ -165,7 +165,7 @@ const MainRequest: FC<Props> = ({uid, email}) => {
 				okText="fufil request?"
 			>
 				<Typography>
-					<Title>{modalReq?.task.payerName}</Title>
+					<Title>{modalReq?.task.payerUid}</Title>
 					<Paragraph>{modalReq?.task.item}</Paragraph>
 					<ViewTask task={modalReq?.task} />
 				</Typography>

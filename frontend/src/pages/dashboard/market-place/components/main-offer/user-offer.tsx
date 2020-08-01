@@ -55,7 +55,7 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
 			if (email !== null && email !== undefined) {
 				emailName = email;
 			}
-      await addOffer(uid ?? '-', title, description, shopLocation, expectedDeliveryTime.unix(), Status.OPEN, emailName );
+      await addOffer(uid ?? '-', title, description, shopLocation, expectedDeliveryTime.unix(), Status.OPEN);
       fetchOffer();
       setVisible(false);
     } catch (err) {

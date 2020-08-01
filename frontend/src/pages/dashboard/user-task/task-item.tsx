@@ -25,20 +25,20 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
           title={task.item}
           description={
             <Typography>
-              <Title>{task.item}</Title>
-              <Paragraph >
-                <Text strong={true}>Shop Location: </Text>
-                {task.shopLocation}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Payer </Text>
-                {task.payerName}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Expected Delivery Time</Text>
-                {convertToDate(task.expectedDeliveryTime)}
-              </Paragraph>
-            </Typography>
+            <Title>{task.item }</Title>
+            <Paragraph>
+              <Text strong={true}>Shop Location: </Text>
+              {task.shopLocation}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Expected Delivery Time</Text>
+              {` ${convertToDate(task.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {task.status}
+            </Paragraph>
+          </Typography>
           }
         />
       </Card>
@@ -66,20 +66,24 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
           title={task.item}
           description={
             <Typography>
-              <Title>{task.item}</Title>
-              <Paragraph>
-                <Text strong={true}>Shop Location: </Text>
-                {task.shopLocation}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Payer </Text>
-                {task.payerName}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Expected Delivery Time</Text>
-                {convertToDate(task.expectedDeliveryTime)}
-              </Paragraph>
-            </Typography>
+            <Title>{task.item }</Title>
+            <Paragraph>
+              <Text strong={true}>Shop Location: </Text>
+              {task.shopLocation}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Fee</Text>
+              {task.fee}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Expected Delivery Time</Text>
+              {` ${convertToDate(task.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {task.status}
+            </Paragraph>
+          </Typography>
           }
         />
       </Card>
