@@ -9,15 +9,13 @@ export class Task {
   shopLocation: string;
   expectedDeliveryTime: number;
   item: string;
-  payerName: string;
+  payerUid: string;
   fee: number;
   status: Status;
   uid?: string; // equivalent to doer's id
-  doerName?: string;
 
   /**
-   * @throws Error if `uid` and `doerName` are not both empty, or are not both non-empty.
-   * @throws Error if `id`, `shopLocation`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerName` or `status` are empty.
+   * @throws Error if `id`, `shopLocation`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerUid` or `status` are empty.
    * @throws Error if `fee` is not non-negative.
    */
   constructor(
@@ -25,11 +23,10 @@ export class Task {
     shopLocation: string,
     expectedDeliveryTime: number,
     item: string,
-    payerName: string,
+    payerUid: string,
     fee: number,
     status: Status,
-    uid?: string,
-    doerName?: string
+    uid?: string
   ) {
     try {
       ensureNonEmpty(
@@ -37,7 +34,7 @@ export class Task {
         shopLocation,
         expectedDeliveryTime,
         item,
-        payerName,
+        payerUid,
         fee,
         status
       );
@@ -50,41 +47,21 @@ export class Task {
     this.shopLocation = shopLocation;
     this.expectedDeliveryTime = expectedDeliveryTime;
     this.item = item;
-    this.payerName = payerName;
+    this.payerUid = payerUid;
     this.fee = fee;
     this.status = status;
 
-    if (!Task.isValidDoer(uid, doerName)) {
-      throw new Error(
-        "Either task has doer (an owner of task) but no doer's id (i.e. uid) is missing, or" +
-          " task has doer's id but no doer."
-      );
-    }
-
-    if (!Task.isValidState(uid, doerName, status)) {
+    if (!Task.isValidState(uid, status)) {
       throw new Error("Missing doer for task with id " + id);
     }
 
     this.uid = uid === undefined ? "" : uid;
-    this.doerName = doerName === undefined ? "" : doerName;
   }
 
   /** Checks if a valid doer is present. */
   static isValidDoerPresent = (
-    uid: string | undefined,
-    doerName: string | undefined
-  ) => !isEmptyString(uid) && !isEmptyString(doerName);
-
-  /**
-   * Checks if doer is valid.
-   * @returns `true` if `uid` (i.e. doer's id) and `doerName` are both empty, or both non-empty.
-   */
-  static isValidDoer = (
-    uid: string | undefined,
-    doerName: string | undefined
-  ) =>
-    Task.isValidDoerPresent(uid, doerName) ||
-    (isEmptyString(uid) && isEmptyString(doerName));
+    uid: string | undefined
+  ) => !isEmptyString(uid);
 
   /**
    * Checks if state valid.
@@ -92,30 +69,28 @@ export class Task {
    */
   static isValidState = (
     uid: string | undefined,
-    doerName: string | undefined,
     status: Status
   ) =>
-    (Task.isValidDoerPresent(uid, doerName) && status !== Status.OPEN) ||
-    (isEmptyString(uid) && isEmptyString(doerName) && status === Status.OPEN);
+    (Task.isValidDoerPresent(uid) && status !== Status.OPEN) ||
+    (!Task.isValidDoerPresent(uid) && status === Status.OPEN);
 }
 
 export const taskConverter = Object.freeze({
   /**
-   * @throws Error if `id`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerName` or `status` are empty.
+   * @throws Error if `id`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerUid` or `status` are empty.
    * @throws Error if `fee` is not a non-negative number.
    */
   toFirestore: (
     shopLocation: string,
     expectedDeliveryTime: number,
     item: string,
-    payerName: string,
+    payerUid: string,
     fee: number,
     status: Status,
-    uid: string,
-    doerName: string
+    uid: string
   ) => {
     try {
-      ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerName, fee);
+      ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerUid, fee);
       ensureNonNegative(fee);
     } catch (e) {
       throw new Error(
@@ -127,11 +102,10 @@ export const taskConverter = Object.freeze({
       shopLocation: shopLocation,
       expectedDeliveryTime: expectedDeliveryTime,
       item: item,
-      payerName: payerName,
+      payerUid: payerUid,
       fee: fee,
       status: Status[status],
-      uid: uid,
-      doerName: doerName,
+      uid: uid
     };
   },
   /** @throws Error if data associated with `taskSnapshot` cannot be found. */
@@ -147,11 +121,10 @@ export const taskConverter = Object.freeze({
       data.shopLocation,
       data.expectedDeliveryTime,
       data.item,
-      data.payerName,
+      data.payerUid,
       data.fee,
       Status[data.status],
-      data.uid,
-      data.doerName
+      data.uid
     );
   },
 });
@@ -229,51 +202,40 @@ export const getTaskById: (id: string) => Promise<Task> = async (
 };
 
 /**
- * Adds a new task to the database. If a valid doer is present (i.e. both `uid` and `doerName` are given),
- * task's status will be `PENDING`. If no valid doer is present (i.e. both `uid` and `doerName` are not given),
+ * Adds a new task to the database. If a valid doer is present (i.e. both `uid` is given),
+ * task's status will be `PENDING`. If no valid doer is present (i.e. both `uid` is not given),
  * task's status will be `OPEN`.
- * @throws Exception if `uid` is present but `doerName` is absent, or vice versa.
- * @throws Error if `id`, `shopLocation`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerName` or `status` are empty.
+ * @throws Error if `id`, `shopLocation`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerUid` or `status` are empty.
  * @throws Error if `fee` is not non-negative.
  */
 export const addTask: (
   shopLocation: string,
   expectedDeliveryTime: number,
   item: string,
-  payerName: string,
+  payerUid: string,
   fee: number,
-  uid?: any,
-  doerName?: any
+  uid?: any // doer's id
 ) => Promise<Task> = async function (
   shopLocation,
   expectedDeliveryTime,
   item,
-  payerName,
+  payerUid,
   fee,
-  uid,
-  doerName
+  uid
 ) {
   try {
-    ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerName, fee);
+    ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerUid, fee);
     ensureNonNegative(fee);
   } catch (e) {
     throw new Error(`Unable to add task: ${e.message}`);
   }
 
-  if (!Task.isValidDoer(uid, doerName)) {
-    throw new Error(
-      "Unable to add task. Either task has doer (an owner of task) " +
-        "but no doer's id (i.e. uid) is missing, or task has doer's id but no doer."
-    );
-  }
-
   let status;
-  if (Task.isValidDoerPresent(uid, doerName)) {
+  if (Task.isValidDoerPresent(uid)) {
     status = Status.PENDING;
   } else {
     status = Status.OPEN;
     uid = "";
-    doerName = "";
   }
 
   try {
@@ -284,11 +246,10 @@ export const addTask: (
           shopLocation,
           expectedDeliveryTime,
           item,
-          payerName,
+          payerUid,
           fee,
           Status[status],
-          uid,
-          doerName
+          uid
         )
       );
     return new Task(
@@ -296,11 +257,10 @@ export const addTask: (
       shopLocation,
       expectedDeliveryTime,
       item,
-      payerName,
+      payerUid,
       fee,
       status,
-      uid,
-      doerName
+      uid
     );
   } catch (e) {
     throw new Error(`Unable to add task: ${e.message}`);
@@ -334,11 +294,10 @@ export const cancelTask: (id: string) => Promise<void> = async (id) => {
  */
 export const addDoerToTask: (
   id: string,
-  doerId: string,
-  doerName: string
-) => Promise<void> = (id, doerId, doerName) => {
+  doerId: string
+) => Promise<void> = (id, doerId) => {
   try {
-    ensureNonEmpty(doerId, id, doerName);
+    ensureNonEmpty(doerId, id);
   } catch (e) {
     throw new Error("Unable to add doer to task when arguments are missing");
   }
@@ -346,7 +305,6 @@ export const addDoerToTask: (
   const taskRef = db.collection(COLLECTION_TASKS).doc(id);
   return taskRef.update({
     uid: doerId,
-    doerName: doerName,
     status: Status[Status.PENDING],
   });
 };
