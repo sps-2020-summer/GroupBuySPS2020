@@ -1,6 +1,6 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState, useEffect, useCallback } from "react";
 import { DashboardCompProps } from "..";
-import { Request } from "../../../logic"
+import { Request } from "../../../logic";
 import { Slide } from "react-awesome-reveal";
 import { List } from "antd";
 import RequestItem from "./request-item";
@@ -11,20 +11,20 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [requests, setRequests] = useState<Request[]>([]);
 
-  useEffect(() => {
-    const fetchRequest = async (userUid: string) => {
-      try {
-        setLoading(true);
-        const res = await getRequests(userUid);
-        setRequests(res);
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchRequest = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await getRequests(userUid);
+      setRequests(res);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    fetchRequest(userUid);
+  useEffect(() => {
+    fetchRequest();
   }, [userUid]);
 
   return (
@@ -37,31 +37,31 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
       {loading ? (
         <Loader spin={loading} topMargin={"24px"} />
       ) : (
-          <>
-            {requests.length === 0 ? (
-              <>You currently have no requests opened!</>
-            ) : (
-                <></>
-              )}
-            <List
-              grid={{
-                gutter: 16,
-                xs: 1,
-                sm: 2,
-                md: 4,
-                lg: 4,
-                xl: 4,
-                xxl: 3,
-              }}
-              dataSource={requests}
-              renderItem={(item) => (
-                <List.Item>
-                  <RequestItem request={item} />
-                </List.Item>
-              )}
-            />
-          </>
-        )}
+        <>
+          {requests.length === 0 ? (
+            <>You currently have no requests opened!</>
+          ) : (
+            <></>
+          )}
+          <List
+            grid={{
+              gutter: 16,
+              xs: 1,
+              sm: 2,
+              md: 4,
+              lg: 4,
+              xl: 4,
+              xxl: 3,
+            }}
+            dataSource={requests}
+            renderItem={(item) => (
+              <List.Item>
+                <RequestItem fetch={fetchRequest} request={item} />
+              </List.Item>
+            )}
+          />
+        </>
+      )}
     </>
   );
 };

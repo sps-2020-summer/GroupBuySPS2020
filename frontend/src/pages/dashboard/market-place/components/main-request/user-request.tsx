@@ -44,7 +44,7 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
     console.log("Success:", values);
     try {
       setLoading(true);
-      await addRequest(uid ?? '-', values.payerName, values.shopLocation, values.expectedDeliveryTime.unix(), values.item, values.fee);
+      await addRequest(uid ?? '-', values.shopLocation, values.expectedDeliveryTime.unix(), values.item, values.fee);
       message.success('Request added successfully');
       fetchRequest();
       setLoading(false);
@@ -86,21 +86,7 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
           onOk={handleOk}
           onCancel={handleCancel}
           confirmLoading={loading}
-        >
-      
-          <Form.Item
-            label="Payer Name"
-            name="payerName"
-            rules={[
-              {
-                required: true,
-                message: "Please input your name",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-         
+        >   
           <Form.Item
             label={"Shop location"}
             name="shopLocation"

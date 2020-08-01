@@ -24,21 +24,24 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
           title={offer.title}
           description={
             <Typography>
-              <Title>{offer.title}</Title>
-             <Text>THIS offer IS DONE</Text> 
-              <Paragraph>
-                <Text strong={true}>Shop Location: </Text>
-                {offer.shopLocation}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Doer Name </Text>
-                {offer.doerName}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Expected Delivery Time</Text>
-                {convertToDate(offer.expectedDeliveryTime)}
-              </Paragraph>
-            </Typography>
+            <Title>{offer.title}</Title>
+            <Paragraph>
+              <Text strong={true}>Description: </Text>
+              {offer.description}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Shop Location: </Text>
+              {offer.shopLocation}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Expected Delivery Time</Text>
+              {` ${convertToDate(offer.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {offer.status}
+            </Paragraph>
+          </Typography>
           }
         />
       </Card>
@@ -65,22 +68,21 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
         description={
           <Typography>
             <Title>{offer.title}</Title>
-           
+            <Paragraph>
+              <Text strong={true}>Description: </Text>
+              {offer.description}
+            </Paragraph>
             <Paragraph>
               <Text strong={true}>Shop Location: </Text>
               {offer.shopLocation}
             </Paragraph>
-			      <Paragraph>
-              <Text strong={true}>Status: </Text>
-              {offer.status}
-            </Paragraph>
-            <Paragraph>
-              <Text strong={true}>Doer Name </Text>
-              {offer.doerName}
-            </Paragraph>
             <Paragraph>
               <Text strong={true}>Expected Delivery Time</Text>
-              {convertToDate(offer.expectedDeliveryTime)}
+              {` ${convertToDate(offer.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {offer.status}
             </Paragraph>
           </Typography>
         }

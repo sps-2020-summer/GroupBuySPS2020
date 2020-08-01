@@ -51,7 +51,7 @@ const CreateRequest: FC<Props> = ({
 			if (offer === null) {
 				throw new Error('offer is nul');
 			}
-		  await addRequestToOffer(offer.id, offer.doerName  ,uid ?? '-', values.payerName, values.item, values.fee);
+		  await addRequestToOffer(offer.id,  uid ?? '-', values.item, values.fee);
 		  message.success('Request added successfully');
 		  await fetch();
 		  setLoading(false);
@@ -80,19 +80,6 @@ const CreateRequest: FC<Props> = ({
           onCancel={handleCancel}
           confirmLoading={loading}
         >
-			 <Form.Item
-            label="Payer Name"
-            name="payerName"
-            rules={[
-              {
-                required: true,
-                message: "Please input your name",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-       
           <Form.Item
             label={"Item"}
             name="item"

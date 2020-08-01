@@ -51,6 +51,7 @@
   "devDependencies": {
     "@types/react-css-modules": "^4.6.2",
     "@types/react-router-dom": "^5.1.5",
-    "css-loader": "^3.6.0"
+    "css-loader": "^3.6.0",
+    "eslint-plugin-react-hooks": "^4.0.8"
   }
 }

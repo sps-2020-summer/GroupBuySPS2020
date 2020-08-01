@@ -107,21 +107,28 @@ export const getRequests: (
   if (status) {
     const requestRef = db
       .collection(COLLECTION_REQUESTS)
-      .where("uid", "==", uid)
-      .where("status", "==", status);
-    const requests: Request[] = [];
+      .where("uid", "==", uid);
+    const requests: firebase.firestore.QueryDocumentSnapshot<
+      firebase.firestore.DocumentData
+    >[] = [];
+    const results: Request[] = [];
     const requestQuerySnapshot = await requestRef.get();
-    requestQuerySnapshot.forEach(async (requestSnapshot) => {
-      try {
-        const request = await requestConverter.fromFirestore(requestSnapshot);
-        requests.push(request);
-      } catch (e) {
-        return console.error(
-          `Encountered error while retrieving request: ${e.message}`
-        );
-      }
+    requestQuerySnapshot.forEach((requestSnapshot) => {
+      requests.push(requestSnapshot);
     });
-    return requests;
+    await Promise.all(
+      requests.map(async (requestSnapshot) => {
+        try {
+          const request = await requestConverter.fromFirestore(requestSnapshot);
+          results.push(request);
+        } catch (e) {
+          return console.error(
+            `Encountered error while retrieving request: ${e.message}`
+          );
+        }
+      })
+    );
+    return results.filter((x) => x.task.status === Status.DONE);
   } else {
     const requestRef = db
       .collection(COLLECTION_REQUESTS)
@@ -213,14 +220,7 @@ export const addRequest: (
   expectedDeliveryTime,
   item,
   fee
-) =>
-  addRequestHelper(
-    uid,
-    shopLocation,
-    expectedDeliveryTime,
-    item,
-    fee
-  );
+) => addRequestHelper(uid, shopLocation, expectedDeliveryTime, item, fee);
 
 /**
  * Indicates that doer with the specified user id will fulfil the request with the given id.
@@ -229,10 +229,10 @@ export const addRequest: (
  * @throws Error if any of the arguments is empty
  * @throws Error if the request with `id` cannot be found
  */
-export const fulfilRequest: (
-  id: string,
-  uid: string
-) => Promise<void> = async (id, uid) => {
+export const fulfilRequest: (id: string, uid: string) => Promise<void> = async (
+  id,
+  uid
+) => {
   try {
     ensureNonEmpty(id, uid);
   } catch (e) {
