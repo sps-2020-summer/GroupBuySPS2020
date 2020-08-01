@@ -14,7 +14,6 @@ export class Offer {
   shopLocation: string;
   expectedDeliveryTime: number;
   status: Status;
-  doerName: string;
 
   constructor(
     uid: string,
@@ -24,7 +23,6 @@ export class Offer {
     shopLocation: string,
     expectedDeliveryTime: number,
     status: Status,
-    doerName: string
   ) {
     try {
       ensureNonEmpty(
@@ -33,8 +31,7 @@ export class Offer {
         expectedDeliveryTime,
         status,
         title,
-        description,
-        doerName
+        description
       );
     } catch (e) {
       throw new Error("Unable to create offer. Reason: " + e.message);
@@ -47,7 +44,6 @@ export class Offer {
     this.shopLocation = shopLocation;
     this.expectedDeliveryTime = expectedDeliveryTime;
     this.status = status;
-    this.doerName = doerName;
   }
 }
 
@@ -58,8 +54,7 @@ const offerConverter = Object.freeze({
     description: string,
     shopLocation: string,
     expectedDeliveryTime: number,
-    status: Status,
-    doerName: string
+    status: Status
   ) => ({
     uid: uid,
     title: title,
@@ -67,7 +62,6 @@ const offerConverter = Object.freeze({
     shopLocation: shopLocation,
     expectedDeliveryTime: expectedDeliveryTime,
     status: Status[status],
-    doerName,
   }),
   fromFirestore: (offerSnapshot: firebase.firestore.DocumentSnapshot) => {
     const data = offerSnapshot.data();
@@ -82,7 +76,6 @@ const offerConverter = Object.freeze({
       data.shopLocation,
       data.expectedDeliveryTime,
       Status[data.status],
-      data.doerName
     );
   },
 });
@@ -170,7 +163,6 @@ export const addOffer: (
   shopLocation: string,
   expectedDeliveryTime: number,
   status: Status,
-  doerName: string
 ) => Promise<Offer> = async function (
   uid,
   title,
@@ -178,7 +170,6 @@ export const addOffer: (
   shopLocation,
   expectedDeliveryTime,
   status,
-  doerName: string
 ) {
   if (status === null) {
     status = Status.OPEN;
@@ -197,7 +188,6 @@ export const addOffer: (
     shopLocation,
     expectedDeliveryTime,
     status,
-    doerName
   );
   console.log(res);
 
@@ -211,8 +201,7 @@ export const addOffer: (
           description,
           shopLocation,
           expectedDeliveryTime,
-          status,
-          doerName
+          status
         )
       );
 
@@ -223,8 +212,7 @@ export const addOffer: (
       description,
       shopLocation,
       expectedDeliveryTime,
-      status,
-      doerName
+      status
     );
   } catch (e) {
     throw new Error(`Unable to add offer: ${e.message}`);
@@ -275,21 +263,17 @@ const reopenOffer: (
  */
 export const addRequestToOffer: (
   id: string,
-  doerName: string,
   payerUid: string,
-  payerName: string,
   item: string,
   fee: number
 ) => Promise<Request> = async (
   id,
-  doerName,
   payerUid,
-  payerName,
   item,
   fee
 ) => {
   try {
-    ensureNonEmpty(id, doerName, payerUid, payerName, item, fee);
+    ensureNonEmpty(id, payerUid, item, fee);
     ensureNonNegative(fee);
   } catch (e) {
     throw new Error(`Unable to add request to offer: ${e.message}`);
@@ -304,21 +288,18 @@ export const addRequestToOffer: (
     offer.shopLocation,
     offer.expectedDeliveryTime,
     item,
-    payerName,
+    payerUid,
     fee,
-    offer.uid,
-    doerName
+    offer.uid
   );
 
   // 	create and add new request for payer
   return addRequestHelper(
     payerUid,
-    payerName,
     offer.shopLocation,
     offer.expectedDeliveryTime,
     item,
     fee,
-    offer.uid,
-    doerName
+    offer.uid
   );
 };
