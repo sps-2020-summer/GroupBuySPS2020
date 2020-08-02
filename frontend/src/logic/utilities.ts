@@ -28,3 +28,10 @@ export const isEmptyString = (str: string | undefined | null) =>
 
 export const convertToDate = (date: number) =>
   moment.unix(date).toLocaleString();
+
+/**
+ * Gets the current time (of user's browser) in unix format.
+ */
+export const getCurrentTime = () => (
+  (new Date()).getTime() / 1000
+)

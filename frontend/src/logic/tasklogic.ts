@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonEmpty, ensureNonNegative, isEmptyString } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative, isEmptyString, getCurrentTime } from "./utilities";
 
 const COLLECTION_TASKS: string = "tasks";
 
@@ -105,7 +105,8 @@ export const taskConverter = Object.freeze({
       payerUid: payerUid,
       fee: fee,
       status: Status[status],
-      uid: uid
+      uid: uid,
+      addedOn: getCurrentTime(),
     };
   },
   /** @throws Error if data associated with `taskSnapshot` cannot be found. */

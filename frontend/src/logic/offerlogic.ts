@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonEmpty, ensureNonNegative } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative, getCurrentTime } from "./utilities";
 import { addRequestHelper, Request } from "./requestlogic";
 import { addTask } from "./tasklogic";
 
@@ -62,6 +62,7 @@ const offerConverter = Object.freeze({
     shopLocation: shopLocation,
     expectedDeliveryTime: expectedDeliveryTime,
     status: Status[status],
+    addedOn: getCurrentTime(),
   }),
   fromFirestore: (offerSnapshot: firebase.firestore.DocumentSnapshot) => {
     const data = offerSnapshot.data();
@@ -124,7 +125,7 @@ export const getOffers: (
     const offersRef = db
       .collection(COLLECTION_OFFERS)
       .where("uid", "==", uid)
-      .where("status", "==", status);
+      .where("status", "==", status); // TODO: if it is still open --> must close
     const offers: Offer[] = [];
     const offersQuerySnapshot = await offersRef.get();
     offersQuerySnapshot.forEach((offerSnapshot) => {
@@ -181,16 +182,6 @@ export const addOffer: (
     throw new Error(`Unable to add offer: ${e.message}`);
   }
 
-  const res = offerConverter.toFirestore(
-    uid,
-    title,
-    description,
-    shopLocation,
-    expectedDeliveryTime,
-    status,
-  );
-  console.log(res);
-
   try {
     const offersRef = await db
       .collection(COLLECTION_OFFERS)
@@ -235,26 +226,6 @@ export const cancelOffer: (id: string) => Promise<void> = async (id) => {
 
   const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
   return offerRef.update({ status: Status[Status.CANCELLED] });
-};
-
-/**
- * Reopens an offer if it is already cancelled. If the offer's `expectedDeliveryTime` has past, no action will be taken.
- * @param id id of the offer that is to be reopened.
- * @throws Error if no `id` is provided
- */
-const reopenOffer: (
-  // TODO: if we have time
-  id: string
-) => Promise<void> = async (id) => {
-  try {
-    ensureNonEmpty(id);
-  } catch (e) {
-    throw new Error("Unable to reopen offer without its id");
-  }
-
-  const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
-  // TODO: deal with the case in which the offer has expired
-  return offerRef.update({ status: Status.OPEN });
 };
 
 /**
