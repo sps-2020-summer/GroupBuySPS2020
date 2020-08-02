@@ -1,5 +1,9 @@
 .cardStyle {
-	box-shadow: 0 20px 20px rgba(0, 0, 0, 0.2);
-	max-width: 100%;
-	overflow-wrap: break-word;
+    box-shadow: 0 20px 20px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+.list {
+    padding-left: 24px;
 }

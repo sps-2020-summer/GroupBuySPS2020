@@ -1,42 +1,43 @@
 .cardStyle {
-  border-radius: 40px;
-  box-shadow: -2px 5px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 40px;
+    box-shadow: -2px 5px 20px rgba(0, 0, 0, 0.2);
 }
+
 .content {
-  margin: 24px;
-  min-height: 80vh;
-  max-height: 80vh;
-  display: grid;
-  grid-template-areas: "sidebar content";
-  grid-template-columns: 2fr 5fr;
-  gap: 1rem;
+    margin: 24px;
+    min-height: 80vh;
+    max-height: 80vh;
+    display: grid;
+    grid-template-areas: 'sidebar content';
+    grid-template-columns: 2fr 5fr;
+    gap: 1rem;
 }
 
 .column {
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
 }
 
 .userActionBtn {
-  margin-bottom: 1rem;
-  max-width: 12rem;
-  min-width: 5rem;
+    margin-bottom: 1rem;
+    max-width: 12rem;
+    min-width: 5rem;
 }
 
 .userActions {
-  grid-area: sidebar;
+    grid-area: sidebar;
 }
 
 .requestBoard {
-  grid-area: content;
+    grid-area: content;
 }
 
 .requestBackground {
-  width: 100%;
-  padding-left: 12px;
-  min-height: 70vh;
-  max-height: 70vh;
-  border-radius: 20px;
-  box-shadow: 17px 6px 20px 5px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    padding-left: 12px;
+    min-height: 70vh;
+    max-height: 70vh;
+    border-radius: 20px;
+    box-shadow: 17px 6px 20px 5px rgba(0, 0, 0, 0.2);
 }

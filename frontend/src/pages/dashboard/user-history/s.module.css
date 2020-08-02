@@ -1,24 +1,25 @@
 .content {
-  display: grid;
-  grid-template-areas: "tasks requests offers";
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 2rem;
+    margin-top: 16px;
+    display: grid;
+    grid-template-areas: 'tasks requests offers';
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
 }
 
 .prevTasks {
-  grid-area: tasks;
+    grid-area: tasks;
 }
 
 .prevRequest {
-  grid-area: requests;
+    grid-area: requests;
 }
 
 .prevOffer {
-  grid-area: offers;
+    grid-area: offers;
 }
 
 .cardStyle {
-  box-shadow: 0 20px 20px rgba(0, 0, 0, 0.2);
-  max-width: 100%;
-  overflow-wrap: break-word;
+    box-shadow: 0 20px 20px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+    overflow-wrap: break-word;
 }

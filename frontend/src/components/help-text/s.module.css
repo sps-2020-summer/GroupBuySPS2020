@@ -1,0 +1,15 @@
+.cardStyle {
+    border-radius: 20px;
+    box-shadow: -2px 3px 11px 0px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+.cardStyleWarning {
+    border-color: transparent;
+    background: #cc7878;
+    border-radius: 15px;
+    box-shadow: -2px 3px 11px 0px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+    overflow-wrap: break-word;
+}

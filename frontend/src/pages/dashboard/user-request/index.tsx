@@ -1,69 +1,109 @@
-import React, { FC, useState, useEffect, useCallback } from "react";
-import { DashboardCompProps } from "..";
-import { Request } from "../../../logic";
-import { Slide } from "react-awesome-reveal";
-import { List } from "antd";
-import RequestItem from "./request-item";
-import Loader from "../../../components/loader";
+import React, { FC, useState, useEffect, useCallback } from 'react';
+import { DashboardCompProps } from '..';
+import { Request } from '../../../logic';
+import { Slide } from 'react-awesome-reveal';
+import { List } from 'antd';
+import RequestItem from './request-item';
+import Loader from '../../../components/loader';
 
-import { getRequests } from "../../../logic/requestlogic";
+import { getCurrentRequests } from '../../../logic/requestlogic';
+import { RequestHelpText, NoRequestText } from '../../../components/help-text';
+import s from './s.module.css';
+
 const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [requests, setRequests] = useState<Request[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [pendingRequests, setPendingRequests] = useState<Request[]>([]);
+    const [openRequests, setOpenRequests] = useState<Request[]>([]);
 
-  const fetchRequest = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await getRequests(userUid);
-      setRequests(res);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    const fetchRequest = useCallback(async () => {
+        try {
+            setLoading(true);
+            const { open, pending } = await getCurrentRequests(userUid);
 
-  useEffect(() => {
-    fetchRequest();
-  }, [userUid]);
+            setOpenRequests(open);
+            setPendingRequests(pending);
+        } catch (e) {
+            console.log(e);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-  return (
-    <>
-      <Slide triggerOnce direction={"bottom"}>
-        <h1>My Requests</h1>
-        <h3>These are the current request you have opened </h3>
-      </Slide>
-      <br />
-      {loading ? (
-        <Loader spin={loading} topMargin={"24px"} />
-      ) : (
+    useEffect(() => {
+        fetchRequest();
+    }, [userUid]);
+
+    console.log(openRequests.length);
+    console.log(pendingRequests.length);
+
+    return (
         <>
-          {requests.length === 0 ? (
-            <>You currently have no requests opened!</>
-          ) : (
-            <></>
-          )}
-          <List
-            grid={{
-              gutter: 16,
-              xs: 1,
-              sm: 2,
-              md: 4,
-              lg: 4,
-              xl: 4,
-              xxl: 3,
-            }}
-            dataSource={requests}
-            renderItem={(item) => (
-              <List.Item>
-                <RequestItem fetch={fetchRequest} request={item} />
-              </List.Item>
-            )}
-          />
+            <Slide triggerOnce direction={'bottom'}>
+                <RequestHelpText />
+            </Slide>
+            <br />
+            <div className={s.list}>
+                {loading ? (
+                    <Loader spin={loading} topMargin={'24px'} />
+                ) : (
+                    <>
+                        <h1>Pending Requests</h1>
+                        {pendingRequests.length == 0 ? (
+                            <NoRequestText status="pending" />
+                        ) : (
+                            <List
+                                key={'pending request'}
+                                grid={{
+                                    gutter: 16,
+                                    xs: 1,
+                                    sm: 2,
+                                    md: 4,
+                                    lg: 4,
+                                    xl: 4,
+                                    xxl: 3,
+                                }}
+                                dataSource={pendingRequests}
+                                renderItem={(item) => (
+                                    <List.Item>
+                                        <RequestItem
+                                            fetch={fetchRequest}
+                                            request={item}
+                                        />
+                                    </List.Item>
+                                )}
+                            />
+                        )}
+                        <h1>Open Requests</h1>
+                        {openRequests.length === 0 ? (
+                            <NoRequestText status="open" />
+                        ) : (
+                            <List
+                                key={'open request'}
+                                grid={{
+                                    gutter: 16,
+                                    xs: 1,
+                                    sm: 2,
+                                    md: 4,
+                                    lg: 4,
+                                    xl: 4,
+                                    xxl: 3,
+                                }}
+                                dataSource={openRequests}
+                                renderItem={(item) => (
+                                    <List.Item>
+                                        <RequestItem
+                                            fetch={fetchRequest}
+                                            request={item}
+                                        />
+                                    </List.Item>
+                                )}
+                            />
+                        )}
+                    </>
+                )}
+            </div>
         </>
-      )}
-    </>
-  );
+    );
 };
 
 export default UserRequest;
