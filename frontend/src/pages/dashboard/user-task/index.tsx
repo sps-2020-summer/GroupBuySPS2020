@@ -1,15 +1,10 @@
 import React, { FC, useState, useEffect, useCallback } from "react";
 import { DashboardCompProps } from "..";
 import { List } from "antd";
-import { Task } from  "../../../logic/tasklogic";
+import { Task, getTasks } from  "../../../logic/tasklogic";
 import { Slide } from "react-awesome-reveal";
 import TaskItem from "./task-item";
 import Loader from "../../../components/loader";
-
-import { FirebaseContext } from "../../../context/firebase-context";
-import firebase from "firebase";
-import { getOffers } from "../../../logic/offerlogic";
-import { getTasks } from "../../../logic/tasklogic";
 
 const UserTask: FC<DashboardCompProps> = ({ userUid }) => {
 	const [loading, setLoading] = useState<boolean>(true);

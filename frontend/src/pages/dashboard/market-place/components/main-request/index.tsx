@@ -17,7 +17,7 @@ import UserCreateRequestComponent from "./user-request";
 import { FirebaseContext } from "../../../../../context/firebase-context";
 import firebase from "firebase";
 import ViewTask from "../../../../../components/view-task";
-import { fulfilRequest, getRequests, getOpenRequests } from "../../../../../logic/requestlogic";
+import { fulfilRequest, getOpenRequests } from "../../../../../logic/requestlogic";
 
 const { Title, Paragraph } = Typography;
 type Props = {

@@ -1,5 +1,5 @@
 import { db } from "../index";
-import { ensureNonEmpty } from "./utilities";
+import { ensureNonEmpty, sortByReverseOrder } from "./utilities";
 import {
   Task,
   getTaskById,
@@ -63,10 +63,9 @@ const requestConverter = Object.freeze({
 });
 
 /**
- * Gets open requests
+ * Gets open requests.
  */
 export const getOpenRequests: () => Promise<Request[]> = async () => {
-  const requestsAndTasks: Request[] = [];
   const requestRef = await db.collection(COLLECTION_REQUESTS).get();
   const temp: firebase.firestore.QueryDocumentSnapshot<
     firebase.firestore.DocumentData
@@ -74,11 +73,13 @@ export const getOpenRequests: () => Promise<Request[]> = async () => {
   requestRef.forEach((requestSnapshot) => {
     temp.push(requestSnapshot);
   });
+
+  const requests: Request[] = [];
   await Promise.all(
     temp.map(async (requestSnapshot) => {
       try {
         const request = await requestConverter.fromFirestore(requestSnapshot);
-        requestsAndTasks.push(request);
+        requests.push(request);
       } catch (e) {
         return console.error(
           `Encountered error while retrieving request: ${e.message}`
@@ -86,75 +87,144 @@ export const getOpenRequests: () => Promise<Request[]> = async () => {
       }
     })
   );
-  return requestsAndTasks.filter(
+  return requests.filter(
     (value: Request) => value.task.status === "OPEN"
-  );
+  ).sort((prev, curr) => sortByReverseOrder(prev.task.expectedDeliveryTime, curr.task.expectedDeliveryTime));
 };
 
+type CurrentRequests = {
+  open: Request[],
+  pending: Request[]
+}
 /**
- * Gets all requests that are associated with `uid`.
+ * Gets all current requests that are associated with `uid`. 
+ * The requests are categorised by `OPEN` and `PENDING`.
  * @throws Error if `uid` is empty.
  */
-export const getRequests: (
-  uid: string,
-  status?: Status
-) => Promise<Request[]> = async (uid: string, status?: Status) => {
+export const getCurrentRequests: (
+  uid: string
+) => Promise<CurrentRequests> = async (uid: string) => {
   try {
     ensureNonEmpty(uid);
   } catch (e) {
     throw new Error("Unable to get requests when uid is empty");
   }
-  if (status) {
-    const requestRef = db
-      .collection(COLLECTION_REQUESTS)
-      .where("uid", "==", uid);
-    const requests: firebase.firestore.QueryDocumentSnapshot<
-      firebase.firestore.DocumentData
-    >[] = [];
-    const results: Request[] = [];
-    const requestQuerySnapshot = await requestRef.get();
-    requestQuerySnapshot.forEach((requestSnapshot) => {
-      requests.push(requestSnapshot);
-    });
-    await Promise.all(
-      requests.map(async (requestSnapshot) => {
-        try {
-          const request = await requestConverter.fromFirestore(requestSnapshot);
-          results.push(request);
-        } catch (e) {
-          return console.error(
-            `Encountered error while retrieving request: ${e.message}`
-          );
-        }
-      })
-    );
-    return results.filter((x) => x.task.status === Status.DONE);
-  } else {
-    const requestRef = db
-      .collection(COLLECTION_REQUESTS)
-      .where("uid", "==", uid);
-    const requests: firebase.firestore.QueryDocumentSnapshot<
-      firebase.firestore.DocumentData
-    >[] = [];
-    const results: Request[] = [];
-    const requestQuerySnapshot = await requestRef.get();
-    requestQuerySnapshot.forEach((requestSnapshot) => {
-      requests.push(requestSnapshot);
-    });
-    await Promise.all(
-      requests.map(async (requestSnapshot) => {
-        try {
-          const request = await requestConverter.fromFirestore(requestSnapshot);
-          results.push(request);
-        } catch (e) {
-          return console.error(
-            `Encountered error while retrieving request: ${e.message}`
-          );
-        }
-      })
-    );
-    return results;
+  
+  const requestRef = db
+    .collection(COLLECTION_REQUESTS)
+    .where("uid", "==", uid)
+    .where("status", "in", [Status.OPEN, Status.PENDING]);
+  const requestQuerySnapshot = await requestRef.get();
+
+  const requests: firebase.firestore.QueryDocumentSnapshot<
+    firebase.firestore.DocumentData
+  >[] = [];
+  requestQuerySnapshot.forEach((requestSnapshot) => {
+    requests.push(requestSnapshot);
+  });
+
+  const results: Request[] = [];
+  await Promise.all(
+    requests.map(async (requestSnapshot) => {
+      try {
+        const request = await requestConverter.fromFirestore(requestSnapshot);
+        results.push(request);
+      } catch (e) {
+        return console.error(
+          `Encountered error while retrieving request: ${e.message}`
+        );
+      }
+    })
+  );
+
+  const categorisedResults: CurrentRequests = {
+    open: [],
+    pending: []
   }
+
+  results.sort((prev, curr) => sortByReverseOrder(prev.task.expectedDeliveryTime, curr.task.expectedDeliveryTime))
+    .forEach(request => {
+      const status: Status = request.task.status;
+
+      if (status === Status.OPEN) {
+        categorisedResults.open.push(request);
+      } else if (status === Status.PENDING) {
+        categorisedResults.pending.push(request);
+      } else {
+        // ignore
+      }
+    });
+
+  return categorisedResults;
+};
+
+export type PastRequests = {
+  cancelled: Request[],
+  expired: Request[],
+  done: Request[]
+}
+/**
+ * Gets all past requests that are associated with `uid`. 
+ * The requests are categorised by `CANCELLED`, `EXPIRED` and `DONE`.
+ * @throws Error if `uid` is empty.
+ */
+export const getPastRequests: ( // shouldn't be called from FE
+  uid: string
+) => Promise<PastRequests> = async (uid: string) => {
+  try {
+    ensureNonEmpty(uid);
+  } catch (e) {
+    throw new Error("Unable to get requests when uid is empty");
+  }
+  
+  const requestRef = db
+    .collection(COLLECTION_REQUESTS)
+    .where("uid", "==", uid)
+    .where("status", "in", [Status.OPEN, Status.EXPIRED, Status.DONE, Status.CANCELLED]);
+  const requestQuerySnapshot = await requestRef.get();
+
+  const requests: firebase.firestore.QueryDocumentSnapshot<
+    firebase.firestore.DocumentData
+  >[] = [];
+  requestQuerySnapshot.forEach((requestSnapshot) => {
+    requests.push(requestSnapshot);
+  });
+
+  const results: Request[] = [];
+  await Promise.all(
+    requests.map(async (requestSnapshot) => {
+      try {
+        const request = await requestConverter.fromFirestore(requestSnapshot);
+        results.push(request);
+      } catch (e) {
+        return console.error(
+          `Encountered error while retrieving request: ${e.message}`
+        );
+      }
+    })
+  );
+
+  const categorisedResults: PastRequests = {
+    cancelled: [],
+    expired: [],
+    done: []
+  }
+
+  results.forEach(request => {
+    const status: Status = request.task.status;
+
+    if (status === Status.CANCELLED) {
+      categorisedResults.cancelled.push(request);
+    } else if (status === Status.DONE) {
+      categorisedResults.done.push(request);
+    } else if (status === Status.EXPIRED) {
+      categorisedResults.expired.push(request);
+    } else {
+      // ignore
+    }
+  });
+
+  return categorisedResults;
 };
 
 /**
