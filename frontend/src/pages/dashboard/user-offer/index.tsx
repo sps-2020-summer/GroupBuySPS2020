@@ -1,44 +1,44 @@
-import React, { FC, useState, useEffect, useCallback } from 'react';
-import { DashboardCompProps } from '..';
-import { List, Typography, Card } from 'antd';
-import { Offer } from '../../../logic';
-import { Slide } from 'react-awesome-reveal';
-import TaskItem from './offer-item';
-import Loader from '../../../components/loader';
-import { getCurrentOffers } from '../../../logic';
-import { OfferHelpText, NoOfferText } from '../../../components/help-text';
-import s from './s.module.css';
+import React, { FC, useState, useEffect, useCallback } from "react"
+import { DashboardCompProps } from ".."
+import { List, Typography, Card } from "antd"
+import { Offer } from "../../../logic"
+import { Slide } from "react-awesome-reveal"
+import TaskItem from "./offer-item"
+import Loader from "../../../components/loader"
+import { getCurrentOffers } from "../../../logic"
+import { OfferHelpText, NoOfferText } from "../../../components/help-text"
+import s from "./s.module.css"
 
-const { Paragraph } = Typography;
+const { Paragraph } = Typography
 
 const UserOffer: FC<DashboardCompProps> = ({ userUid }) => {
-    const [loading, setLoading] = useState<boolean>(true);
-    const [offers, setoffers] = useState<Offer[]>([]);
+    const [loading, setLoading] = useState<boolean>(true)
+    const [offers, setoffers] = useState<Offer[]>([])
     const fetchOffers = useCallback(async () => {
         try {
-            setLoading(true);
-            const { open } = await getCurrentOffers(userUid);
-            setoffers(open);
+            setLoading(true)
+            const { open } = await getCurrentOffers(userUid)
+            setoffers(open)
         } catch (e) {
-            console.log(e);
+            console.log(e)
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    }, []);
+    }, [])
 
     useEffect(() => {
-        fetchOffers();
-    }, []);
+        fetchOffers()
+    }, [])
 
     return (
         <>
-            <Slide triggerOnce direction={'bottom'}>
+            <Slide triggerOnce direction={"bottom"}>
                 <OfferHelpText />
             </Slide>
             <br />
             <div className={s.list}>
                 {loading ? (
-                    <Loader spin={loading} topMargin={'24px'} />
+                    <Loader spin={loading} topMargin={"24px"} />
                 ) : (
                     <>
                         {offers.length === 0 ? (
@@ -69,7 +69,7 @@ const UserOffer: FC<DashboardCompProps> = ({ userUid }) => {
                 )}
             </div>
         </>
-    );
-};
+    )
+}
 
-export default UserOffer;
+export default UserOffer

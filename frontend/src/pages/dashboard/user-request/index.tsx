@@ -1,50 +1,50 @@
-import React, { FC, useState, useEffect, useCallback } from 'react';
-import { DashboardCompProps } from '..';
-import { Request } from '../../../logic';
-import { Slide } from 'react-awesome-reveal';
-import { List } from 'antd';
-import RequestItem from './request-item';
-import Loader from '../../../components/loader';
+import React, { FC, useState, useEffect, useCallback } from "react"
+import { DashboardCompProps } from ".."
+import { Request } from "../../../logic"
+import { Slide } from "react-awesome-reveal"
+import { List } from "antd"
+import RequestItem from "./request-item"
+import Loader from "../../../components/loader"
 
-import { getCurrentRequests } from '../../../logic/requestlogic';
-import { RequestHelpText, NoRequestText } from '../../../components/help-text';
-import s from './s.module.css';
+import { getCurrentRequests } from "../../../logic/requestlogic"
+import { RequestHelpText, NoRequestText } from "../../../components/help-text"
+import s from "./s.module.css"
 
 const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
-    const [loading, setLoading] = useState<boolean>(true);
-    const [pendingRequests, setPendingRequests] = useState<Request[]>([]);
-    const [openRequests, setOpenRequests] = useState<Request[]>([]);
+    const [loading, setLoading] = useState<boolean>(true)
+    const [pendingRequests, setPendingRequests] = useState<Request[]>([])
+    const [openRequests, setOpenRequests] = useState<Request[]>([])
 
     const fetchRequest = useCallback(async () => {
         try {
-            setLoading(true);
-            const { open, pending } = await getCurrentRequests(userUid);
+            setLoading(true)
+            const { open, pending } = await getCurrentRequests(userUid)
 
-            setOpenRequests(open);
-            setPendingRequests(pending);
+            setOpenRequests(open)
+            setPendingRequests(pending)
         } catch (e) {
-            console.log(e);
+            console.log(e)
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    }, []);
+    }, [])
 
     useEffect(() => {
-        fetchRequest();
-    }, [userUid]);
+        fetchRequest()
+    }, [userUid])
 
-    console.log(openRequests.length);
-    console.log(pendingRequests.length);
+    console.log(openRequests.length)
+    console.log(pendingRequests.length)
 
     return (
         <>
-            <Slide triggerOnce direction={'bottom'}>
+            <Slide triggerOnce direction={"bottom"}>
                 <RequestHelpText />
             </Slide>
             <br />
             <div className={s.list}>
                 {loading ? (
-                    <Loader spin={loading} topMargin={'24px'} />
+                    <Loader spin={loading} topMargin={"24px"} />
                 ) : (
                     <>
                         <h1>Pending Requests</h1>
@@ -52,7 +52,7 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
                             <NoRequestText status="pending" />
                         ) : (
                             <List
-                                key={'pending request'}
+                                key={"pending request"}
                                 grid={{
                                     gutter: 16,
                                     xs: 1,
@@ -78,7 +78,7 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
                             <NoRequestText status="open" />
                         ) : (
                             <List
-                                key={'open request'}
+                                key={"open request"}
                                 grid={{
                                     gutter: 16,
                                     xs: 1,
@@ -103,7 +103,7 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
                 )}
             </div>
         </>
-    );
-};
+    )
+}
 
-export default UserRequest;
+export default UserRequest

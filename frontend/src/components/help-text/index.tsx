@@ -1,6 +1,6 @@
-import { Typography, Card } from 'antd'
-import React from 'react'
-import s from './s.module.css'
+import { Typography, Card } from "antd"
+import React from "react"
+import s from "./s.module.css"
 
 const { Paragraph, Title, Text } = Typography
 
@@ -100,7 +100,7 @@ export const NoRequestText = ({ status }) => (
     <Card className={s.cardStyleWarning}>
         <Typography>
             <Paragraph>
-                <Text strong>Hmm... You have no {status} requests. </Text>{' '}
+                <Text strong>Hmm... You have no {status} requests. </Text>{" "}
                 <br /> But do you need something but can't find the time or
                 energy to get them?
                 <br />

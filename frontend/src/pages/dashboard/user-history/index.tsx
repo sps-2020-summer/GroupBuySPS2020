@@ -1,24 +1,24 @@
-import React, { FC, useState, useEffect } from 'react'
-import { DashboardCompProps } from '..'
-import { Request, Task, Offer } from '../../../logic'
+import React, { FC, useState, useEffect } from "react"
+import { DashboardCompProps } from ".."
+import { Request, Task, Offer } from "../../../logic"
 
-import { Slide } from 'react-awesome-reveal'
-import { List, Card } from 'antd'
-import s from './s.module.css'
-import RequestItem from '../user-request/request-item'
-import TaskItem from '../user-task/task-item'
-import Loader from '../../../components/loader'
+import { Slide } from "react-awesome-reveal"
+import { List, Card } from "antd"
+import s from "./s.module.css"
+import RequestItem from "../user-request/request-item"
+import TaskItem from "../user-task/task-item"
+import Loader from "../../../components/loader"
 //import { getTasks } from "../../../logic/tasklogic";
 //import { getRequests } from "../../../logic/requestlogic";
 //import { getOffers } from "../../../logic/offerlogic";
-import OfferItem from '../user-offer/offer-item'
-import { Status } from '../../../types'
+import OfferItem from "../user-offer/offer-item"
+import { Status } from "../../../types"
 import {
     HistoryHelpText,
     NoHistoryTaskText,
     NoHistoryRequestText,
     NoHistoryOfferText,
-} from '../../../components/help-text'
+} from "../../../components/help-text"
 
 const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
     const [loading, setLoading] = useState<boolean>(true)
@@ -49,11 +49,11 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
 
     return (
         <>
-            <Slide triggerOnce direction={'bottom'}>
+            <Slide triggerOnce direction={"bottom"}>
                 <HistoryHelpText />
             </Slide>
             {loading ? (
-                <Loader spin={loading} topMargin={'24px'} />
+                <Loader spin={loading} topMargin={"24px"} />
             ) : (
                 <div className={s.content}>
                     <div className={s.prevTasks}>
@@ -69,7 +69,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                                         <Card
                                             className={s.cardStyle}
                                             title={item.item}
-                                            style={{ width: '100%' }}
+                                            style={{ width: "100%" }}
                                         >
                                             <TaskItem task={item} />
                                         </Card>
@@ -90,7 +90,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                                     <List.Item>
                                         <Card
                                             title={`Payer ID: ${item.task.payerUid}`}
-                                            style={{ width: '100%' }}
+                                            style={{ width: "100%" }}
                                         >
                                             <RequestItem request={item} />
                                         </Card>
@@ -111,7 +111,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                                     <List.Item>
                                         <Card
                                             title={item.title}
-                                            style={{ width: '100%' }}
+                                            style={{ width: "100%" }}
                                         >
                                             <OfferItem offer={item} />
                                         </Card>
