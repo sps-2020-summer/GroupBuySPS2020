@@ -115,12 +115,12 @@ export const getOpenOffers: () => Promise<Offer[]> = async () => {
 };
 
 /**
- * Gets offers that are associated with `uid`.
+ * Gets offers that are associated with `uid`. The offers are categorised based on their status.
  * @throws Error if `uid` is empty.
  */
 export const getOffers: (
   uid: string
-) => Promise<Offer[]> = async (uid: string) => {
+) => Promise<Map<Status, Offer[]>> = async (uid: string) => {
   try {
     ensureNonEmpty(uid);
   } catch {
@@ -138,7 +138,18 @@ export const getOffers: (
       console.log("Encountered error while retrieving offers: " + e.message);
     }
   });
-  return offers;
+
+  const categorisedOffers: Map<Status, Offer[]> = new Map();
+  const statuses = Object.keys(Status);
+  for (let status of statuses) {
+    categorisedOffers.set(Status[status], []);
+  }
+  offers.forEach(offer => {
+    const status = offer.status;
+    categorisedOffers.get(status)?.push(offer);
+  })
+  
+  return categorisedOffers;
 };
 
 /**
