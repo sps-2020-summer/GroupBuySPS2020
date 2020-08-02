@@ -15,6 +15,7 @@ export enum Status {
 	PENDING = "PENDING",
 	DONE = "DONE",
 	CANCELLED = "CANCELLED",
+	EXPIRED = "EXPIRED"
 }
 
 export type Offer = {

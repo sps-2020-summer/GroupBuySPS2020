@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonEmpty, ensureNonNegative, getCurrentTime } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative, shouldShowExpired } from "./utilities";
 import { addRequestHelper, Request } from "./requestlogic";
 import { addTask } from "./tasklogic";
 
@@ -61,42 +61,48 @@ const offerConverter = Object.freeze({
     description: description,
     shopLocation: shopLocation,
     expectedDeliveryTime: expectedDeliveryTime,
-    status: Status[status],
-    addedOn: getCurrentTime(),
+    status: Status[status]
   }),
   fromFirestore: (offerSnapshot: firebase.firestore.DocumentSnapshot) => {
     const data = offerSnapshot.data();
     if (data === undefined) {
       throw new Error("Unable to find snapshot for offer.");
     }
+
+    const expectedDeliveryTime: number = data.expectedDeliveryTime;
+    const status: Status = Status[data.status];
+    const newStatus = shouldShowExpired(expectedDeliveryTime, status) ? Status.EXPIRED : status;
+    
     return new Offer(
       data.uid,
       offerSnapshot.id,
       data.title,
       data.description,
       data.shopLocation,
-      data.expectedDeliveryTime,
-      Status[data.status],
+      expectedDeliveryTime,
+      newStatus
     );
   },
 });
 
 /**
- * Gets open offer
+ * Gets open offers.
  */
-export const getOpenOffer: () => Promise<Offer[]> = async () => {
+export const getOpenOffers: () => Promise<Offer[]> = async () => {
   const offers: Offer[] = [];
-  const requestRef = await db.collection(COLLECTION_OFFERS).get();
+  const offersRef = await db.collection(COLLECTION_OFFERS)
+    .where("status", "==", Status.OPEN)
+    .get();
   const temp: firebase.firestore.QueryDocumentSnapshot<
     firebase.firestore.DocumentData
   >[] = [];
-  requestRef.forEach((offerSnapshot) => {
+  offersRef.forEach((offerSnapshot) => {
     temp.push(offerSnapshot);
   });
   await Promise.all(
     temp.map(async (offerSnapshot) => {
       try {
-        const offer = await offerConverter.fromFirestore(offerSnapshot);
+        const offer = offerConverter.fromFirestore(offerSnapshot);
         offers.push(offer);
       } catch (e) {
         return console.error(
@@ -105,7 +111,7 @@ export const getOpenOffer: () => Promise<Offer[]> = async () => {
       }
     })
   );
-  return offers.filter((value: Offer) => value.status === "OPEN");
+  return offers.filter((value: Offer) => value.status === Status.OPEN);
 };
 
 /**
@@ -113,68 +119,46 @@ export const getOpenOffer: () => Promise<Offer[]> = async () => {
  * @throws Error if `uid` is empty.
  */
 export const getOffers: (
-  uid: string,
-  status?: Status
-) => Promise<Offer[]> = async (uid: string, status?: Status) => {
+  uid: string
+) => Promise<Offer[]> = async (uid: string) => {
   try {
     ensureNonEmpty(uid);
   } catch {
     throw new Error("Unable to get offers for user when his/her id is empty");
   }
-  if (status) {
-    const offersRef = db
-      .collection(COLLECTION_OFFERS)
-      .where("uid", "==", uid)
-      .where("status", "==", status); // TODO: if it is still open --> must close
-    const offers: Offer[] = [];
-    const offersQuerySnapshot = await offersRef.get();
-    offersQuerySnapshot.forEach((offerSnapshot) => {
-      try {
-        const offer = offerConverter.fromFirestore(offerSnapshot);
-        offers.push(offer);
-      } catch (e) {
-        console.log("Encountered error while retrieving offers: " + e.message);
-      }
-    });
-    return offers;
-  } else {
-    const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
-    const offers: Offer[] = [];
-    const offersQuerySnapshot = await offersRef.get();
-    offersQuerySnapshot.forEach((offerSnapshot) => {
-      try {
-        const offer = offerConverter.fromFirestore(offerSnapshot);
-        offers.push(offer);
-      } catch (e) {
-        console.log("Encountered error while retrieving offers: " + e.message);
-      }
-    });
-    return offers;
-  }
+  
+  const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
+  const offers: Offer[] = [];
+  const offersQuerySnapshot = await offersRef.get();
+  offersQuerySnapshot.forEach((offerSnapshot) => {
+    try {
+      const offer = offerConverter.fromFirestore(offerSnapshot);
+      offers.push(offer);
+    } catch (e) {
+      console.log("Encountered error while retrieving offers: " + e.message);
+    }
+  });
+  return offers;
 };
 
 /**
- *	Adds an offer to the database.
- *  @throws Error if `uid`, `title`, `description`, `shopLocation`, `expectedDeliveryTime`or `status` are empty.
+ *	Adds an open offer to the database.
+ *  @throws Error if `uid`, `title`, `description`, `shopLocation` or `expectedDeliveryTime` are empty.
  */
 export const addOffer: (
   uid: string,
   title: string,
   description: string,
   shopLocation: string,
-  expectedDeliveryTime: number,
-  status: Status,
+  expectedDeliveryTime: number
 ) => Promise<Offer> = async function (
   uid,
   title,
   description,
   shopLocation,
-  expectedDeliveryTime,
-  status,
+  expectedDeliveryTime
 ) {
-  if (status === null) {
-    status = Status.OPEN;
-  }
+  const status = Status.OPEN;
 
   try {
     ensureNonEmpty(uid, shopLocation, expectedDeliveryTime, status);
