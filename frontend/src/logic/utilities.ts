@@ -48,3 +48,7 @@ const isExpired = (expectedTime: number) => expectedTime < getCurrentTime();
 export const shouldShowExpired = (expectedTime: number, status: Status) => (
   isExpired(expectedTime) && status === Status.OPEN
 )
+
+export const sortByReverseOrder = (prev: number, curr: number) => (
+  prev - curr
+)

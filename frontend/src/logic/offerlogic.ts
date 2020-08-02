@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonEmpty, ensureNonNegative, shouldShowExpired } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative, shouldShowExpired, sortByReverseOrder } from "./utilities";
 import { addRequestHelper, Request } from "./requestlogic";
 import { addTask } from "./tasklogic";
 
@@ -103,7 +103,7 @@ export const getOpenOffers: () => Promise<Offer[]> = async () => {
   });
   
   return offers.filter((value: Offer) => value.status === Status.OPEN)
-    .sort((prev, curr) => curr.expectedDeliveryTime - prev.expectedDeliveryTime); 
+    .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime)); 
 };
 
 type CurrentOffers = {
@@ -141,7 +141,7 @@ export const getCurrentOffers: (
     open: [],
   }
   offers.filter((value: Offer) => value.status === Status.OPEN)
-    .sort((prev, curr) => curr.expectedDeliveryTime - prev.expectedDeliveryTime)
+    .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime))
     .forEach(offer => categorisedOffers.open.push(offer));
   
   return categorisedOffers;
@@ -177,7 +177,7 @@ export const getPastOffers: ( // should not be imported by FE
     }
   });
   // sort offers by `expectedDeliveryTime`
-  offers.sort((prev, curr) => curr.expectedDeliveryTime - prev.expectedDeliveryTime);
+  offers.sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime));
 
   // categorise offers
   const categorisedOffers: PastOffers = {

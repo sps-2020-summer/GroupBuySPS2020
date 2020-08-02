@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonEmpty, ensureNonNegative, isEmptyString } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative, isEmptyString, shouldShowExpired, sortByReverseOrder } from "./utilities";
 
 const COLLECTION_TASKS: string = "tasks";
 
@@ -116,66 +116,171 @@ export const taskConverter = Object.freeze({
     }
     // no error should occur here
     console.log(data);
+
+    const expectedDeliveryTime: number = data.expectedDeliveryTime;
+    const status: Status = Status[data.status];
+    const newStatus = shouldShowExpired(expectedDeliveryTime, status) ? Status.EXPIRED : status;
+
     return new Task(
       taskSnapshot.id,
       data.shopLocation,
-      data.expectedDeliveryTime,
+      expectedDeliveryTime,
       data.item,
       data.payerUid,
       data.fee,
-      Status[data.status],
+      newStatus,
       data.uid
     );
   },
 });
 
 /**
- * Gets all tasks which are associated with `uid`.
+ * Gets all tasks that are opened. 
+ * @returns An array of tasks that are sorted by reverse chronological order.
  * @throws Error if `uid` is `null`, `undefined` or `""`.
  */
-export const getTasks: (
-  uid: string,
-  status?: Status
-) => Promise<Task[]> = async (uid: string, status?: Status) => {
+export const getOpenTasks: (
+  uid: string
+) => Promise<Task[]> = async (uid) => {
   try {
     ensureNonEmpty(uid);
   } catch (e) {
     throw new Error(`Unable to get tasks for user with empty uid.`);
   }
-  if (status) {
-    const tasksRef = db
-      .collection(COLLECTION_TASKS)
-      .where("uid", "==", uid)
-      .where("status", "==", status);
-    const tasks: Task[] = [];
-    const tasksQuerySnapshot = await tasksRef.get();
-    tasksQuerySnapshot.forEach((taskSnapshot) => {
-      try {
-        const task = taskConverter.fromFirestore(taskSnapshot);
-        tasks.push(task);
-      } catch (e) {
-        return console.error(
-          `Encountered error while retrieving task: ${e.message}`
-        );
-      }
-    });
-    return tasks;
-  } else {
-    const tasksRef = db.collection(COLLECTION_TASKS).where("uid", "==", uid);
-    const tasks: Task[] = [];
-    const tasksQuerySnapshot = await tasksRef.get();
-    tasksQuerySnapshot.forEach((taskSnapshot) => {
-      try {
-        const task = taskConverter.fromFirestore(taskSnapshot);
-        tasks.push(task);
-      } catch (e) {
-        return console.error(
-          `Encountered error while retrieving task: ${e.message}`
-        );
-      }
-    });
-    return tasks;
+  const tasksRef = db
+    .collection(COLLECTION_TASKS)
+    .where("uid", "==", uid)
+    .where("status", "==", Status.OPEN);
+  
+  const tasksQuerySnapshot = await tasksRef.get();
+  const tasks: Task[] = [];
+  tasksQuerySnapshot.forEach((taskSnapshot) => {
+    try {
+      const task = taskConverter.fromFirestore(taskSnapshot);
+      tasks.push(task);
+    } catch (e) {
+      return console.error(
+        `Encountered error while retrieving task: ${e.message}`
+      );
+    }
+  });
+
+  return tasks.filter(task => task.status === Status.OPEN)
+    .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime))
+}
+
+type CurrentTasks = {
+  open: Task[],
+  pending: Task[]
+}
+/**
+ * Gets all current tasks which are associated with `uid`.
+ * Tasks are categorised by `OPEN` and `PENDING`, and sorted by reverse chronological order.
+ * @throws Error if `uid` is `null`, `undefined` or `""`.
+ */
+export const getCurrentTasks: (
+  uid: string
+) => Promise<CurrentTasks> = async (uid) => {
+  try {
+    ensureNonEmpty(uid);
+  } catch (e) {
+    throw new Error(`Unable to get tasks for user with empty uid.`);
   }
+  const tasksRef = db
+    .collection(COLLECTION_TASKS)
+    .where("uid", "==", uid)
+    .where("status", "in", [Status.OPEN, Status.PENDING]);
+  
+  const tasksQuerySnapshot = await tasksRef.get();
+  const tasks: Task[] = [];
+  tasksQuerySnapshot.forEach((taskSnapshot) => {
+    try {
+      const task = taskConverter.fromFirestore(taskSnapshot);
+      tasks.push(task);
+    } catch (e) {
+      return console.error(
+        `Encountered error while retrieving task: ${e.message}`
+      );
+    }
+  });
+
+  const currentTasks: CurrentTasks = {
+    open: [],
+    pending: []
+  }
+
+  tasks.sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime))
+    .forEach(task => {
+      const status = task.status;
+      if (status === Status.PENDING) {
+        currentTasks.pending.push(task);
+      } else if (status === Status.OPEN) {
+        currentTasks.open.push(task);
+      } else {
+        // ignore
+      }
+    });
+
+  return currentTasks;
+};
+
+export type PastTasks = {
+  cancelled: Task[],
+  done: Task[],
+  expired: Task[]
+}
+/**
+ * Gets all past tasks which are associated with `uid`.
+ * Tasks are categorised by `EXPIRED`, `DONE` and `CANCELLED`, and sorted by reverse chronological order.
+ * @throws Error if `uid` is `null`, `undefined` or `""`.
+ */
+export const getPastTasks: (
+  uid: string
+) => Promise<PastTasks> = async (uid) => {
+  try {
+    ensureNonEmpty(uid);
+  } catch (e) {
+    throw new Error(`Unable to get tasks for user with empty uid.`);
+  }
+  const tasksRef = db
+    .collection(COLLECTION_TASKS)
+    .where("uid", "==", uid)
+    .where("status", "in", [Status.OPEN, Status.CANCELLED, Status.DONE, Status.EXPIRED]);
+  
+  const tasksQuerySnapshot = await tasksRef.get();
+  const tasks: Task[] = [];
+  tasksQuerySnapshot.forEach((taskSnapshot) => {
+    try {
+      const task = taskConverter.fromFirestore(taskSnapshot);
+      tasks.push(task);
+    } catch (e) {
+      return console.error(
+        `Encountered error while retrieving task: ${e.message}`
+      );
+    }
+  });
+
+  const pastTasks: PastTasks = {
+    cancelled: [],
+    done: [],
+    expired: []
+  }
+
+  tasks.sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime))
+    .forEach(task => {
+      const status = task.status;
+      if (status === Status.CANCELLED) {
+        pastTasks.cancelled.push(task);
+      } else if (status === Status.DONE) {
+        pastTasks.done.push(task);
+      } else if (status === Status.EXPIRED) {
+        pastTasks.expired.push(task);
+      } else {
+        // ignore
+      }
+    });
+
+  return pastTasks;
 };
 
 /**
