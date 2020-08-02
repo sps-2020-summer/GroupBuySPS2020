@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react";
 import { Layout, Menu, Spin } from "antd";
-import { withRouter, useHistory } from "react-router-dom";
+
 import { ClickParam } from "antd/lib/menu";
 import { MailOutlined, AppstoreOutlined } from "@ant-design/icons";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -11,7 +11,7 @@ import MainOffer from "./components/main-offer";
 const { Content } = Layout;
 
 const Main: FC<{}> = () => {
-	const history = useHistory();
+	 
 	const [current, setCurrent] = useState<string>("request");
 	const [user, loading] = useAuthState(firebase.auth());
 	if (loading) return <Spin spinning={true}></Spin>;
@@ -21,18 +21,14 @@ const Main: FC<{}> = () => {
 	/** The pages to show on menu click */
 	const childPages = { request: <MainRequest email={email} uid={user?.uid} />, offers: <MainOffer email={email}  uid={user?.uid} /> };
 
-	/** Navigation */
 
-	const navToDashboard = () => history.push("/dashboard");
-	const handleClick = (e: ClickParam) =>
-		e.key === "dashboard" ? navToDashboard() : setCurrent(e.key);
-
+	const handleClick = (e: ClickParam) => setCurrent(e.key);
 	return (
 		<Content
 			className={s.cardStyle}
 			style={{
 				padding: "0 50px",
-				margin: "48px",
+				margin: "0px",
 				backgroundColor: "white",
 			}}
 		>
@@ -47,11 +43,10 @@ const Main: FC<{}> = () => {
 				<Menu.Item key="offers" icon={<AppstoreOutlined />}>
 					Offers
 				</Menu.Item>
-				<Menu.Item key="dashboard">Dashboard</Menu.Item>
 			</Menu>
 			{childPages[current]}
 		</Content>
 	);
 };
 
-export default withRouter(Main);
+export default Main;

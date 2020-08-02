@@ -1,19 +1,13 @@
-import React, { FC, useState, useEffect, useContext, useCallback} from "react";
+import React, { FC, useState, useEffect, useCallback} from "react";
 import { DashboardCompProps } from "..";
 import { List } from "antd";
 import { Offer }from '../../../logic'
 import { Slide } from "react-awesome-reveal";
 import TaskItem from "./offer-item";
 import Loader from "../../../components/loader";
-
-import { FirebaseContext } from "../../../context/firebase-context";
-import firebase from "firebase";
 import { getOffers } from "../../../logic/offerlogic";
 
 const UserOffer: FC<DashboardCompProps> = ({ userUid }) => {
-	const firebaseContext = useContext(FirebaseContext);
-	const { firebaseApp } = firebaseContext;
-	const db = firebase.firestore(firebaseApp as firebase.app.App);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [offers, setoffers] = useState<Offer[]>([]);
 	const fetchOffers = useCallback(async () => {

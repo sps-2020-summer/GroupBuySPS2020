@@ -17,9 +17,9 @@ import { MoneyCollectOutlined } from "@ant-design/icons";
 import { userInfo } from "os";
 import MainOffer from ".";
 import firebase from "firebase";
-import { FirebaseContext } from "../../../../context/firebase-context";
-import { addOffer } from "../../../../logic/offerlogic";
-import { Status } from "../../../../types";
+import { FirebaseContext } from "../../../../../context/firebase-context";
+import { addOffer } from "../../../../../logic/offerlogic";
+import { Status } from "../../../../../types";
 import moment from "moment";
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -55,7 +55,7 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
 			if (email !== null && email !== undefined) {
 				emailName = email;
 			}
-      await addOffer(uid ?? '-', title, description, shopLocation, expectedDeliveryTime.unix(), Status.OPEN, emailName );
+      await addOffer(uid ?? '-', title, description, shopLocation, expectedDeliveryTime.unix());
       fetchOffer();
       setVisible(false);
     } catch (err) {

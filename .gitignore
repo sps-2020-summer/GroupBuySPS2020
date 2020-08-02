@@ -2,3 +2,4 @@ serviceAccountKey.json
 my-app/target
 **/*.DS_STORE
 **/*.factorypath
+**/frontend/.firebase

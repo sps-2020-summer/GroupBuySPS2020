@@ -27,7 +27,7 @@ const Login: FC<{}> = () => {
     setLoading(true);
     const res = await firebase.auth().signInAnonymously();
     console.log(res);
-    history.push("/dashboard");
+    history.push("/");
   };
 
   return (

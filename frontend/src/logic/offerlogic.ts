@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { Status } from "../types";
-import { ensureNonEmpty, ensureNonNegative } from "./utilities";
+import { ensureNonEmpty, ensureNonNegative, shouldShowExpired, sortByReverseOrder } from "./utilities";
 import { addRequestHelper, Request } from "./requestlogic";
 import { addTask } from "./tasklogic";
 
@@ -61,135 +61,168 @@ const offerConverter = Object.freeze({
     description: description,
     shopLocation: shopLocation,
     expectedDeliveryTime: expectedDeliveryTime,
-    status: Status[status],
+    status: Status[status]
   }),
   fromFirestore: (offerSnapshot: firebase.firestore.DocumentSnapshot) => {
     const data = offerSnapshot.data();
     if (data === undefined) {
       throw new Error("Unable to find snapshot for offer.");
     }
+
+    const expectedDeliveryTime: number = data.expectedDeliveryTime;
+    const status: Status = Status[data.status];
+    const newStatus = shouldShowExpired(expectedDeliveryTime, status) ? Status.EXPIRED : status;
+    
     return new Offer(
       data.uid,
       offerSnapshot.id,
       data.title,
       data.description,
       data.shopLocation,
-      data.expectedDeliveryTime,
-      Status[data.status],
+      expectedDeliveryTime,
+      newStatus
     );
   },
 });
 
 /**
- * Gets open offer
+ * Gets open offers. The offers are sorted by `expectedDeliveryTime` in reverse-chronological order.
  */
-export const getOpenOffer: () => Promise<Offer[]> = async () => {
+export const getOpenOffers: () => Promise<Offer[]> = async () => {
+  const offersRef = await db.collection(COLLECTION_OFFERS)
+    .where("status", "==", Status.OPEN)
+    .get();
   const offers: Offer[] = [];
-  const requestRef = await db.collection(COLLECTION_OFFERS).get();
-  const temp: firebase.firestore.QueryDocumentSnapshot<
-    firebase.firestore.DocumentData
-  >[] = [];
-  requestRef.forEach((offerSnapshot) => {
-    temp.push(offerSnapshot);
+  offersRef.forEach((offerSnapshot) => {
+    try {
+      const offer = offerConverter.fromFirestore(offerSnapshot);
+      offers.push(offer);
+    } catch (e) {
+      console.log("Encountered error while retrieving offers: " + e.message);
+    }
   });
-  await Promise.all(
-    temp.map(async (offerSnapshot) => {
-      try {
-        const offer = await offerConverter.fromFirestore(offerSnapshot);
-        offers.push(offer);
-      } catch (e) {
-        return console.error(
-          `Encountered error while retrieving offer: ${e.message}`
-        );
-      }
-    })
-  );
-  return offers.filter((value: Offer) => value.status === "OPEN");
+  
+  return offers.filter((value: Offer) => value.status === Status.OPEN)
+    .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime)); 
 };
 
+type CurrentOffers = {
+  open: Offer[]
+}
 /**
- * Gets offers that are associated with `uid`.
+ * Gets current offers that are associated with `uid`. They are sorted in reverse-choronological order.
+ * The offers are categorised based on `OPEN`.
  * @throws Error if `uid` is empty.
  */
-export const getOffers: (
-  uid: string,
-  status?: Status
-) => Promise<Offer[]> = async (uid: string, status?: Status) => {
+export const getCurrentOffers: (
+  uid: string
+) => Promise<CurrentOffers> = async (uid: string) => {
   try {
     ensureNonEmpty(uid);
   } catch {
     throw new Error("Unable to get offers for user when his/her id is empty");
   }
-  if (status) {
-    const offersRef = db
-      .collection(COLLECTION_OFFERS)
-      .where("uid", "==", uid)
-      .where("status", "==", status);
-    const offers: Offer[] = [];
-    const offersQuerySnapshot = await offersRef.get();
-    offersQuerySnapshot.forEach((offerSnapshot) => {
-      try {
-        const offer = offerConverter.fromFirestore(offerSnapshot);
-        offers.push(offer);
-      } catch (e) {
-        console.log("Encountered error while retrieving offers: " + e.message);
-      }
-    });
-    return offers;
-  } else {
-    const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
-    const offers: Offer[] = [];
-    const offersQuerySnapshot = await offersRef.get();
-    offersQuerySnapshot.forEach((offerSnapshot) => {
-      try {
-        const offer = offerConverter.fromFirestore(offerSnapshot);
-        offers.push(offer);
-      } catch (e) {
-        console.log("Encountered error while retrieving offers: " + e.message);
-      }
-    });
-    return offers;
+
+  const offersRef = db.collection(COLLECTION_OFFERS)
+    .where("uid", "==", uid)
+    .where("status", "==", Status.OPEN);
+  const offers: Offer[] = [];
+  const offersQuerySnapshot = await offersRef.get();
+  offersQuerySnapshot.forEach((offerSnapshot) => {
+    try {
+      const offer = offerConverter.fromFirestore(offerSnapshot);
+      offers.push(offer);
+    } catch (e) {
+      console.log("Encountered error while retrieving offers: " + e.message);
+    }
+  });
+
+  const categorisedOffers: CurrentOffers = {
+    open: [],
   }
+  offers.filter((value: Offer) => value.status === Status.OPEN)
+    .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime))
+    .forEach(offer => categorisedOffers.open.push(offer));
+  
+  return categorisedOffers;
+}
+
+export type PastOffers = {
+  cancelled: Offer[],
+  expired: Offer[]
+}
+/**
+ * Gets past offers that are associated with `uid`. 
+ * The offers are categorised based on `CANCELLED` and `EXPIRED`.
+ * @throws Error if `uid` is empty.
+ */
+export const getPastOffers: ( // should not be imported by FE
+  uid: string
+) => Promise<PastOffers> = async (uid: string) => {
+  try {
+    ensureNonEmpty(uid);
+  } catch {
+    throw new Error("Unable to get offers for user when his/her id is empty");
+  }
+  
+  const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
+  const offers: Offer[] = [];
+  const offersQuerySnapshot = await offersRef.get();
+  offersQuerySnapshot.forEach((offerSnapshot) => {
+    try {
+      const offer = offerConverter.fromFirestore(offerSnapshot);
+      offers.push(offer);
+    } catch (e) {
+      console.log("Encountered error while retrieving offers: " + e.message);
+    }
+  });
+  // sort offers by `expectedDeliveryTime`
+  offers.sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime));
+
+  // categorise offers
+  const categorisedOffers: PastOffers = {
+    cancelled: [],
+    expired: []
+  }
+
+  offers.forEach(offer => {
+    const status = offer.status;
+    if (status === Status.EXPIRED) {
+      categorisedOffers.expired.push(offer);
+    } else if (status === Status.CANCELLED) {
+      categorisedOffers.cancelled.push(offer);
+    } else {
+      // ignore
+    }
+  })
+  
+  return categorisedOffers;
 };
 
 /**
- *	Adds an offer to the database.
- *  @throws Error if `uid`, `title`, `description`, `shopLocation`, `expectedDeliveryTime`or `status` are empty.
+ *	Adds an open offer to the database.
+ *  @throws Error if `uid`, `title`, `description`, `shopLocation` or `expectedDeliveryTime` are empty.
  */
 export const addOffer: (
   uid: string,
   title: string,
   description: string,
   shopLocation: string,
-  expectedDeliveryTime: number,
-  status: Status,
+  expectedDeliveryTime: number
 ) => Promise<Offer> = async function (
   uid,
   title,
   description,
   shopLocation,
-  expectedDeliveryTime,
-  status,
+  expectedDeliveryTime
 ) {
-  if (status === null) {
-    status = Status.OPEN;
-  }
+  const status = Status.OPEN;
 
   try {
     ensureNonEmpty(uid, shopLocation, expectedDeliveryTime, status);
   } catch (e) {
     throw new Error(`Unable to add offer: ${e.message}`);
   }
-
-  const res = offerConverter.toFirestore(
-    uid,
-    title,
-    description,
-    shopLocation,
-    expectedDeliveryTime,
-    status,
-  );
-  console.log(res);
 
   try {
     const offersRef = await db
@@ -235,26 +268,6 @@ export const cancelOffer: (id: string) => Promise<void> = async (id) => {
 
   const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
   return offerRef.update({ status: Status[Status.CANCELLED] });
-};
-
-/**
- * Reopens an offer if it is already cancelled. If the offer's `expectedDeliveryTime` has past, no action will be taken.
- * @param id id of the offer that is to be reopened.
- * @throws Error if no `id` is provided
- */
-const reopenOffer: (
-  // TODO: if we have time
-  id: string
-) => Promise<void> = async (id) => {
-  try {
-    ensureNonEmpty(id);
-  } catch (e) {
-    throw new Error("Unable to reopen offer without its id");
-  }
-
-  const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
-  // TODO: deal with the case in which the offer has expired
-  return offerRef.update({ status: Status.OPEN });
 };
 
 /**

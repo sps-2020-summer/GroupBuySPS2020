@@ -11,13 +11,13 @@ import {
 } from "antd";
 import s from "../../main.module.css";
 
-import { Request } from '../../../../logic/requestlogic';
+import { Request } from '../../../../../logic/requestlogic';
 import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
 import UserCreateRequestComponent from "./user-request";
-import { FirebaseContext } from "../../../../context/firebase-context";
+import { FirebaseContext } from "../../../../../context/firebase-context";
 import firebase from "firebase";
-import ViewTask from "../../../../components/view-task";
-import { fulfilRequest, getRequests, getOpenRequests } from "../../../../logic/requestlogic";
+import ViewTask from "../../../../../components/view-task";
+import { fulfilRequest, getOpenRequests } from "../../../../../logic/requestlogic";
 
 const { Title, Paragraph } = Typography;
 type Props = {
@@ -76,7 +76,7 @@ const MainRequest: FC<Props> = ({uid, email}) => {
 			if (email !== null && email !== undefined) {
 				emailName = email;
 			}
-			await fulfilRequest(modalReq?.id, uid, emailName );
+			await fulfilRequest(modalReq?.id, uid );
 			
 			setLoading(false);
 		
@@ -165,7 +165,7 @@ const MainRequest: FC<Props> = ({uid, email}) => {
 				okText="fufil request?"
 			>
 				<Typography>
-					<Title>{modalReq?.task.payerName}</Title>
+					<Title>{modalReq?.task.payerUid}</Title>
 					<Paragraph>{modalReq?.task.item}</Paragraph>
 					<ViewTask task={modalReq?.task} />
 				</Typography>

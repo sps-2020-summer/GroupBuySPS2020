@@ -1,10 +1,7 @@
 import React, { FC, useState } from "react";
-import { Card, message, Typography, Spin } from "antd";
+import { Card, message, Typography, Spin, Button } from "antd";
 import {
-  EditOutlined,
-  EllipsisOutlined,
-  SettingOutlined,
-  GoogleOutlined,
+ CloseCircleFilled,
 } from "@ant-design/icons";
 
 import s from "./s.module.css";
@@ -27,21 +24,24 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
           title={offer.title}
           description={
             <Typography>
-              <Title>{offer.title}</Title>
-             <Text>THIS offer IS DONE</Text> 
-              <Paragraph>
-                <Text strong={true}>Shop Location: </Text>
-                {offer.shopLocation}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Doer Name </Text>
-                {offer.doerName}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Expected Delivery Time</Text>
-                {convertToDate(offer.expectedDeliveryTime)}
-              </Paragraph>
-            </Typography>
+            <Title>{offer.title}</Title>
+            <Paragraph>
+              <Text strong={true}>Description: </Text>
+              {offer.description}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Shop Location: </Text>
+              {offer.shopLocation}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Expected Delivery Time</Text>
+              {` ${convertToDate(offer.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {offer.status}
+            </Paragraph>
+          </Typography>
           }
         />
       </Card>
@@ -61,29 +61,28 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
 	<Spin spinning={loading}>
     <Card
       className={s.cardStyle}
-      actions={[<GoogleOutlined onClick={handleCancel} />]}
+      actions={[<Button onClick={handleCancel} >Cancel <CloseCircleFilled/> </Button>]}
     >
       <Card.Meta
         title={offer.title}
         description={
           <Typography>
             <Title>{offer.title}</Title>
-           
+            <Paragraph>
+              <Text strong={true}>Description: </Text>
+              {offer.description}
+            </Paragraph>
             <Paragraph>
               <Text strong={true}>Shop Location: </Text>
               {offer.shopLocation}
             </Paragraph>
-			<Paragraph>
-              <Text strong={true}>Status: </Text>
-              {offer.status}
-            </Paragraph>
-            <Paragraph>
-              <Text strong={true}>Doer Name </Text>
-              {offer.doerName}
-            </Paragraph>
             <Paragraph>
               <Text strong={true}>Expected Delivery Time</Text>
-              {convertToDate(offer.expectedDeliveryTime)}
+              {` ${convertToDate(offer.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {offer.status}
             </Paragraph>
           </Typography>
         }

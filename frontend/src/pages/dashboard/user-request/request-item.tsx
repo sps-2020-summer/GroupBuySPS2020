@@ -1,15 +1,14 @@
 import React, { FC, useState } from "react";
-import { Card, Typography, message } from "antd";
+import { Card, Typography, message, Button } from "antd";
 import {
-  EditOutlined,
-  EllipsisOutlined,
-  SettingOutlined,
-  GoogleCircleFilled,
+
+  CheckOutlined
 } from "@ant-design/icons";
 
 import s from "./s.module.css";
 import { Request, markRequestAsDone } from "../../../logic";
 import { convertToDate } from "../../../logic/utilities";
+import { Status } from "../../../types";
 const { Title, Text, Paragraph } = Typography;
 
 type Props = {
@@ -19,29 +18,29 @@ type Props = {
 
 const RequestItem: FC<Props> = ({ request, fetch }) => {
   const [loading, setLoading] = useState(false);
-  if (!fetch || request.task.status === "DONE" ) {
+  if (!fetch || request.task.status === Status.DONE ) {
     return (
       <Card className={s.cardStyle}>
         <Card.Meta
-          title={request.id}
           description={
             <Typography>
-              <Title>{request.task.item}</Title>
-              {request.task.status === "DONE" ? (
-                <Text>THIS request IS DONE</Text>
-              ) : null}
-              <Paragraph>
-                <Text strong={true}>Shop Location: </Text>
-                {request.task.shopLocation}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Doer Name </Text>
-                {request.task.doerName}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Expected Delivery Time</Text>
-                {convertToDate(request.task.expectedDeliveryTime)}
-              </Paragraph>
+            <Title>{request.task.item }</Title>
+            <Paragraph>
+              <Text strong={true}>Shop Location: </Text>
+              {request.task.shopLocation}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Expected Delivery Time</Text>
+              {` ${convertToDate(request.task.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Doer: </Text>
+              {request.task.uid}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {request.task.status}
+            </Paragraph>
             </Typography>
           }
         />
@@ -53,7 +52,7 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
       setLoading(true);
       await markRequestAsDone(request.id);
       await fetch();
-      message.success("request cancelled!");
+      message.success("request marked as completed!");
     } catch (err) {
       message.error(err);
     }
@@ -62,27 +61,31 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
   return (
     <Card
       className={s.cardStyle}
-      actions={[<GoogleCircleFilled onClick={handleDone} />]}
+      actions={[<Button disabled={request.task.uid === '' } onClick={handleDone} >Complete <CheckOutlined/> </Button>]}
     >
       <Card.Meta
-        title={request.id}
         description={
           <Typography>
-            <Title>{request.task.item}</Title>
-            {request.task.status === "CANCELLED" ? (
-              <Text>THIS request IS Cancelled</Text>
-            ) : null}
+            <Title>{request.task.item }</Title>
             <Paragraph>
               <Text strong={true}>Shop Location: </Text>
               {request.task.shopLocation}
             </Paragraph>
             <Paragraph>
-              <Text strong={true}>Doer Name </Text>
-              {request.task.doerName}
+              <Text strong={true}>Expected Delivery Time</Text>
+              {` ${convertToDate(request.task.expectedDeliveryTime)}`}
             </Paragraph>
             <Paragraph>
-              <Text strong={true}>Expected Delivery Time</Text>
-              {convertToDate(request.task.expectedDeliveryTime)}
+              <Text strong={true}>Fee</Text>
+              {request.task.fee}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Doer: </Text>
+              {request.task.uid}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {request.task.status}
             </Paragraph>
           </Typography>
         }

@@ -1,10 +1,7 @@
 import React, { FC, useState } from "react";
-import { Card, message, Typography, Spin } from "antd";
+import { Card, message, Typography, Spin, Button } from "antd";
 import {
-  EditOutlined,
-  EllipsisOutlined,
-  SettingOutlined,
-  GoogleOutlined,
+ CloseCircleFilled,
 } from "@ant-design/icons";
 
 import s from "./s.module.css";
@@ -28,20 +25,20 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
           title={task.item}
           description={
             <Typography>
-              <Title>{task.item}</Title>
-              <Paragraph>
-                <Text strong={true}>Shop Location: </Text>
-                {task.shopLocation}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Payer </Text>
-                {task.payerName}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Expected Delivery Time</Text>
-                {convertToDate(task.expectedDeliveryTime)}
-              </Paragraph>
-            </Typography>
+            <Title>{task.item }</Title>
+            <Paragraph>
+              <Text strong={true}>Shop Location: </Text>
+              {task.shopLocation}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Expected Delivery Time</Text>
+              {` ${convertToDate(task.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {task.status}
+            </Paragraph>
+          </Typography>
           }
         />
       </Card>
@@ -63,26 +60,30 @@ const TaskItem: FC<Props> = ({ task, fetch }) => {
     <Spin spinning={loading}>
       <Card
         className={s.cardStyle}
-        actions={[<GoogleOutlined onClick={handleCancel} />]}
+        actions={[<Button onClick={handleCancel} >Cancel <CloseCircleFilled/> </Button>]}
       >
         <Card.Meta
           title={task.item}
           description={
             <Typography>
-              <Title>{task.item}</Title>
-              <Paragraph>
-                <Text strong={true}>Shop Location: </Text>
-                {task.shopLocation}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Payer </Text>
-                {task.payerName}
-              </Paragraph>
-              <Paragraph>
-                <Text strong={true}>Expected Delivery Time</Text>
-                {convertToDate(task.expectedDeliveryTime)}
-              </Paragraph>
-            </Typography>
+            <Title>{task.item }</Title>
+            <Paragraph>
+              <Text strong={true}>Shop Location: </Text>
+              {task.shopLocation}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Fee</Text>
+              {task.fee}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Expected Delivery Time</Text>
+              {` ${convertToDate(task.expectedDeliveryTime)}`}
+            </Paragraph>
+            <Paragraph>
+              <Text strong={true}>Status: </Text>
+              {task.status}
+            </Paragraph>
+          </Typography>
           }
         />
       </Card>
