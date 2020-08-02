@@ -89,40 +89,76 @@ const offerConverter = Object.freeze({
  * Gets open offers. The offers are sorted by `expectedDeliveryTime` in reverse-chronological order.
  */
 export const getOpenOffers: () => Promise<Offer[]> = async () => {
-  const offers: Offer[] = [];
   const offersRef = await db.collection(COLLECTION_OFFERS)
     .where("status", "==", Status.OPEN)
     .get();
-  const temp: firebase.firestore.QueryDocumentSnapshot<
-    firebase.firestore.DocumentData
-  >[] = [];
+  const offers: Offer[] = [];
   offersRef.forEach((offerSnapshot) => {
-    temp.push(offerSnapshot);
+    try {
+      const offer = offerConverter.fromFirestore(offerSnapshot);
+      offers.push(offer);
+    } catch (e) {
+      console.log("Encountered error while retrieving offers: " + e.message);
+    }
   });
-  await Promise.all(
-    temp.map(async (offerSnapshot) => {
-      try {
-        const offer = offerConverter.fromFirestore(offerSnapshot);
-        offers.push(offer);
-      } catch (e) {
-        return console.error(
-          `Encountered error while retrieving offer: ${e.message}`
-        );
-      }
-    })
-  );
-
+  
   return offers.filter((value: Offer) => value.status === Status.OPEN)
     .sort((prev, curr) => curr.expectedDeliveryTime - prev.expectedDeliveryTime); 
 };
 
+type CurrentOffers = {
+  open: Offer[]
+}
 /**
- * Gets offers that are associated with `uid`. The offers are categorised based on their status.
+ * Gets current offers that are associated with `uid`. They are sorted in reverse-choronological order.
+ * The offers are categorised based on `OPEN`.
  * @throws Error if `uid` is empty.
  */
-export const getOffers: (
+export const getCurrentOffers: (
   uid: string
-) => Promise<Map<Status, Offer[]>> = async (uid: string) => {
+) => Promise<CurrentOffers> = async (uid: string) => {
+  try {
+    ensureNonEmpty(uid);
+  } catch {
+    throw new Error("Unable to get offers for user when his/her id is empty");
+  }
+
+  const offersRef = db.collection(COLLECTION_OFFERS)
+    .where("uid", "==", uid)
+    .where("status", "==", Status.OPEN);
+  const offers: Offer[] = [];
+  const offersQuerySnapshot = await offersRef.get();
+  offersQuerySnapshot.forEach((offerSnapshot) => {
+    try {
+      const offer = offerConverter.fromFirestore(offerSnapshot);
+      offers.push(offer);
+    } catch (e) {
+      console.log("Encountered error while retrieving offers: " + e.message);
+    }
+  });
+
+  const categorisedOffers: CurrentOffers = {
+    open: [],
+  }
+  offers.filter((value: Offer) => value.status === Status.OPEN)
+    .sort((prev, curr) => curr.expectedDeliveryTime - prev.expectedDeliveryTime)
+    .forEach(offer => categorisedOffers.open.push(offer));
+  
+  return categorisedOffers;
+}
+
+export type PastOffers = {
+  cancelled: Offer[],
+  expired: Offer[]
+}
+/**
+ * Gets past offers that are associated with `uid`. 
+ * The offers are categorised based on `CANCELLED` and `EXPIRED`.
+ * @throws Error if `uid` is empty.
+ */
+export const getPastOffers: ( // should not be imported by FE
+  uid: string
+) => Promise<PastOffers> = async (uid: string) => {
   try {
     ensureNonEmpty(uid);
   } catch {
@@ -144,14 +180,20 @@ export const getOffers: (
   offers.sort((prev, curr) => curr.expectedDeliveryTime - prev.expectedDeliveryTime);
 
   // categorise offers
-  const categorisedOffers: Map<Status, Offer[]> = new Map();
-  const statuses = Object.keys(Status);
-  for (let status of statuses) {
-    categorisedOffers.set(Status[status], []);
+  const categorisedOffers: PastOffers = {
+    cancelled: [],
+    expired: []
   }
+
   offers.forEach(offer => {
     const status = offer.status;
-    categorisedOffers.get(status)?.push(offer);
+    if (status === Status.EXPIRED) {
+      categorisedOffers.expired.push(offer);
+    } else if (status === Status.CANCELLED) {
+      categorisedOffers.cancelled.push(offer);
+    } else {
+      // ignore
+    }
   })
   
   return categorisedOffers;
