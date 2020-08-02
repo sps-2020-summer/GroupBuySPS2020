@@ -86,7 +86,7 @@ const offerConverter = Object.freeze({
 });
 
 /**
- * Gets open offers.
+ * Gets open offers. The offers are sorted by `expectedDeliveryTime` in reverse-chronological order.
  */
 export const getOpenOffers: () => Promise<Offer[]> = async () => {
   const offers: Offer[] = [];
@@ -111,7 +111,9 @@ export const getOpenOffers: () => Promise<Offer[]> = async () => {
       }
     })
   );
-  return offers.filter((value: Offer) => value.status === Status.OPEN);
+
+  return offers.filter((value: Offer) => value.status === Status.OPEN)
+    .sort((prev, curr) => curr.expectedDeliveryTime - prev.expectedDeliveryTime); 
 };
 
 /**
@@ -138,7 +140,10 @@ export const getOffers: (
       console.log("Encountered error while retrieving offers: " + e.message);
     }
   });
+  // sort offers by `expectedDeliveryTime`
+  offers.sort((prev, curr) => curr.expectedDeliveryTime - prev.expectedDeliveryTime);
 
+  // categorise offers
   const categorisedOffers: Map<Status, Offer[]> = new Map();
   const statuses = Object.keys(Status);
   for (let status of statuses) {
