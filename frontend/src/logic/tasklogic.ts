@@ -57,12 +57,11 @@ export class Task {
         this.fee = fee
         this.status = status
 
-        console.log(uid)
-        console.log(status)
-        /*===
-    if (!Task.isValidState(uid, status)) {
+        
+        
+    if (!Task.isValidState(uid, status)) { 
       throw new Error("Missing doer for task with id " + id);
-    }*/
+    }
 
         this.uid = uid === undefined ? "" : uid
     }
@@ -75,8 +74,8 @@ export class Task {
      * @returns `true` if doer information is present but status is OPEN.
      */
     static isValidState = (uid: string | undefined, status: Status) =>
-        (Task.isValidDoerPresent(uid) && status !== Status.OPEN) ||
-        (!Task.isValidDoerPresent(uid) && status === Status.OPEN)
+        (Task.isValidDoerPresent(uid) && (status === Status.PENDING || status === Status.DONE)) ||
+        !Task.isValidDoerPresent(uid);
 }
 
 export const taskConverter = Object.freeze({

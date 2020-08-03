@@ -84,13 +84,13 @@ export const getOpenRequests: () => Promise<Request[]> = async () => {
                 requests.push(request)
             } catch (e) {
                 return console.error(
-                    `Encountered error while retrieving request: ${e.message}`
+                    `Encountered error while retrieving open requests: ${e.message}`
                 )
             }
         })
     )
     return requests
-        .filter((value: Request) => value.task.status === 'OPEN')
+        .filter(value => value.task.status === 'OPEN')
         .sort((prev, curr) =>
             sortByReverseOrder(
                 prev.task.expectedDeliveryTime,
