@@ -1,14 +1,14 @@
-import { db } from '../index'
-import { Status } from '../types'
+import { db } from "../index"
+import { Status } from "../types"
 import {
     ensureNonEmpty,
     ensureNonNegative,
     isEmptyString,
     shouldShowExpired,
     sortByReverseOrder,
-} from './utilities'
+} from "./utilities"
 
-const COLLECTION_TASKS: string = 'tasks'
+const COLLECTION_TASKS: string = "tasks"
 
 export class Task {
     id: string
@@ -56,12 +56,15 @@ export class Task {
         this.payerUid = payerUid
         this.fee = fee
         this.status = status
-        /*
+
+        console.log(uid)
+        console.log(status)
+        /*===
     if (!Task.isValidState(uid, status)) {
       throw new Error("Missing doer for task with id " + id);
     }*/
 
-        this.uid = uid === undefined ? '' : uid
+        this.uid = uid === undefined ? "" : uid
     }
 
     /** Checks if a valid doer is present. */
@@ -119,7 +122,7 @@ export const taskConverter = Object.freeze({
     fromFirestore: (taskSnapshot: firebase.firestore.DocumentSnapshot) => {
         const data = taskSnapshot.data()
         if (data === undefined) {
-            throw new Error('Unable to find snapshot for task.')
+            throw new Error("Unable to find snapshot for task.")
         }
         // no error should occur here
         console.log(data)
@@ -156,8 +159,8 @@ export const getOpenTasks: (uid: string) => Promise<Task[]> = async (uid) => {
     }
     const tasksRef = db
         .collection(COLLECTION_TASKS)
-        .where('uid', '==', uid)
-        .where('status', '==', Status.OPEN)
+        .where("uid", "==", uid)
+        .where("status", "==", Status.OPEN)
 
     const tasksQuerySnapshot = await tasksRef.get()
     const tasks: Task[] = []
@@ -201,8 +204,8 @@ export const getCurrentTasks: (uid: string) => Promise<CurrentTasks> = async (
     }
     const tasksRef = db
         .collection(COLLECTION_TASKS)
-        .where('uid', '==', uid)
-        .where('status', 'in', [Status.OPEN, Status.PENDING])
+        .where("uid", "==", uid)
+        .where("status", "in", [Status.OPEN, Status.PENDING])
 
     const tasksQuerySnapshot = await tasksRef.get()
     const tasks: Task[] = []
@@ -263,8 +266,8 @@ export const getPastTasks: (uid: string) => Promise<PastTasks> = async (
     }
     const tasksRef = db
         .collection(COLLECTION_TASKS)
-        .where('uid', '==', uid)
-        .where('status', 'in', [
+        .where("uid", "==", uid)
+        .where("status", "in", [
             Status.OPEN,
             Status.CANCELLED,
             Status.DONE,
@@ -326,7 +329,7 @@ export const getTaskById: (id: string) => Promise<Task> = async (
         ensureNonEmpty(id)
     } catch (e) {
         throw new Error(
-            'Unable to get task by id when id is not specified/empty'
+            "Unable to get task by id when id is not specified/empty"
         )
     }
 
@@ -372,7 +375,7 @@ export const addTask: (
         status = Status.PENDING
     } else {
         status = Status.OPEN
-        uid = ''
+        uid = ""
     }
 
     try {
@@ -415,7 +418,7 @@ export const cancelTask: (id: string) => Promise<void> = async (id) => {
     try {
         ensureNonEmpty(id)
     } catch (e) {
-        throw new Error('Unable to cancel task without its id')
+        throw new Error("Unable to cancel task without its id")
     }
 
     const taskRef = db.collection(COLLECTION_TASKS).doc(id)
@@ -436,7 +439,7 @@ export const addDoerToTask: (id: string, doerId: string) => Promise<void> = (
     try {
         ensureNonEmpty(doerId, id)
     } catch (e) {
-        throw new Error('Unable to add doer to task when arguments are missing')
+        throw new Error("Unable to add doer to task when arguments are missing")
     }
 
     const taskRef = db.collection(COLLECTION_TASKS).doc(id)
@@ -454,7 +457,7 @@ export const markTaskAsDone: (id: string) => Promise<void> = (id) => {
     try {
         ensureNonEmpty(id)
     } catch (e) {
-        throw new Error('Unable to mark task as done when no id is provided')
+        throw new Error("Unable to mark task as done when no id is provided")
     }
 
     const taskRef = db.collection(COLLECTION_TASKS).doc(id)
