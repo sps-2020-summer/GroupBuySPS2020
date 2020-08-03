@@ -1,5 +1,5 @@
-import { db } from '../index'
-import { ensureNonEmpty, sortByReverseOrder } from './utilities'
+import { db } from "../index"
+import { ensureNonEmpty, sortByReverseOrder } from "./utilities"
 import {
     Task,
     getTaskById,
@@ -7,10 +7,10 @@ import {
     addDoerToTask,
     markTaskAsDone,
     cancelTask,
-} from './tasklogic'
-import { Status } from '../types'
+} from "./tasklogic"
+import { Status } from "../types"
 
-const COLLECTION_REQUESTS = 'requests'
+const COLLECTION_REQUESTS = "requests"
 
 export class Request {
     uid: string
@@ -40,7 +40,7 @@ const requestConverter = Object.freeze({
             ensureNonEmpty(uid, task)
         } catch (e) {
             throw new Error(
-                'Unable to convert request to firestore because uid/task is empty'
+                "Unable to convert request to firestore because uid/task is empty"
             )
         }
 
@@ -54,7 +54,7 @@ const requestConverter = Object.freeze({
     ) => {
         const data = requestSnapshot.data()
         if (data === undefined) {
-            throw new Error('Unable to find snapshot for request.')
+            throw new Error("Unable to find snapshot for request.")
         }
 
         const task = await getTaskById(data.taskId)
@@ -90,7 +90,7 @@ export const getOpenRequests: () => Promise<Request[]> = async () => {
         })
     )
     return requests
-        .filter((value: Request) => value.task.status === 'OPEN')
+        .filter((value: Request) => value.task.status === "OPEN")
         .sort((prev, curr) =>
             sortByReverseOrder(
                 prev.task.expectedDeliveryTime,
@@ -114,12 +114,12 @@ export const getCurrentRequests: (
     try {
         ensureNonEmpty(uid)
     } catch (e) {
-        throw new Error('Unable to get requests when uid is empty')
+        throw new Error("Unable to get requests when uid is empty")
     }
 
     const requestRef = db
         .collection(COLLECTION_REQUESTS)
-        .where('uid', '==', uid)
+        .where("uid", "==", uid)
     //.where('status', 'in', [Status.OPEN, Status.PENDING])
     const requestQuerySnapshot = await requestRef.get()
 
@@ -184,18 +184,13 @@ export const getPastRequests: (
     try {
         ensureNonEmpty(uid)
     } catch (e) {
-        throw new Error('Unable to get requests when uid is empty')
+        throw new Error("Unable to get requests when uid is empty")
     }
 
     const requestRef = db
         .collection(COLLECTION_REQUESTS)
-        .where('uid', '==', uid)
-        .where('status', 'in', [
-            Status.OPEN,
-            Status.EXPIRED,
-            Status.DONE,
-            Status.CANCELLED,
-        ])
+        .where("uid", "==", uid)
+
     const requestQuerySnapshot = await requestRef.get()
 
     const requests: firebase.firestore.QueryDocumentSnapshot<
@@ -206,6 +201,8 @@ export const getPastRequests: (
     })
 
     const results: Request[] = []
+
+    console.log(requests.length)
     await Promise.all(
         requests.map(async (requestSnapshot) => {
             try {
@@ -221,17 +218,23 @@ export const getPastRequests: (
         })
     )
 
-    results.filter(request => {
-            const status: Status = request.task.status;
-            return status === Status.CANCELLED || status === Status.DONE || status === Status.EXPIRED;
+    results
+        .filter((request) => {
+            const status: Status = request.task.status
+            return (
+                status === Status.CANCELLED ||
+                status === Status.DONE ||
+                status === Status.EXPIRED
+            )
         })
         .sort((prev, curr) =>
             sortByReverseOrder(
                 prev.task.expectedDeliveryTime,
                 curr.task.expectedDeliveryTime
-        ));
+            )
+        )
 
-    return results;
+    return results
 }
 
 /**
@@ -258,7 +261,7 @@ export const addRequestHelper: (
     try {
         ensureNonEmpty(uid)
     } catch (e) {
-        throw new Error('Unable to add request when user id is not specified')
+        throw new Error("Unable to add request when user id is not specified")
     }
 
     try {
@@ -318,11 +321,11 @@ export const fulfilRequest: (id: string, uid: string) => Promise<void> = async (
 
     const requestRef = db.collection(COLLECTION_REQUESTS).doc(id)
     const requestSnapshot = await requestRef.get()
-    const taskId = requestSnapshot.get('taskId')
+    const taskId = requestSnapshot.get("taskId")
 
     if (taskId === undefined) {
         throw new Error(
-            'Unable to find specified request, or request has missing task'
+            "Unable to find specified request, or request has missing task"
         )
     }
 
@@ -339,17 +342,17 @@ export const markRequestAsDone: (id: string) => Promise<void> = async (id) => {
         ensureNonEmpty(id)
     } catch (e) {
         throw new Error(
-            'Unable to mark request as done when its id is not provided'
+            "Unable to mark request as done when its id is not provided"
         )
     }
 
     const requestRef = db.collection(COLLECTION_REQUESTS).doc(id)
     const requestSnapshot = await requestRef.get()
-    const taskId = requestSnapshot.get('taskId')
+    const taskId = requestSnapshot.get("taskId")
 
     if (taskId === undefined) {
         throw new Error(
-            'Unable to find specified request, or request has missing task'
+            "Unable to find specified request, or request has missing task"
         )
     }
 
@@ -364,16 +367,16 @@ export const cancelRequest: (id: string) => Promise<void> = async (id) => {
     try {
         ensureNonEmpty(id)
     } catch (e) {
-        throw new Error('Unable to cancel request when its id is not provided')
+        throw new Error("Unable to cancel request when its id is not provided")
     }
 
     const requestRef = db.collection(COLLECTION_REQUESTS).doc(id)
     const requestSnapshot = await requestRef.get()
-    const taskId = requestSnapshot.get('taskId')
+    const taskId = requestSnapshot.get("taskId")
 
     if (taskId === undefined) {
         throw new Error(
-            'Unable to find specified request, or request has missing task'
+            "Unable to find specified request, or request has missing task"
         )
     }
 
