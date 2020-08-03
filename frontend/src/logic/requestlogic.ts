@@ -90,7 +90,7 @@ export const getOpenRequests: () => Promise<Request[]> = async () => {
         })
     )
     return requests
-        .filter(value => value.task.status === 'OPEN')
+        .filter((value) => value.task.status === "OPEN")
         .sort((prev, curr) =>
             sortByReverseOrder(
                 prev.task.expectedDeliveryTime,
@@ -120,7 +120,7 @@ export const getCurrentRequests: (
     const requestRef = db
         .collection(COLLECTION_REQUESTS)
         .where("uid", "==", uid)
-    //.where('status', 'in', [Status.OPEN, Status.PENDING])
+
     const requestQuerySnapshot = await requestRef.get()
 
     const requests: firebase.firestore.QueryDocumentSnapshot<
