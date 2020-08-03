@@ -173,20 +173,14 @@ export const getCurrentRequests: (
     return categorisedResults
 }
 
-export type PastRequests = {
-    cancelled: Request[]
-    expired: Request[]
-    done: Request[]
-}
 /**
  * Gets all past requests that are associated with `uid`.
- * The requests are categorised by `CANCELLED`, `EXPIRED` and `DONE`.
  * @throws Error if `uid` is empty.
  */
 export const getPastRequests: (
     // shouldn't be called from FE
     uid: string
-) => Promise<PastRequests> = async (uid: string) => {
+) => Promise<Request[]> = async (uid: string) => {
     try {
         ensureNonEmpty(uid)
     } catch (e) {
@@ -227,27 +221,17 @@ export const getPastRequests: (
         })
     )
 
-    const categorisedResults: PastRequests = {
-        cancelled: [],
-        expired: [],
-        done: [],
-    }
+    results.filter(request => {
+            const status: Status = request.task.status;
+            return status === Status.CANCELLED || status === Status.DONE || status === Status.EXPIRED;
+        })
+        .sort((prev, curr) =>
+            sortByReverseOrder(
+                prev.task.expectedDeliveryTime,
+                curr.task.expectedDeliveryTime
+        ));
 
-    results.forEach((request) => {
-        const status: Status = request.task.status
-
-        if (status === Status.CANCELLED) {
-            categorisedResults.cancelled.push(request)
-        } else if (status === Status.DONE) {
-            categorisedResults.done.push(request)
-        } else if (status === Status.EXPIRED) {
-            categorisedResults.expired.push(request)
-        } else {
-            // ignore
-        }
-    })
-
-    return categorisedResults
+    return results;
 }
 
 /**

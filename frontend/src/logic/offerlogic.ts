@@ -147,18 +147,13 @@ export const getCurrentOffers: (
   return categorisedOffers;
 }
 
-export type PastOffers = {
-  cancelled: Offer[],
-  expired: Offer[]
-}
 /**
  * Gets past offers that are associated with `uid`. 
- * The offers are categorised based on `CANCELLED` and `EXPIRED`.
  * @throws Error if `uid` is empty.
  */
 export const getPastOffers: ( // should not be imported by FE
   uid: string
-) => Promise<PastOffers> = async (uid: string) => {
+) => Promise<Offer[]> = async (uid: string) => {
   try {
     ensureNonEmpty(uid);
   } catch {
@@ -177,26 +172,10 @@ export const getPastOffers: ( // should not be imported by FE
     }
   });
   // sort offers by `expectedDeliveryTime`
-  offers.sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime));
+  offers.filter(offer => offer.status === Status.EXPIRED || offer.status === Status.CANCELLED)
+    .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime));
 
-  // categorise offers
-  const categorisedOffers: PastOffers = {
-    cancelled: [],
-    expired: []
-  }
-
-  offers.forEach(offer => {
-    const status = offer.status;
-    if (status === Status.EXPIRED) {
-      categorisedOffers.expired.push(offer);
-    } else if (status === Status.CANCELLED) {
-      categorisedOffers.cancelled.push(offer);
-    } else {
-      // ignore
-    }
-  })
-  
-  return categorisedOffers;
+  return offers;
 };
 
 /**

@@ -246,17 +246,11 @@ export const getCurrentTasks: (uid: string) => Promise<CurrentTasks> = async (
     return currentTasks
 }
 
-export type PastTasks = {
-    cancelled: Task[]
-    done: Task[]
-    expired: Task[]
-}
 /**
  * Gets all past tasks which are associated with `uid`.
- * Tasks are categorised by `EXPIRED`, `DONE` and `CANCELLED`, and sorted by reverse chronological order.
  * @throws Error if `uid` is `null`, `undefined` or `""`.
  */
-export const getPastTasks: (uid: string) => Promise<PastTasks> = async (
+export const getPastTasks: (uid: string) => Promise<Task[]> = async (
     uid
 ) => {
     try {
@@ -287,33 +281,19 @@ export const getPastTasks: (uid: string) => Promise<PastTasks> = async (
         }
     })
 
-    const pastTasks: PastTasks = {
-        cancelled: [],
-        done: [],
-        expired: [],
-    }
-
     tasks
+        .filter(task => {
+            const status = task.status;
+            return status === Status.CANCELLED || status === Status.DONE || status === Status.EXPIRED;
+        })
         .sort((prev, curr) =>
             sortByReverseOrder(
                 prev.expectedDeliveryTime,
                 curr.expectedDeliveryTime
             )
         )
-        .forEach((task) => {
-            const status = task.status
-            if (status === Status.CANCELLED) {
-                pastTasks.cancelled.push(task)
-            } else if (status === Status.DONE) {
-                pastTasks.done.push(task)
-            } else if (status === Status.EXPIRED) {
-                pastTasks.expired.push(task)
-            } else {
-                // ignore
-            }
-        })
 
-    return pastTasks
+    return tasks
 }
 
 /**
