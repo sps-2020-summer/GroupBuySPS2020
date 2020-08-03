@@ -120,7 +120,7 @@ export const getCurrentRequests: (
     const requestRef = db
         .collection(COLLECTION_REQUESTS)
         .where('uid', '==', uid)
-    //.where('status', 'in', [Status.OPEN, Status.PENDING])
+        
     const requestQuerySnapshot = await requestRef.get()
 
     const requests: firebase.firestore.QueryDocumentSnapshot<
@@ -189,13 +189,7 @@ export const getPastRequests: (
 
     const requestRef = db
         .collection(COLLECTION_REQUESTS)
-        .where('uid', '==', uid)
-        .where('status', 'in', [
-            Status.OPEN,
-            Status.EXPIRED,
-            Status.DONE,
-            Status.CANCELLED,
-        ])
+        .where('uid', '==', uid);
     const requestQuerySnapshot = await requestRef.get()
 
     const requests: firebase.firestore.QueryDocumentSnapshot<
