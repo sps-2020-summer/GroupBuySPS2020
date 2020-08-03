@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from "react"
 import { DashboardCompProps } from ".."
-import { Request, Task, Offer } from "../../../logic"
+import { Request, Task, Offer, getHistory } from "../../../logic"
 
 import { Slide } from "react-awesome-reveal"
 import { List, Card } from "antd"
@@ -30,13 +30,11 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
         const fetchUserHistory = async (userUid: string) => {
             try {
                 setLoading(true)
-                /*
-        const resOffer = await getOffers(userUid);
-        const resTask = await getTasks(userUid);
-        const resRequest = await getRequests(userUid, Status.DONE);
-        setOffers(resOffer);
-        setTasks(resTask);
-        setRequests(resRequest)*/
+                const { tasks, requests, offers } = await getHistory(userUid)
+                console.log(requests)
+                setOffers(offers)
+                setTasks(tasks)
+                setRequests(requests)
             } catch (e) {
                 console.log(e)
             } finally {
