@@ -217,9 +217,11 @@ export const getPastRequests: (
         })
     )
 
-    results
+    return results
         .filter((request) => {
             const status: Status = request.task.status
+            console.log("REQUEST");
+            console.log(status);
             return (
                 status === Status.CANCELLED ||
                 status === Status.DONE ||
@@ -232,8 +234,6 @@ export const getPastRequests: (
                 curr.task.expectedDeliveryTime
             )
         )
-
-    return results
 }
 
 /**

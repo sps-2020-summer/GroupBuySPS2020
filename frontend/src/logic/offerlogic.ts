@@ -191,10 +191,8 @@ export const getPastOffers: ( // should not be imported by FE
       .catch(e => console.error(`Encountered error while retrieving offer: ${e.message}`));
   
   // sort offers by `expectedDeliveryTime`
-  offers.filter(offer => offer.status === Status.EXPIRED || offer.status === Status.CANCELLED)
+  return offers.filter(offer => offer.status === Status.EXPIRED || offer.status === Status.CANCELLED)
     .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime));
-
-  return offers;
 };
 
 /**

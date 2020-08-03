@@ -289,7 +289,7 @@ export const getPastTasks: (uid: string) => Promise<Task[]> = async (
         })
         .catch(e => console.error(`Encountered error while retrieving task: ${e.message}`));
 
-    tasks
+    return tasks
         .filter(task => {
             const status = task.status;
             return status === Status.CANCELLED || status === Status.DONE || status === Status.EXPIRED;
@@ -300,8 +300,6 @@ export const getPastTasks: (uid: string) => Promise<Task[]> = async (
                 curr.expectedDeliveryTime
             )
         )
-
-    return tasks
 }
 
 /**
