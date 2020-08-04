@@ -150,7 +150,7 @@ const MainOffer: FC<Props> = ({ uid , email}) => {
 					</Paragraph>
 					<Paragraph>
 						<Text strong={true}>Delivery time: </Text>
-						{modalOffer && moment.unix(modalOffer?.expectedDeliveryTime).format("MM/DD/YYYY")}
+						{modalOffer && moment.unix(modalOffer?.expectedDeliveryTime).format("dddd, MMMM Do YYYY, h:mm:ss a")}
 					</Paragraph>
 				</Typography>
 			</Modal>

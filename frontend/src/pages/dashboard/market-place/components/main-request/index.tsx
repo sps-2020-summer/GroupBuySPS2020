@@ -176,7 +176,7 @@ const MainRequest: FC<Props> = ({ uid, email }) => {
                     <Title> Shop location: {modalReq?.task.shopLocation}</Title>
                     <Paragraph>
 						<Text strong={true}>Expected Delivery Time: </Text>
-                        {modalReq && moment.unix(modalReq?.task.expectedDeliveryTime).format("MM/DD/YYYY")}
+                        {modalReq && moment.unix(modalReq?.task.expectedDeliveryTime).format("dddd, MMMM Do YYYY, h:mm:ss a")}
 					</Paragraph>
 					<Paragraph>
 						<Text strong={true}>Item: </Text>
