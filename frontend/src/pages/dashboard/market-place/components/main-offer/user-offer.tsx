@@ -105,8 +105,8 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
         New Offer
       </Button>
       <Typography>
-        <Title>You</Title>
-        <Paragraph>You currently have {offers.length} open</Paragraph>
+        <Title>{email}</Title>
+        <Paragraph>You currently have {offers.length} offers open</Paragraph>
       </Typography>
       <Form ref={formRef} onFinish={onFinish}>
         <Modal

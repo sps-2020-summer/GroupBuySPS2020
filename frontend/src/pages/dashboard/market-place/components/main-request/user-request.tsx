@@ -23,8 +23,9 @@ const { RangePicker } = DatePicker
 type Props = {
     uid: string | undefined
     fetchRequest: () => Promise<void>
+    email : string | undefined | null;
 }
-const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
+const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid, email }) => {
     const firebaseContext = useContext(FirebaseContext)
     const { firebaseApp } = firebaseContext
     const db = firebase.firestore(firebaseApp as firebase.app.App)
@@ -63,6 +64,10 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
         console.log("Success:", values)
         try {
             setLoading(true)
+            let emailName = '';
+			if (email !== null && email !== undefined) {
+				emailName = email;
+			}
             await addRequest(
                 uid ?? "-",
                 values.shopLocation,
@@ -101,7 +106,7 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
                 New Request
             </Button>
             <Typography>
-                <Title>You</Title>
+                <Title>{email}</Title>
                 <Paragraph>You currently have {requests.length} requests open</Paragraph>
             </Typography>
             <Form ref={formRef} onFinish={onFinish}>

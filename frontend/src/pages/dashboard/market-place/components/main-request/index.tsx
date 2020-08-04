@@ -98,6 +98,7 @@ const MainRequest: FC<Props> = ({ uid, email }) => {
                 <div className={s.column}>
                     <UserCreateRequestComponent
                         uid={uid}
+                        email={email}
                         fetchRequest={fetchRequest}
                     />
                 </div>
