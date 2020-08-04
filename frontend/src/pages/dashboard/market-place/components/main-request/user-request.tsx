@@ -1,4 +1,4 @@
-import React, { FC, useState, useContext } from "react"
+import React, { FC, useState, useContext, useEffect, useCallback } from "react"
 import s from "../../main.module.css"
 import {
     Button,
@@ -15,6 +15,8 @@ import { MoneyCollectOutlined } from "@ant-design/icons"
 import firebase from "firebase"
 import { FirebaseContext } from "../../../../../context/firebase-context"
 import { addRequest } from "../../../../../logic/requestlogic"
+import { Request, getOpenRequests } from "../../../../../logic/requestlogic";
+import { getCurrentRequests } from "../../../../../logic"
 const { Title, Paragraph, Text } = Typography
 const { RangePicker } = DatePicker
 
@@ -30,11 +32,28 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
 
     const formRef = React.createRef<FormInstance>()
     const [visible, setVisible] = useState<boolean>(false)
+    const [requests, setRequests] = useState<Request[]>([])
 
     const handleOk = () => {
         console.log(formRef.current)
         formRef.current?.submit()
     }
+    const fetchRequests = useCallback(async () => {
+        if (uid === undefined) return;
+        try {
+            setLoading(true)
+            const { open } = await getCurrentRequests(uid)
+            setRequests(open)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setLoading(false)
+        }
+      }, [])
+      useEffect(() => {
+        fetchRequests()
+      }, [])
+
 
     const showModal = () => setVisible(true)
     const handleCancel = () => setVisible(false)
@@ -83,7 +102,7 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid }) => {
             </Button>
             <Typography>
                 <Title>You</Title>
-                <Paragraph>You currently have 0 requests open</Paragraph>
+                <Paragraph>You currently have {requests.length} requests open</Paragraph>
             </Typography>
             <Form ref={formRef} onFinish={onFinish}>
                 <Modal
