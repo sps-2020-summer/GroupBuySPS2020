@@ -5,6 +5,7 @@ import { Offer, getOpenOffers } from "../../../../../logic/offerlogic";
 import { LikeOutlined, StarOutlined } from "@ant-design/icons";
 import UserCreateOfferComponent from "./user-offer";
 import CreateRequest from "../../../../../components/create-request";
+import moment from "moment";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -149,7 +150,7 @@ const MainOffer: FC<Props> = ({ uid , email}) => {
 					</Paragraph>
 					<Paragraph>
 						<Text strong={true}>Delivery time: </Text>
-						{modalOffer?.expectedDeliveryTime}
+						{modalOffer && moment.unix(modalOffer?.expectedDeliveryTime).format("MM/DD/YYYY")}
 					</Paragraph>
 				</Typography>
 			</Modal>
