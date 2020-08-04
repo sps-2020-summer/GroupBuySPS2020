@@ -1,11 +1,11 @@
-import { PastOffers, getPastOffers } from "./offerlogic";
-import { PastRequests, getPastRequests } from "./requestlogic";
-import { PastTasks, getPastTasks } from "./tasklogic";
+import { Offer, getPastOffers } from "./offerlogic";
+import { Request, getPastRequests } from "./requestlogic";
+import { Task, getPastTasks } from "./tasklogic";
 
 type history = {
-  offers: PastOffers,
-  requests: PastRequests,
-  tasks: PastTasks
+  offers: Offer[],
+  requests: Request[],
+  tasks: Task[]
 }
 
 /**
