@@ -189,13 +189,7 @@ export const getPastRequests: (
 
     const requestRef = db
         .collection(COLLECTION_REQUESTS)
-        .where("uid", "==", uid)
-        .where("status", "in", [
-            Status.OPEN,
-            Status.EXPIRED,
-            Status.DONE,
-            Status.CANCELLED,
-        ])
+        .where('uid', '==', uid);
     const requestQuerySnapshot = await requestRef.get()
 
     const requests: firebase.firestore.QueryDocumentSnapshot<
@@ -223,9 +217,11 @@ export const getPastRequests: (
         })
     )
 
-    results
+    return results
         .filter((request) => {
             const status: Status = request.task.status
+            console.log("REQUEST");
+            console.log(status);
             return (
                 status === Status.CANCELLED ||
                 status === Status.DONE ||
@@ -238,8 +234,6 @@ export const getPastRequests: (
                 curr.task.expectedDeliveryTime
             )
         )
-
-    return results
 }
 
 /**

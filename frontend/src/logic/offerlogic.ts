@@ -47,6 +47,17 @@ export class Offer {
   }
 }
 
+const markAsExpired: (id: string) => Promise<void> = async (id) => {
+  try {
+      ensureNonEmpty(id)
+  } catch (e) {
+      throw new Error("Unable to mark offer as expired without its id")
+  }
+
+  const offerRef = db.collection(COLLECTION_OFFERS).doc(id)
+  return offerRef.update({ status: Status[Status.EXPIRED] })
+}
+
 const offerConverter = Object.freeze({
   toFirestore: (
     uid: string,
@@ -63,7 +74,7 @@ const offerConverter = Object.freeze({
     expectedDeliveryTime: expectedDeliveryTime,
     status: Status[status]
   }),
-  fromFirestore: (offerSnapshot: firebase.firestore.DocumentSnapshot) => {
+  fromFirestore: async (offerSnapshot: firebase.firestore.DocumentSnapshot) => {
     const data = offerSnapshot.data();
     if (data === undefined) {
       throw new Error("Unable to find snapshot for offer.");
@@ -72,6 +83,10 @@ const offerConverter = Object.freeze({
     const expectedDeliveryTime: number = data.expectedDeliveryTime;
     const status: Status = Status[data.status];
     const newStatus = shouldShowExpired(expectedDeliveryTime, status) ? Status.EXPIRED : status;
+
+    if (newStatus !== status) { // i.e. change status to expire
+      await markAsExpired(offerSnapshot.id);
+    }
     
     return new Offer(
       data.uid,
@@ -92,15 +107,16 @@ export const getOpenOffers: () => Promise<Offer[]> = async () => {
   const offersRef = await db.collection(COLLECTION_OFFERS)
     .where("status", "==", Status.OPEN)
     .get();
+
+  const temp: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>[] = [];
+  offersRef.forEach(offerSnapshot => temp.push(offerSnapshot));
+
   const offers: Offer[] = [];
-  offersRef.forEach((offerSnapshot) => {
-    try {
-      const offer = offerConverter.fromFirestore(offerSnapshot);
-      offers.push(offer);
-    } catch (e) {
-      console.log("Encountered error while retrieving offers: " + e.message);
-    }
-  });
+  await Promise.all(temp.map(taskSnapShot => offerConverter.fromFirestore(taskSnapShot)))
+      .then(values => {
+          values.forEach(value => offers.push(value))
+      })
+      .catch(e => console.error(`Encountered error while retrieving offer: ${e.message}`));
   
   return offers.filter((value: Offer) => value.status === Status.OPEN)
     .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime)); 
@@ -126,16 +142,17 @@ export const getCurrentOffers: (
   const offersRef = db.collection(COLLECTION_OFFERS)
     .where("uid", "==", uid)
     .where("status", "==", Status.OPEN);
-  const offers: Offer[] = [];
   const offersQuerySnapshot = await offersRef.get();
-  offersQuerySnapshot.forEach((offerSnapshot) => {
-    try {
-      const offer = offerConverter.fromFirestore(offerSnapshot);
-      offers.push(offer);
-    } catch (e) {
-      console.log("Encountered error while retrieving offers: " + e.message);
-    }
-  });
+
+  const temp: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>[] = [];
+  offersQuerySnapshot.forEach(offerSnapshot => temp.push(offerSnapshot));
+
+  const offers: Offer[] = [];
+  await Promise.all(temp.map(taskSnapShot => offerConverter.fromFirestore(taskSnapShot)))
+      .then(values => {
+          values.forEach(value => offers.push(value))
+      })
+      .catch(e => console.error(`Encountered error while retrieving offer: ${e.message}`));
 
   const categorisedOffers: CurrentOffers = {
     open: [],
@@ -161,21 +178,21 @@ export const getPastOffers: ( // should not be imported by FE
   }
   
   const offersRef = db.collection(COLLECTION_OFFERS).where("uid", "==", uid);
-  const offers: Offer[] = [];
   const offersQuerySnapshot = await offersRef.get();
-  offersQuerySnapshot.forEach((offerSnapshot) => {
-    try {
-      const offer = offerConverter.fromFirestore(offerSnapshot);
-      offers.push(offer);
-    } catch (e) {
-      console.log("Encountered error while retrieving offers: " + e.message);
-    }
-  });
-  // sort offers by `expectedDeliveryTime`
-  offers.filter(offer => offer.status === Status.EXPIRED || offer.status === Status.CANCELLED)
-    .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime));
 
-  return offers;
+  const temp: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>[] = [];
+  offersQuerySnapshot.forEach(offerSnapshot => temp.push(offerSnapshot));
+
+  const offers: Offer[] = [];
+  await Promise.all(temp.map(taskSnapShot => offerConverter.fromFirestore(taskSnapShot)))
+      .then(values => {
+          values.forEach(value => offers.push(value))
+      })
+      .catch(e => console.error(`Encountered error while retrieving offer: ${e.message}`));
+  
+  // sort offers by `expectedDeliveryTime`
+  return offers.filter(offer => offer.status === Status.EXPIRED || offer.status === Status.CANCELLED)
+    .sort((prev, curr) => sortByReverseOrder(prev.expectedDeliveryTime, curr.expectedDeliveryTime));
 };
 
 /**
@@ -273,7 +290,7 @@ export const addRequestToOffer: (
 
   const offerRef = db.collection(COLLECTION_OFFERS).doc(id);
   const offerSnapshot = await offerRef.get();
-  const offer = offerConverter.fromFirestore(offerSnapshot);
+  const offer = await offerConverter.fromFirestore(offerSnapshot);
 
   // create and add new task for doer (i.e. owner of offer)
   addTask(

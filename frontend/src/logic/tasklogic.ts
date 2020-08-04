@@ -78,6 +78,17 @@ export class Task {
         !Task.isValidDoerPresent(uid);
 }
 
+const markAsExpired: (id: string) => Promise<void> = async (id) => {
+    try {
+        ensureNonEmpty(id)
+    } catch (e) {
+        throw new Error("Unable to mark a task as expired without its id")
+    }
+
+    const taskRef = db.collection(COLLECTION_TASKS).doc(id)
+    return taskRef.update({ status: Status[Status.EXPIRED] })
+}
+
 export const taskConverter = Object.freeze({
     /**
      * @throws Error if `id`, `shopLocation`, `expectedDeliveryTime`, `item`, `payerUid` or `status` are empty.
@@ -118,7 +129,7 @@ export const taskConverter = Object.freeze({
         }
     },
     /** @throws Error if data associated with `taskSnapshot` cannot be found. */
-    fromFirestore: (taskSnapshot: firebase.firestore.DocumentSnapshot) => {
+    fromFirestore: async (taskSnapshot: firebase.firestore.DocumentSnapshot) => {
         const data = taskSnapshot.data()
         if (data === undefined) {
             throw new Error("Unable to find snapshot for task.")
@@ -131,6 +142,10 @@ export const taskConverter = Object.freeze({
         const newStatus = shouldShowExpired(expectedDeliveryTime, status)
             ? Status.EXPIRED
             : status
+        
+        if (newStatus !== status) { // i.e. status changed
+            await markAsExpired(taskSnapshot.id);
+        }
 
         return new Task(
             taskSnapshot.id,
@@ -162,17 +177,15 @@ export const getOpenTasks: (uid: string) => Promise<Task[]> = async (uid) => {
         .where("status", "==", Status.OPEN)
 
     const tasksQuerySnapshot = await tasksRef.get()
-    const tasks: Task[] = []
-    tasksQuerySnapshot.forEach((taskSnapshot) => {
-        try {
-            const task = taskConverter.fromFirestore(taskSnapshot)
-            tasks.push(task)
-        } catch (e) {
-            return console.error(
-                `Encountered error while retrieving task: ${e.message}`
-            )
-        }
-    })
+    const temp: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>[] = [];
+    tasksQuerySnapshot.forEach(taskSnapshot => temp.push(taskSnapshot));
+
+    const tasks: Task[] = [];
+    await Promise.all(temp.map(taskSnapShot => taskConverter.fromFirestore(taskSnapShot)))
+        .then(values => {
+            values.forEach(value => tasks.push(value))
+        })
+        .catch(e => console.error(`Encountered error while retrieving task: ${e.message}`));
 
     return tasks
         .filter((task) => task.status === Status.OPEN)
@@ -207,17 +220,15 @@ export const getCurrentTasks: (uid: string) => Promise<CurrentTasks> = async (
         .where("status", "in", [Status.OPEN, Status.PENDING])
 
     const tasksQuerySnapshot = await tasksRef.get()
-    const tasks: Task[] = []
-    tasksQuerySnapshot.forEach((taskSnapshot) => {
-        try {
-            const task = taskConverter.fromFirestore(taskSnapshot)
-            tasks.push(task)
-        } catch (e) {
-            return console.error(
-                `Encountered error while retrieving task: ${e.message}`
-            )
-        }
-    })
+    const temp: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>[] = [];
+    tasksQuerySnapshot.forEach(taskSnapshot => temp.push(taskSnapshot));
+
+    const tasks: Task[] = [];
+    await Promise.all(temp.map(taskSnapShot => taskConverter.fromFirestore(taskSnapShot)))
+        .then(values => {
+            values.forEach(value => tasks.push(value))
+        })
+        .catch(e => console.error(`Encountered error while retrieving task: ${e.message}`));
 
     const currentTasks: CurrentTasks = {
         open: [],
@@ -268,19 +279,17 @@ export const getPastTasks: (uid: string) => Promise<Task[]> = async (
         ])
 
     const tasksQuerySnapshot = await tasksRef.get()
-    const tasks: Task[] = []
-    tasksQuerySnapshot.forEach((taskSnapshot) => {
-        try {
-            const task = taskConverter.fromFirestore(taskSnapshot)
-            tasks.push(task)
-        } catch (e) {
-            return console.error(
-                `Encountered error while retrieving task: ${e.message}`
-            )
-        }
-    })
+    const temp: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>[] = [];
+    tasksQuerySnapshot.forEach(taskSnapshot => temp.push(taskSnapshot));
 
-    tasks
+    const tasks: Task[] = [];
+    await Promise.all(temp.map(taskSnapShot => taskConverter.fromFirestore(taskSnapShot)))
+        .then(values => {
+            values.forEach(value => tasks.push(value))
+        })
+        .catch(e => console.error(`Encountered error while retrieving task: ${e.message}`));
+
+    return tasks
         .filter(task => {
             const status = task.status;
             return status === Status.CANCELLED || status === Status.DONE || status === Status.EXPIRED;
@@ -291,8 +300,6 @@ export const getPastTasks: (uid: string) => Promise<Task[]> = async (
                 curr.expectedDeliveryTime
             )
         )
-
-    return tasks
 }
 
 /**
