@@ -21,9 +21,9 @@ import {
     fulfilRequest,
     getOpenRequests,
 } from "../../../../../logic/requestlogic"
-import moment from "moment";
+import moment from "moment"
 
-const { Title, Paragraph, Text} = Typography
+const { Title, Paragraph, Text } = Typography
 type Props = {
     uid: string | undefined
     email: string | undefined | null
@@ -176,17 +176,24 @@ const MainRequest: FC<Props> = ({ uid, email }) => {
                 <Typography>
                     <Title> Shop location: {modalReq?.task.shopLocation}</Title>
                     <Paragraph>
-						<Text strong={true}>Expected Delivery Time: </Text>
-                        {modalReq && moment.unix(modalReq?.task.expectedDeliveryTime).format("dddd, MMMM Do YYYY, h:mm:ss a")}
-					</Paragraph>
-					<Paragraph>
-						<Text strong={true}>Item: </Text>
-						{modalReq?.task.item}
-					</Paragraph>
-					<Paragraph>
-						<Text strong={true}>Fees: </Text>
-						{modalReq?.task.fee}
-					</Paragraph>
+                        <Text strong={true}>Expected Delivery Time: </Text>
+                        {modalReq &&
+                            moment
+                                .unix(modalReq?.task.expectedDeliveryTime)
+                                .format("dddd, MMMM Do YYYY, h:mm:ss a")}
+                    </Paragraph>
+                    <Paragraph>
+                        <Text strong={true}>Delivery Location: </Text>
+                        {modalReq?.task.deliveryLocation}
+                    </Paragraph>
+                    <Paragraph>
+                        <Text strong={true}>Item: </Text>
+                        {modalReq?.task.item}
+                    </Paragraph>
+                    <Paragraph>
+                        <Text strong={true}>Fees: </Text>
+                        {modalReq?.task.fee}
+                    </Paragraph>
                 </Typography>
             </Modal>
         </div>

@@ -32,6 +32,10 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
                                 {offer.shopLocation}
                             </Paragraph>
                             <Paragraph>
+                                <Text strong={true}>Delivery Location: </Text>
+                                {offer.deliveryLocation}
+                            </Paragraph>
+                            <Paragraph>
                                 <Text strong={true}>
                                     Expected Delivery Time
                                 </Text>
@@ -81,6 +85,10 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
                             <Paragraph>
                                 <Text strong={true}>Shop Location: </Text>
                                 {offer.shopLocation}
+                            </Paragraph>
+                            <Paragraph>
+                                <Text strong={true}>Delivery Location: </Text>
+                                {offer.deliveryLocation}
                             </Paragraph>
                             <Paragraph>
                                 <Text strong={true}>

@@ -15,7 +15,7 @@ import { MoneyCollectOutlined } from "@ant-design/icons"
 import firebase from "firebase"
 import { FirebaseContext } from "../../../../../context/firebase-context"
 import { addRequest } from "../../../../../logic/requestlogic"
-import { Request, getOpenRequests } from "../../../../../logic/requestlogic";
+import { Request, getOpenRequests } from "../../../../../logic/requestlogic"
 import { getCurrentRequests } from "../../../../../logic"
 const { Title, Paragraph, Text } = Typography
 const { RangePicker } = DatePicker
@@ -23,9 +23,13 @@ const { RangePicker } = DatePicker
 type Props = {
     uid: string | undefined
     fetchRequest: () => Promise<void>
-    email : string | undefined | null;
+    email: string | undefined | null
 }
-const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid, email }) => {
+const UserCreateRequestComponent: FC<Props> = ({
+    fetchRequest,
+    uid,
+    email,
+}) => {
     const firebaseContext = useContext(FirebaseContext)
     const { firebaseApp } = firebaseContext
     const db = firebase.firestore(firebaseApp as firebase.app.App)
@@ -40,7 +44,7 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid, email }) => 
         formRef.current?.submit()
     }
     const fetchRequests = useCallback(async () => {
-        if (uid === undefined) return;
+        if (uid === undefined) return
         try {
             setLoading(true)
             const { open } = await getCurrentRequests(uid)
@@ -50,11 +54,10 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid, email }) => 
         } finally {
             setLoading(false)
         }
-      }, [])
-      useEffect(() => {
+    }, [])
+    useEffect(() => {
         fetchRequests()
-      }, [])
-
+    }, [])
 
     const showModal = () => setVisible(true)
     const handleCancel = () => setVisible(false)
@@ -64,13 +67,14 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid, email }) => 
         console.log("Success:", values)
         try {
             setLoading(true)
-            let emailName = '';
-			if (email !== null && email !== undefined) {
-				emailName = email;
-			}
+            let emailName = ""
+            if (email !== null && email !== undefined) {
+                emailName = email
+            }
             await addRequest(
                 uid ?? "-",
                 values.shopLocation,
+                values.deliveryLocation,
                 values.expectedDeliveryTime.unix(),
                 values.item,
                 values.fee
@@ -107,7 +111,9 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid, email }) => 
             </Button>
             <Typography>
                 <Title>{email}</Title>
-                <Paragraph>You currently have {requests.length} requests open</Paragraph>
+                <Paragraph>
+                    You currently have {requests.length} requests open
+                </Paragraph>
             </Typography>
             <Form ref={formRef} onFinish={onFinish}>
                 <Modal
@@ -127,6 +133,18 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid, email }) => 
                                 required: true,
                                 message:
                                     "Please input the location of the shop",
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label={"Delivery location"}
+                        name="deliveryLocation"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please input the delivery location",
                             },
                         ]}
                     >
@@ -156,7 +174,16 @@ const UserCreateRequestComponent: FC<Props> = ({ fetchRequest, uid, email }) => 
                     >
                         <Input />
                     </Form.Item>
-                    <Form.Item label="fee" name="fee" rules={[]}>
+                    <Form.Item
+                        label="fee"
+                        name="fee"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Fee is required",
+                            },
+                        ]}
+                    >
                         <InputNumber />
                     </Form.Item>
                 </Modal>

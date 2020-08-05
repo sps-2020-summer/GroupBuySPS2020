@@ -27,6 +27,10 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
                                 {request.task.shopLocation}
                             </Paragraph>
                             <Paragraph>
+                                <Text strong={true}>Delivery Location: </Text>
+                                {request.task.deliveryLocation}
+                            </Paragraph>
+                            <Paragraph>
                                 <Text strong={true}>
                                     Expected Delivery Time
                                 </Text>
@@ -75,6 +79,10 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
                         <Paragraph>
                             <Text strong={true}>Shop Location: </Text>
                             {request.task.shopLocation}
+                        </Paragraph>
+                        <Paragraph>
+                            <Text strong={true}>Delivery Location: </Text>
+                            {request.task.deliveryLocation}
                         </Paragraph>
                         <Paragraph>
                             <Text strong={true}>Expected Delivery Time</Text>
