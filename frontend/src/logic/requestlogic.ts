@@ -245,6 +245,7 @@ export const addRequestHelper: (
     // NOTE: this should not be imported by FE
     uid: string,
     shopLocation: string,
+    deliveryLocation: string,
     expectedDeliveryTime: number,
     item: string,
     fee: number,
@@ -252,6 +253,7 @@ export const addRequestHelper: (
 ) => Promise<Request> = async function (
     uid,
     shopLocation,
+    deliveryLocation,
     expectedDeliveryTime,
     item,
     fee,
@@ -266,6 +268,7 @@ export const addRequestHelper: (
     try {
         const task = await addTask(
             shopLocation,
+            deliveryLocation,
             expectedDeliveryTime,
             item,
             uid,
@@ -290,16 +293,18 @@ export const addRequestHelper: (
 export const addRequest: (
     uid: string,
     shopLocation: string,
+    deliveryLocation: string,
     expectedDeliveryTime: number,
     item: string,
     fee: number
 ) => Promise<Request> = async (
     uid,
     shopLocation,
+    deliveryLocation,
     expectedDeliveryTime,
     item,
     fee
-) => addRequestHelper(uid, shopLocation, expectedDeliveryTime, item, fee)
+) => addRequestHelper(uid, shopLocation, deliveryLocation, expectedDeliveryTime, item, fee)
 
 /**
  * Indicates that doer with the specified user id will fulfil the request with the given id.

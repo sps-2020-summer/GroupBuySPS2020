@@ -12,6 +12,7 @@ export class Offer {
   title: string;
   description: string;
   shopLocation: string;
+  deliveryLocation: string;
   expectedDeliveryTime: number;
   status: Status;
 
@@ -21,6 +22,7 @@ export class Offer {
     title: string,
     description: string,
     shopLocation: string,
+    deliveryLocation: string,
     expectedDeliveryTime: number,
     status: Status,
   ) {
@@ -28,6 +30,7 @@ export class Offer {
       ensureNonEmpty(
         id,
         shopLocation,
+        deliveryLocation,
         expectedDeliveryTime,
         status,
         title,
@@ -42,6 +45,7 @@ export class Offer {
     this.title = title;
     this.description = description;
     this.shopLocation = shopLocation;
+    this.deliveryLocation = deliveryLocation;
     this.expectedDeliveryTime = expectedDeliveryTime;
     this.status = status;
   }
@@ -64,6 +68,7 @@ const offerConverter = Object.freeze({
     title: string,
     description: string,
     shopLocation: string,
+    deliveryLocation: string,
     expectedDeliveryTime: number,
     status: Status
   ) => ({
@@ -71,6 +76,7 @@ const offerConverter = Object.freeze({
     title: title,
     description: description,
     shopLocation: shopLocation,
+    deliveryLocation: deliveryLocation,
     expectedDeliveryTime: expectedDeliveryTime,
     status: Status[status]
   }),
@@ -94,6 +100,7 @@ const offerConverter = Object.freeze({
       data.title,
       data.description,
       data.shopLocation,
+      data.deliveryLocation,
       expectedDeliveryTime,
       newStatus
     );
@@ -204,12 +211,14 @@ export const addOffer: (
   title: string,
   description: string,
   shopLocation: string,
+  deliveryLocation: string,
   expectedDeliveryTime: number
 ) => Promise<Offer> = async function (
   uid,
   title,
   description,
   shopLocation,
+  deliveryLocation,
   expectedDeliveryTime
 ) {
   const status = Status.OPEN;
@@ -229,6 +238,7 @@ export const addOffer: (
           title,
           description,
           shopLocation,
+          deliveryLocation,
           expectedDeliveryTime,
           status
         )
@@ -240,6 +250,7 @@ export const addOffer: (
       title,
       description,
       shopLocation,
+      deliveryLocation,
       expectedDeliveryTime,
       status
     );
@@ -295,6 +306,7 @@ export const addRequestToOffer: (
   // create and add new task for doer (i.e. owner of offer)
   addTask(
     offer.shopLocation,
+    offer.deliveryLocation,
     offer.expectedDeliveryTime,
     item,
     payerUid,
@@ -306,6 +318,7 @@ export const addRequestToOffer: (
   return addRequestHelper(
     payerUid,
     offer.shopLocation,
+    offer.deliveryLocation,
     offer.expectedDeliveryTime,
     item,
     fee,
