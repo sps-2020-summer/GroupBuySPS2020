@@ -21,8 +21,9 @@ import {
     fulfilRequest,
     getOpenRequests,
 } from "../../../../../logic/requestlogic"
+import moment from "moment";
 
-const { Title, Paragraph } = Typography
+const { Title, Paragraph, Text} = Typography
 type Props = {
     uid: string | undefined
     email: string | undefined | null
@@ -173,9 +174,19 @@ const MainRequest: FC<Props> = ({ uid, email }) => {
                 okText="fufil request?"
             >
                 <Typography>
-                    <Title>{modalReq?.task.payerUid}</Title>
-                    <Paragraph>{modalReq?.task.item}</Paragraph>
-                    <ViewTask task={modalReq?.task} />
+                    <Title> Shop location: {modalReq?.task.shopLocation}</Title>
+                    <Paragraph>
+						<Text strong={true}>Expected Delivery Time: </Text>
+                        {modalReq && moment.unix(modalReq?.task.expectedDeliveryTime).format("dddd, MMMM Do YYYY, h:mm:ss a")}
+					</Paragraph>
+					<Paragraph>
+						<Text strong={true}>Item: </Text>
+						{modalReq?.task.item}
+					</Paragraph>
+					<Paragraph>
+						<Text strong={true}>Fees: </Text>
+						{modalReq?.task.fee}
+					</Paragraph>
                 </Typography>
             </Modal>
         </div>
