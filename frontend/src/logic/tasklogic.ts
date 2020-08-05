@@ -46,7 +46,7 @@ export class Task {
             )
             ensureNonNegative(fee)
         } catch (e) {
-            throw new Error(`Unable to create task: e.message`)
+            throw new Error(`Unable to create task: ${e.message}`)
         }
 
         this.id = id
@@ -75,7 +75,8 @@ export class Task {
      */
     static isValidState = (uid: string | undefined, status: Status) =>
         (Task.isValidDoerPresent(uid) && (status === Status.PENDING || status === Status.DONE)) ||
-        !Task.isValidDoerPresent(uid);
+        (!Task.isValidDoerPresent(uid) && status === Status.OPEN)|| status === Status.CANCELLED || 
+        status === Status.EXPIRED;
 }
 
 const markAsExpired: (id: string) => Promise<void> = async (id) => {

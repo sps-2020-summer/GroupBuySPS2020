@@ -56,7 +56,6 @@ const requestConverter = Object.freeze({
         if (data === undefined) {
             throw new Error("Unable to find snapshot for request.")
         }
-
         const task = await getTaskById(data.taskId)
         return new Request(data.uid, requestSnapshot.id, task)
     },
