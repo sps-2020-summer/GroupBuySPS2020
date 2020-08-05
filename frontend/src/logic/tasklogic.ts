@@ -13,6 +13,7 @@ const COLLECTION_TASKS: string = "tasks"
 export class Task {
     id: string
     shopLocation: string
+    deliveryLocation: string
     expectedDeliveryTime: number
     item: string
     payerUid: string
@@ -27,6 +28,7 @@ export class Task {
     constructor(
         id: string,
         shopLocation: string,
+        deliveryLocation: string,
         expectedDeliveryTime: number,
         item: string,
         payerUid: string,
@@ -38,6 +40,7 @@ export class Task {
             ensureNonEmpty(
                 id,
                 shopLocation,
+                deliveryLocation,
                 expectedDeliveryTime,
                 item,
                 payerUid,
@@ -51,13 +54,12 @@ export class Task {
 
         this.id = id
         this.shopLocation = shopLocation
+        this.deliveryLocation = deliveryLocation
         this.expectedDeliveryTime = expectedDeliveryTime
         this.item = item
         this.payerUid = payerUid
         this.fee = fee
         this.status = status
-
-        
         
     if (!Task.isValidState(uid, status)) { 
       throw new Error("Missing doer for task with id " + id);
@@ -97,6 +99,7 @@ export const taskConverter = Object.freeze({
      */
     toFirestore: (
         shopLocation: string,
+        deliveryLocation: string,
         expectedDeliveryTime: number,
         item: string,
         payerUid: string,
@@ -107,6 +110,7 @@ export const taskConverter = Object.freeze({
         try {
             ensureNonEmpty(
                 shopLocation,
+                deliveryLocation,
                 expectedDeliveryTime,
                 item,
                 payerUid,
@@ -121,6 +125,7 @@ export const taskConverter = Object.freeze({
 
         return {
             shopLocation: shopLocation,
+            deliveryLocation: deliveryLocation,
             expectedDeliveryTime: expectedDeliveryTime,
             item: item,
             payerUid: payerUid,
@@ -151,6 +156,7 @@ export const taskConverter = Object.freeze({
         return new Task(
             taskSnapshot.id,
             data.shopLocation,
+            data.deliveryLocation,
             expectedDeliveryTime,
             data.item,
             data.payerUid,
@@ -337,6 +343,7 @@ export const getTaskById: (id: string) => Promise<Task> = async (
  */
 export const addTask: (
     shopLocation: string,
+    deliveryLocation: string,
     expectedDeliveryTime: number,
     item: string,
     payerUid: string,
@@ -344,6 +351,7 @@ export const addTask: (
     uid?: any // doer's id
 ) => Promise<Task> = async function (
     shopLocation,
+    deliveryLocation,
     expectedDeliveryTime,
     item,
     payerUid,
@@ -351,7 +359,7 @@ export const addTask: (
     uid
 ) {
     try {
-        ensureNonEmpty(shopLocation, expectedDeliveryTime, item, payerUid, fee)
+        ensureNonEmpty(shopLocation, deliveryLocation, expectedDeliveryTime, item, payerUid, fee)
         ensureNonNegative(fee)
     } catch (e) {
         throw new Error(`Unable to add task: ${e.message}`)
@@ -371,6 +379,7 @@ export const addTask: (
             .add(
                 taskConverter.toFirestore(
                     shopLocation,
+                    deliveryLocation,
                     expectedDeliveryTime,
                     item,
                     payerUid,
@@ -382,6 +391,7 @@ export const addTask: (
         return new Task(
             taskRef.id,
             shopLocation,
+            deliveryLocation,
             expectedDeliveryTime,
             item,
             payerUid,

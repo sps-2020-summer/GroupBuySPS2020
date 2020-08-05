@@ -1,4 +1,4 @@
-import React, { FC, useState, useContext } from "react";
+import React, { FC, useState, useContext, useEffect, useCallback } from "react";
 import s from "../../main.module.css";
 import {
   Button,
@@ -21,6 +21,8 @@ import { FirebaseContext } from "../../../../../context/firebase-context";
 import { addOffer } from "../../../../../logic/offerlogic";
 import { Status } from "../../../../../types";
 import moment from "moment";
+import { Offer, getOpenOffers } from "../../../../../logic/offerlogic";
+import { getCurrentOffers } from "../../../../../logic"
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
@@ -38,6 +40,24 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
   const formRef = React.createRef<FormInstance>();
 
   const [visible, setVisible] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true)
+  const [offers, setOffers] = useState<Offer[]>([]);
+
+  const fetchOffers = useCallback(async () => {
+    if (uid === undefined) return;
+    try {
+        setLoading(true)
+        const { open } = await getCurrentOffers(uid)
+        setOffers(open)
+    } catch (e) {
+        console.log(e)
+    } finally {
+        setLoading(false)
+    }
+  }, [])
+  useEffect(() => {
+    fetchOffers()
+  }, [])
 
   const handleOk = () => {
     console.log(formRef.current);
@@ -46,6 +66,8 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
 
   const showModal = () => setVisible(true);
   const handleCancel = () => setVisible(false);
+
+
 
   const onFinish = async (values) => {
     console.log("Success:", values);
@@ -84,7 +106,7 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
       </Button>
       <Typography>
         <Title>You</Title>
-        <Paragraph>You currently have 0 offers open</Paragraph>
+        <Paragraph>You currently have {offers.length} open</Paragraph>
       </Typography>
       <Form ref={formRef} onFinish={onFinish}>
         <Modal
