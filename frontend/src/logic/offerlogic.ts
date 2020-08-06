@@ -4,7 +4,7 @@ import { ensureNonEmpty, ensureNonNegative, shouldShowExpired, sortByReverseOrde
 import { addRequestHelper, Request } from "./requestlogic";
 import { addTask } from "./tasklogic";
 
-const COLLECTION_OFFERS: string = "offer";
+const COLLECTION_OFFERS: string = "offers";
 
 export class Offer {
   uid: string;
@@ -33,8 +33,7 @@ export class Offer {
         deliveryLocation,
         expectedDeliveryTime,
         status,
-        title,
-        description
+        title
       );
     } catch (e) {
       throw new Error("Unable to create offer. Reason: " + e.message);
