@@ -1,9 +1,9 @@
 import React, { FC, useState } from "react"
 import { Card, Typography, message, Button } from "antd"
-import { CheckOutlined } from "@ant-design/icons"
+import { CheckOutlined, CloseCircleFilled } from "@ant-design/icons"
 
 import s from "./s.module.css"
-import { Request, markRequestAsDone } from "../../../logic"
+import { Request, markRequestAsDone, cancelRequest } from "../../../logic"
 import { convertToDate } from "../../../logic/utilities"
 import { Status } from "../../../types"
 const { Title, Text, Paragraph } = Typography
@@ -32,11 +32,15 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
                             </Paragraph>
                             <Paragraph>
                                 <Text strong={true}>
-                                    Expected Delivery Time
+                                    Expected Delivery Time:
                                 </Text>
                                 {` ${convertToDate(
                                     request.task.expectedDeliveryTime
                                 )}`}
+                            </Paragraph>
+                            <Paragraph>
+                                <Text strong={true}>Fee: </Text>
+                                {request.task.fee}
                             </Paragraph>
                             <Paragraph>
                                 <Text strong={true}>Doer: </Text>
@@ -63,12 +67,26 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
         }
     }
 
+    const handleCancel = async () => {
+        try {
+            setLoading(true)
+            await cancelRequest(request.id)
+            await fetch()
+            message.success("request cancelled!")
+        } catch (err) {
+            message.error(err)
+        }
+    }
+
     return (
         <Card
             className={s.cardStyle}
             actions={[
                 <Button disabled={request.task.uid === ""} onClick={handleDone}>
                     Complete <CheckOutlined />{" "}
+                </Button>,
+                <Button onClick={handleDone}>
+                    Cancel <CloseCircleFilled />{" "}
                 </Button>,
             ]}
         >
@@ -85,13 +103,13 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
                             {request.task.deliveryLocation}
                         </Paragraph>
                         <Paragraph>
-                            <Text strong={true}>Expected Delivery Time</Text>
+                            <Text strong={true}>Expected Delivery Time: </Text>
                             {` ${convertToDate(
                                 request.task.expectedDeliveryTime
                             )}`}
                         </Paragraph>
                         <Paragraph>
-                            <Text strong={true}>Fee</Text>
+                            <Text strong={true}>Fee: </Text>
                             {request.task.fee}
                         </Paragraph>
                         <Paragraph>

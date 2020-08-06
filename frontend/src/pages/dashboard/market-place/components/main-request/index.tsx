@@ -74,15 +74,14 @@ const MainRequest: FC<Props> = ({ uid, email }) => {
     const handleOkay = async () => {
         try {
             setLoading(true)
-            let emailName = ""
+
             if (!modalReq || !uid) {
                 throw new Error("modalReq undefined")
             }
-            if (email !== null && email !== undefined) {
-                emailName = email
-            }
-            await fulfilRequest(modalReq?.id, uid)
 
+            await fulfilRequest(modalReq?.id, uid)
+            fetchRequest()
+            setVisible(false)
             setLoading(false)
 
             message.success("Request added to dashboard")

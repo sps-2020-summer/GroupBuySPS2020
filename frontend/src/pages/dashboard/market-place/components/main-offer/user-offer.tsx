@@ -145,7 +145,12 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
                     <Form.Item
                         label="Description"
                         name="description"
-                        rules={[]}
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please input description for offer",
+                            },
+                        ]}
                     >
                         <Input />
                     </Form.Item>

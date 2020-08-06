@@ -86,10 +86,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                                 dataSource={requests}
                                 renderItem={(item) => (
                                     <List.Item>
-                                        <Card
-                                            title={`Payer ID: ${item.task.payerUid}`}
-                                            style={{ width: "100%" }}
-                                        >
+                                        <Card style={{ width: "100%" }}>
                                             <RequestItem request={item} />
                                         </Card>
                                     </List.Item>
