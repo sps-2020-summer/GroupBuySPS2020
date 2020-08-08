@@ -16,3 +16,11 @@
     flex-direction: column;
     justify-content: space-evenly;
 }
+
+.buttonStyle {
+    background: linear-gradient(45deg, #9194e7, #aca8eb) !important;
+    border: 0px;
+    width: 220px;
+    margin-bottom: 1rem;
+    border-radius: 15px;
+}

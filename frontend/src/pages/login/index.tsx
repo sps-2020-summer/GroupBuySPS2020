@@ -12,11 +12,15 @@ const Login: FC<{}> = () => {
     const value = useContext(AuthContext)
     const { firebase } = value
 
+    const handleLanding = () => {
+        history.push("/")
+    }
+
     const [loading, setLoading] = useState<boolean>(false)
 
     const uiConfig = {
         signInFlow: "popup",
-        signInSuccessUrl: "/",
+        signInSuccessUrl: "/dashboard",
         signInOptions: [
             firebase.auth.GoogleAuthProvider.PROVIDER_ID,
             firebase.auth.EmailAuthProvider.PROVIDER_ID,
@@ -27,7 +31,7 @@ const Login: FC<{}> = () => {
         setLoading(true)
         const res = await firebase.auth().signInAnonymously()
         console.log(res)
-        history.push("/")
+        history.push("/dashboard")
     }
 
     return (
@@ -41,14 +45,25 @@ const Login: FC<{}> = () => {
             {loading ? (
                 <Spin spinning={loading}></Spin>
             ) : (
-                <Button
-                    style={{ width: "220px" }}
-                    type="primary"
-                    onClick={handleSignIn}
-                >
-                    Guest sign in
-                </Button>
+                <>
+                    <Button
+                        className={s.buttonStyle}
+                        type="primary"
+                        onClick={handleSignIn}
+                    >
+                        Guest sign in
+                    </Button>
+                    <br />
+                </>
             )}
+
+            <Button
+                className={s.buttonStyle}
+                type="primary"
+                onClick={handleLanding}
+            >
+                Home
+            </Button>
         </div>
     )
 }

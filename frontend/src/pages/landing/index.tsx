@@ -1,15 +1,32 @@
 import React, { FC } from "react"
 import s from "./landing.module.css"
 import { FaPeopleCarry } from "react-icons/fa"
-import { Typography } from "antd"
+import { Typography, PageHeader, Button } from "antd"
+import { useHistory } from "react-router"
 
 const { Paragraph, Title, Text } = Typography
 
 const LandingPage: FC = () => {
+    const history = useHistory()
+
     return (
         <div className={s.grid}>
             <header>
-                <h1 className={s.title}>GroupBuy</h1>
+                <PageHeader
+                    style={{ width: "100%" }}
+                    title={"GroupBuy"}
+                    subTitle={"An SPS project"}
+                    extra={
+                        <Button
+                            className={s.loginStyle}
+                            key="1"
+                            type="primary"
+                            onClick={() => history.push("/login")}
+                        >
+                            Login
+                        </Button>
+                    }
+                ></PageHeader>
             </header>
             <div className={s.content}>
                 <div className={s.firstSection}>
@@ -42,6 +59,9 @@ const LandingPage: FC = () => {
                         </div>
                     </div>
                     <br />
+                </div>
+
+                <div className={s.introColumn}>
                     <Typography className={s.alignCenter}>
                         <Title level={2}>
                             Introducing <Text strong={true}>GroupBuy</Text>
@@ -93,7 +113,18 @@ const LandingPage: FC = () => {
                             <Typography>
                                 <Paragraph>
                                     <h3>Ready to try it out?</h3>
-                                    <Text>Click Here</Text>
+                                    <Text>
+                                        <Button
+                                            className={s.loginStyle}
+                                            key="1"
+                                            type="primary"
+                                            onClick={() =>
+                                                history.push("/login")
+                                            }
+                                        >
+                                            Click me
+                                        </Button>
+                                    </Text>
                                 </Paragraph>
                             </Typography>
                         </div>
