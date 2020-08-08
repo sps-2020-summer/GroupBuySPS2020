@@ -1,0 +1,76 @@
+.grid {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    row-gap: 1.5rem;
+}
+
+.content {
+    min-height: 90vh;
+}
+
+.firstSection {
+    margin: 0.5rem auto 0.5rem auto;
+    justify-content: center;
+}
+
+.pitchBox {
+    margin: auto;
+}
+
+@media only screen and (min-width: 600px) {
+    .pitchBox {
+        margin: auto;
+        max-width: 60vw;
+    }
+}
+
+.infoColumn {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-height: 30vh;
+    margin-bottom: 1.5rem;
+}
+
+.boxPitch {
+    background: linear-gradient(45deg, #da7a87, #ecaab3) !important;
+}
+
+.boxReq {
+    background: linear-gradient(45deg, #9194e7, #aca8eb) !important;
+}
+.boxTask {
+    background: linear-gradient(45deg, #da98ab, #f1adc4) !important;
+}
+.boxOffer {
+    background: linear-gradient(45deg, #9092da, #8ca9ca) !important;
+}
+
+.box {
+    flex: 1 1 150px;
+    margin: 8px;
+    box-shadow: 0 20px 20px rgba(0, 0, 0, 0.2);
+    overflow-wrap: break-word;
+    border-radius: 15px;
+    padding: 15px;
+}
+.alignCenter {
+    text-align: center;
+}
+
+.icon {
+    height: 5vh;
+    width: 10vw;
+}
+.title {
+    font-size: 4vh;
+    margin: 0.5rem auto 0.5rem auto;
+}
+
+header {
+    align-items: center;
+    box-shadow: 0px 7px 4px 2px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(45deg, #da7a87, #ecaab3) !important;
+    display: flex;
+    height: 6vh;
+}

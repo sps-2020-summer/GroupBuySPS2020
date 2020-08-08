@@ -1,16 +1,15 @@
 import React from "react"
 import "./App.css"
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom"
-import { Spin } from "antd"
 import { Layout } from "antd"
 import firebase from "firebase"
 
 import { useAuthState } from "react-firebase-hooks/auth"
 import Loader from "./components/loader"
 
-const Main = React.lazy(() => import("./pages/dashboard/market-place"))
 const Login = React.lazy(() => import("./pages/login"))
 const Dashboard = React.lazy(() => import("./pages/dashboard"))
+const Landing = React.lazy(() => import("./pages/landing"))
 
 const App = () => {
     const [user, loading] = useAuthState(firebase.auth())
@@ -66,6 +65,7 @@ const App = () => {
                     }
                 >
                     <Switch>
+                        <Route exact path="/landing" component={Landing} />
                         <PrivateRoute
                             exact
                             path="/"

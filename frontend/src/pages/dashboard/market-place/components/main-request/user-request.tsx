@@ -12,13 +12,11 @@ import {
 } from "antd"
 import { FormInstance } from "antd/lib/form"
 import { MoneyCollectOutlined } from "@ant-design/icons"
-import firebase from "firebase"
 import { FirebaseContext } from "../../../../../context/firebase-context"
 import { addRequest } from "../../../../../logic/requestlogic"
-import { Request, getOpenRequests } from "../../../../../logic/requestlogic"
+import { Request } from "../../../../../logic/requestlogic"
 import { getCurrentRequests } from "../../../../../logic"
-const { Title, Paragraph, Text } = Typography
-const { RangePicker } = DatePicker
+const { Title, Paragraph } = Typography
 
 type Props = {
     uid: string | undefined
@@ -32,7 +30,6 @@ const UserCreateRequestComponent: FC<Props> = ({
 }) => {
     const firebaseContext = useContext(FirebaseContext)
     const { firebaseApp } = firebaseContext
-    const db = firebase.firestore(firebaseApp as firebase.app.App)
     const [loading, setLoading] = useState<boolean>(false)
 
     const formRef = React.createRef<FormInstance>()
@@ -86,12 +83,6 @@ const UserCreateRequestComponent: FC<Props> = ({
         } catch (err) {
             console.log(err)
         }
-    }
-
-    const rangeConfig = {
-        rules: [
-            { type: "array", required: true, message: "Please select time!" },
-        ],
     }
 
     return (

@@ -12,11 +12,9 @@ import {
 import s from "../../main.module.css"
 
 import { Request } from "../../../../../logic/requestlogic"
-import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons"
+import { LikeOutlined, StarOutlined } from "@ant-design/icons"
 import UserCreateRequestComponent from "./user-request"
 import { FirebaseContext } from "../../../../../context/firebase-context"
-import firebase from "firebase"
-import ViewTask from "../../../../../components/view-task"
 import {
     fulfilRequest,
     getOpenRequests,
@@ -31,7 +29,6 @@ type Props = {
 const MainRequest: FC<Props> = ({ uid, email }) => {
     const firebaseContext = useContext(FirebaseContext)
     const { firebaseApp } = firebaseContext
-    const db = firebase.firestore(firebaseApp as firebase.app.App)
     const [loading, setLoading] = useState<boolean>(true)
     const [requests, setRequests] = useState<Request[]>([])
 

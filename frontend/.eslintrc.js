@@ -13,8 +13,8 @@ module.exports = {
     },
     plugins: ["react", "react-hooks"],
     rules: {
-        indent: ["error", "tab"],
+        indent: ["error", "space"],
         "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
         "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
     },
-};
+}

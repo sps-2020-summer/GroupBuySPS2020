@@ -12,7 +12,7 @@ import Loader from "../../../components/loader"
 //import { getRequests } from "../../../logic/requestlogic";
 //import { getOffers } from "../../../logic/offerlogic";
 import OfferItem from "../user-offer/offer-item"
-import { Status } from "../../../types"
+
 import {
     HistoryHelpText,
     NoHistoryTaskText,

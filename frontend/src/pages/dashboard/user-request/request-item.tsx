@@ -6,6 +6,7 @@ import s from "./s.module.css"
 import { Request, markRequestAsDone, cancelRequest } from "../../../logic"
 import { convertToDate } from "../../../logic/utilities"
 import { Status } from "../../../types"
+import Loader from "../../../components/loader"
 const { Title, Text, Paragraph } = Typography
 
 type Props = {
@@ -78,7 +79,9 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
         }
     }
 
-    return (
+    return loading ? (
+        <Loader spin={true} />
+    ) : (
         <Card
             className={s.cardStyle}
             actions={[
