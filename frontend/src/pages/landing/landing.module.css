@@ -3,6 +3,13 @@
     grid-template-rows: auto 1fr auto;
     row-gap: 1.5rem;
     background-color: white;
+    font-family: "Open Sans Condensed", sans-serif;
+}
+
+.headerText {
+    color: #111;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .loginStyle {
@@ -11,7 +18,6 @@
     border-radius: 15px;
     border: 0px;
 }
-
 
 .content {
     min-height: 90vh;
@@ -34,11 +40,18 @@
     margin-bottom: 1.5rem;
 }
 
+.infoColumnDev {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-height: 15vh;
+    margin-bottom: 1.5rem;
+}
+
 .introColumn {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-
     margin-bottom: 1.5rem;
 }
 
@@ -69,6 +82,7 @@
     border-radius: 15px;
     padding: 15px;
 }
+
 .alignCenter {
     text-align: center;
 }
@@ -101,6 +115,7 @@ header {
         max-width: 80vw;
     }
     .introColumn,
+    .infoColumnDev,
     .infoColumn {
         margin: auto;
         max-width: 80vw;

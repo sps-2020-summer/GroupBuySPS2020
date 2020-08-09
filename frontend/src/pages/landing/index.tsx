@@ -1,7 +1,16 @@
 import React, { FC } from "react"
 import s from "./landing.module.css"
-import { FaPeopleCarry } from "react-icons/fa"
-import { Typography, PageHeader, Button } from "antd"
+import {
+    FaPeopleCarry,
+    FaGithub,
+    FaLinkedin,
+    FaTasks,
+    FaHandsHelping,
+    FaHireAHelper,
+    FaUserFriends,
+} from "react-icons/fa"
+import { Typography, PageHeader, Button, Divider } from "antd"
+import { FaUser } from "react-icons/fa"
 import { useHistory } from "react-router"
 
 const { Paragraph, Title, Text } = Typography
@@ -30,12 +39,13 @@ const LandingPage: FC = () => {
             </header>
             <div className={s.content}>
                 <div className={s.firstSection}>
-                    <Typography className={s.alignCenter}>
-                        <Title level={2}>Stuck at Work/School/Home?</Title>
+                    <Typography className={`${s.alignCenter} ${s.headerText}`}>
+                        <FaPeopleCarry style={{ fontSize: "10vh" }} />
+                        <Title level={2}>Stuck at Work / School / Home?</Title>
                     </Typography>
 
                     <div className={s.pitchBox}>
-                        <div className={`${s.box} ${s.boxPitch}`}>
+                        <div className={`${s.alignCenter} ${s.headerText}`}>
                             <Typography>
                                 <Paragraph>
                                     <h3>Want a late night snack?</h3>
@@ -58,17 +68,19 @@ const LandingPage: FC = () => {
                             </Typography>
                         </div>
                     </div>
-                    <br />
                 </div>
 
                 <div className={s.introColumn}>
+                    <Divider />
                     <Typography className={s.alignCenter}>
                         <Title level={2}>
                             Introducing <Text strong={true}>GroupBuy</Text>
-                        </Title>
-                        <Title level={3}>
-                            Connect with others in your community and help each
-                            other!
+                            <br />
+                            <Text type="secondary">
+                                {" "}
+                                Connect with others in your community and help
+                                each other!
+                            </Text>
                         </Title>
                     </Typography>
                 </div>
@@ -76,10 +88,19 @@ const LandingPage: FC = () => {
                 <div className={s.infoColumn}>
                     <div className={`${s.box} ${s.boxReq}`}>
                         <Typography>
-                            <Title>Request</Title>
+                            <div style={{ display: "flex" }}>
+                                <Title> Request</Title>
+                                <FaUserFriends
+                                    style={{
+                                        marginLeft: "auto",
+                                        fontSize: "5vh",
+                                    }}
+                                />
+                            </div>
+
                             <Paragraph>
                                 Make a <Text strong={true}>Request</Text> for
-                                your item
+                                something you desire!
                             </Paragraph>
                             <Paragraph>Wait for your confirmation</Paragraph>
                             <Paragraph>
@@ -90,9 +111,20 @@ const LandingPage: FC = () => {
                     <div className={`${s.box} ${s.boxTask}`}>
                         {" "}
                         <Typography>
-                            <Title>Task</Title>
-                            <Paragraph>Search for available requests</Paragraph>
-                            <Paragraph>Select a task to fufil</Paragraph>
+                            <div style={{ display: "flex" }}>
+                                <Title>Task</Title>
+                                <FaTasks
+                                    style={{
+                                        marginLeft: "auto",
+                                        fontSize: "5vh",
+                                    }}
+                                />
+                            </div>
+
+                            <Paragraph>Want something to do? </Paragraph>
+                            <Paragraph>
+                                Search for available tasks to fufil!
+                            </Paragraph>
                             <Paragraph>
                                 Complete a task to earn a fee!
                             </Paragraph>
@@ -101,34 +133,78 @@ const LandingPage: FC = () => {
                     <div className={`${s.box} ${s.boxOffer}`}>
                         {" "}
                         <Typography>
-                            <Title>Offer</Title>
-                            <Paragraph>Make a Request for food</Paragraph>
+                            <div style={{ display: "flex" }}>
+                                <Title> Offer</Title>
+                                <FaHandsHelping
+                                    style={{
+                                        marginLeft: "auto",
+                                        fontSize: "5vh",
+                                    }}
+                                />
+                            </div>
+
+                            <Paragraph>Going somewhere?</Paragraph>
+                            <Paragraph>
+                                Open an offer and fufil requests!
+                            </Paragraph>
+
+                            <Paragraph>Be rewarded with a fee!</Paragraph>
                         </Typography>
                     </div>
                 </div>
 
                 <div className={s.firstSection}>
                     <div className={s.pitchBox}>
-                        <div className={`${s.box} ${s.boxPitch}`}>
-                            <Typography>
-                                <Paragraph>
-                                    <h3>Ready to try it out?</h3>
-                                    <Text>
-                                        <Button
-                                            className={s.loginStyle}
-                                            key="1"
-                                            type="primary"
-                                            onClick={() =>
-                                                history.push("/login")
-                                            }
-                                        >
-                                            Click me
-                                        </Button>
-                                    </Text>
-                                </Paragraph>
-                            </Typography>
-                        </div>
+                        <Divider />
+                        <Typography className={s.alignCenter}>
+                            <Paragraph>
+                                <h3>Ready to try it out?</h3>
+                                <Text>
+                                    <Button
+                                        className={s.loginStyle}
+                                        key="1"
+                                        type="primary"
+                                        onClick={() => history.push("/login")}
+                                    >
+                                        Click me
+                                    </Button>
+                                </Text>
+                            </Paragraph>
+                        </Typography>
+                        <Divider />
+                        <Typography className={s.alignCenter}>
+                            <Paragraph>
+                                <h3>Brought to you by</h3>
+                            </Paragraph>
+                        </Typography>
                     </div>
+                </div>
+                <div className={s.infoColumnDev}>
+                    <div className={s.box}>
+                        <Typography>
+                            <Title>Katherine Kee</Title>
+                            <FaGithub style={{ fontSize: "5vh" }} />
+                            <FaLinkedin style={{ fontSize: "5vh" }} />
+                        </Typography>
+                    </div>
+                    <div className={s.box}>
+                        <Typography>
+                            <Title>Poh Lin Wei</Title>
+                            <FaGithub style={{ fontSize: "5vh" }} />
+                            <FaLinkedin style={{ fontSize: "5vh" }} />
+                        </Typography>
+                    </div>
+                    <div className={s.box}>
+                        <Typography>
+                            <Title>Eugene Teu</Title>
+                            <FaGithub style={{ fontSize: "5vh" }} />
+                            <FaLinkedin style={{ fontSize: "5vh" }} />
+                        </Typography>
+                    </div>
+                </div>
+                <div className={s.introColumn}>
+                    <Divider />
+                    <Text>All rights reserved</Text>
                 </div>
             </div>
         </div>
