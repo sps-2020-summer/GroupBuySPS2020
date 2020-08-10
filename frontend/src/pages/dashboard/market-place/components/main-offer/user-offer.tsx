@@ -4,7 +4,6 @@ import { Button, Modal, Form, Input, DatePicker, Typography } from "antd"
 import { FormInstance } from "antd/lib/form"
 
 import { MoneyCollectOutlined } from "@ant-design/icons"
-import { FirebaseContext } from "../../../../../context/firebase-context"
 import { addOffer } from "../../../../../logic/offerlogic"
 import { Offer } from "../../../../../logic/offerlogic"
 import { getCurrentOffers } from "../../../../../logic"
@@ -17,9 +16,6 @@ type Props = {
 }
 
 const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
-    const firebaseContext = useContext(FirebaseContext)
-    const { firebaseApp } = firebaseContext
-
     const formRef = React.createRef<FormInstance>()
 
     const [visible, setVisible] = useState<boolean>(false)
@@ -70,7 +66,8 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
                 deliveryLocation,
                 expectedDeliveryTime.unix()
             )
-            fetchOffer()
+            await fetchOffer()
+            await fetchOffers()
             setVisible(false)
         } catch (err) {
             console.log(err)

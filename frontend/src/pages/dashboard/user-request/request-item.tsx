@@ -85,10 +85,17 @@ const RequestItem: FC<Props> = ({ request, fetch }) => {
         <Card
             className={s.cardStyle}
             actions={[
-                <Button disabled={request.task.uid === ""} onClick={handleDone}>
+                <Button
+                    disabled={request.task.uid === ""}
+                    onClick={handleDone}
+                    style={{ backgroundColor: "green", color: "white" }}
+                >
                     Complete <CheckOutlined />{" "}
                 </Button>,
-                <Button onClick={handleDone}>
+                <Button
+                    onClick={handleCancel}
+                    style={{ backgroundColor: "red", color: "white" }}
+                >
                     Cancel <CloseCircleFilled />{" "}
                 </Button>,
             ]}

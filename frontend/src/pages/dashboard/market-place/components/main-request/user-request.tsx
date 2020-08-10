@@ -77,7 +77,8 @@ const UserCreateRequestComponent: FC<Props> = ({
                 values.fee
             )
             message.success("Request added successfully")
-            fetchRequest()
+            await fetchRequest()
+            await fetchRequests()
             setLoading(false)
             setVisible(false)
         } catch (err) {
