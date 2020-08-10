@@ -12,7 +12,7 @@ import Loader from "../../../components/loader"
 //import { getRequests } from "../../../logic/requestlogic";
 //import { getOffers } from "../../../logic/offerlogic";
 import OfferItem from "../user-offer/offer-item"
-import { Status } from "../../../types"
+
 import {
     HistoryHelpText,
     NoHistoryTaskText,
@@ -66,7 +66,6 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                                     <List.Item>
                                         <Card
                                             className={s.cardStyle}
-                                            title={item.item}
                                             style={{ width: "100%" }}
                                         >
                                             <TaskItem task={item} />
@@ -86,7 +85,10 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                                 dataSource={requests}
                                 renderItem={(item) => (
                                     <List.Item>
-                                        <Card style={{ width: "100%" }}>
+                                        <Card
+                                            className={s.cardStyle}
+                                            style={{ width: "100%" }}
+                                        >
                                             <RequestItem request={item} />
                                         </Card>
                                     </List.Item>
@@ -105,7 +107,7 @@ const UserHistory: FC<DashboardCompProps> = ({ userUid }) => {
                                 renderItem={(item) => (
                                     <List.Item>
                                         <Card
-                                            title={item.title}
+                                            className={s.cardStyle}
                                             style={{ width: "100%" }}
                                         >
                                             <OfferItem offer={item} />

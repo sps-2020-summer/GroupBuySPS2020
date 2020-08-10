@@ -19,7 +19,6 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
         return (
             <Card className={s.cardStyle}>
                 <Card.Meta
-                    title={offer.title}
                     description={
                         <Typography>
                             <Title>{offer.title}</Title>
@@ -68,13 +67,15 @@ const OfferItem: FC<Props> = ({ offer, fetch }) => {
             <Card
                 className={s.cardStyle}
                 actions={[
-                    <Button onClick={handleCancel}>
+                    <Button
+                        onClick={handleCancel}
+                        style={{ backgroundColor: "red", color: "white" }}
+                    >
                         Cancel <CloseCircleFilled />{" "}
                     </Button>,
                 ]}
             >
                 <Card.Meta
-                    title={offer.title}
                     description={
                         <Typography>
                             <Title>{offer.title}</Title>

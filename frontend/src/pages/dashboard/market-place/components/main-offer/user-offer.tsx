@@ -1,30 +1,13 @@
 import React, { FC, useState, useContext, useEffect, useCallback } from "react"
 import s from "../../main.module.css"
-import {
-    Button,
-    Modal,
-    Form,
-    Input,
-    DatePicker,
-    Typography,
-    message,
-    TimePicker,
-} from "antd"
+import { Button, Modal, Form, Input, DatePicker, Typography } from "antd"
 import { FormInstance } from "antd/lib/form"
-import TextArea from "antd/lib/input/TextArea"
 
 import { MoneyCollectOutlined } from "@ant-design/icons"
-import { userInfo } from "os"
-import MainOffer from "."
-import firebase from "firebase"
-import { FirebaseContext } from "../../../../../context/firebase-context"
 import { addOffer } from "../../../../../logic/offerlogic"
-import { Status } from "../../../../../types"
-import moment from "moment"
-import { Offer, getOpenOffers } from "../../../../../logic/offerlogic"
+import { Offer } from "../../../../../logic/offerlogic"
 import { getCurrentOffers } from "../../../../../logic"
-const { Title, Paragraph, Text } = Typography
-const { RangePicker } = DatePicker
+const { Title, Paragraph } = Typography
 
 type Props = {
     uid: string | undefined
@@ -33,14 +16,10 @@ type Props = {
 }
 
 const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
-    const firebaseContext = useContext(FirebaseContext)
-    const { firebaseApp } = firebaseContext
-    const db = firebase.firestore(firebaseApp as firebase.app.App)
-
     const formRef = React.createRef<FormInstance>()
 
     const [visible, setVisible] = useState<boolean>(false)
-    const [loading, setLoading] = useState<boolean>(true)
+    const [, setLoading] = useState<boolean>(true)
     const [offers, setOffers] = useState<Offer[]>([])
 
     const fetchOffers = useCallback(async () => {
@@ -87,17 +66,12 @@ const UserCreateOfferComponent: FC<Props> = ({ fetchOffer, uid, email }) => {
                 deliveryLocation,
                 expectedDeliveryTime.unix()
             )
-            fetchOffer()
+            await fetchOffer()
+            await fetchOffers()
             setVisible(false)
         } catch (err) {
             console.log(err)
         }
-    }
-
-    const rangeConfig = {
-        rules: [
-            { type: "array", required: true, message: "Please select time!" },
-        ],
     }
 
     return (

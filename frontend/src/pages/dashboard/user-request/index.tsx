@@ -33,9 +33,6 @@ const UserRequest: FC<DashboardCompProps> = ({ userUid }) => {
         fetchRequest()
     }, [userUid])
 
-    console.log(openRequests.length)
-    console.log(pendingRequests.length)
-
     return (
         <>
             <Slide triggerOnce direction={"bottom"}>

@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect, useCallback } from "react"
 import { DashboardCompProps } from ".."
-import { List, Typography, Card } from "antd"
+import { List } from "antd"
 import { Offer } from "../../../logic"
 import { Slide } from "react-awesome-reveal"
 import TaskItem from "./offer-item"
@@ -8,8 +8,6 @@ import Loader from "../../../components/loader"
 import { getCurrentOffers } from "../../../logic"
 import { OfferHelpText, NoOfferText } from "../../../components/help-text"
 import s from "./s.module.css"
-
-const { Paragraph } = Typography
 
 const UserOffer: FC<DashboardCompProps> = ({ userUid }) => {
     const [loading, setLoading] = useState<boolean>(true)
