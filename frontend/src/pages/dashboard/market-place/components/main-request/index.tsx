@@ -86,9 +86,6 @@ const MainRequest: FC<Props> = ({ uid, email }) => {
             message.error(err)
         }
     }
-
-    console.log(requests)
-
     return (
         <div className={s.content}>
             <div className={s.userActions}>
@@ -111,54 +108,54 @@ const MainRequest: FC<Props> = ({ uid, email }) => {
                     {loading ? (
                         <Spin></Spin>
                     ) : (
-                        <>
-                            {requests.length === 0 ? (
-                                <>You currently have no requests opened!</>
-                            ) : (
-                                <></>
-                            )}
-                            <List
-                                pagination={{
-                                    onChange: (page) => {
-                                        console.log(page)
-                                    },
-                                    pageSize: 4,
-                                }}
-                                split={false}
-                                dataSource={requests}
-                                renderItem={(item: Request, index: number) => (
-                                    <List.Item
-                                        key={item.task.item ?? "-" + index}
-                                        actions={[
-                                            <Button
-                                                type="primary"
-                                                onClick={(e) =>
-                                                    handleClick(e, item)
-                                                }
-                                            >
-                                                View
+                            <>
+                                {requests.length === 0 ? (
+                                    <>No requests opened!</>
+                                ) : (
+                                        <></>
+                                    )}
+                                <List
+                                    pagination={{
+                                        onChange: (page) => {
+                                            console.log(page)
+                                        },
+                                        pageSize: 4,
+                                    }}
+                                    split={false}
+                                    dataSource={requests}
+                                    renderItem={(item: Request, index: number) => (
+                                        <List.Item
+                                            key={item.task.item ?? "-" + index}
+                                            actions={[
+                                                <Button
+                                                    type="primary"
+                                                    onClick={(e) =>
+                                                        handleClick(e, item)
+                                                    }
+                                                >
+                                                    View
                                             </Button>,
-                                            <IconText
-                                                icon={StarOutlined}
-                                                text=""
-                                                key="list-vertical-star-o"
-                                            />,
-                                            <IconText
-                                                icon={LikeOutlined}
-                                                text=""
-                                                key="list-vertical-like-o"
-                                            />,
-                                        ]}
-                                    >
-                                        <List.Item.Meta
-                                            title={item.task.item}
-                                            description={item.task.shopLocation}
-                                        />
-                                    </List.Item>
-                                )}
-                            />
-                        </>
-                    )}
+                                                <IconText
+                                                    icon={StarOutlined}
+                                                    text=""
+                                                    key="list-vertical-star-o"
+                                                />,
+                                                <IconText
+                                                    icon={LikeOutlined}
+                                                    text=""
+                                                    key="list-vertical-like-o"
+                                                />,
+                                            ]}
+                                        >
+                                            <List.Item.Meta
+                                                title={item.task.item}
+                                                description={item.task.shopLocation}
+                                            />
+                                        </List.Item>
+                                    )}
+                                />
+                            </>
+                        )}
                 </Card>
             </div>
             <Modal

@@ -8,6 +8,7 @@ import {
     FaHandsHelping,
     FaHireAHelper,
     FaUserFriends,
+    FaPortrait,
 } from "react-icons/fa"
 import { Typography, PageHeader, Button, Divider } from "antd"
 import { FaUser } from "react-icons/fa"
@@ -183,22 +184,22 @@ const LandingPage: FC = () => {
                     <div className={s.box}>
                         <Typography>
                             <Title>Katherine Kee</Title>
-                            <FaGithub style={{ fontSize: "5vh" }} />
-                            <FaLinkedin style={{ fontSize: "5vh" }} />
+                            <FaGithub onClick={() => window.location.assign('https://github.com/leafgecko')} style={{ fontSize: "5vh" }} />
+                            <FaLinkedin onClick={() => window.location.assign('https://www.linkedin.com/in/katherine-kee-wan-ting/')} style={{ fontSize: "5vh" }} />
                         </Typography>
                     </div>
                     <div className={s.box}>
                         <Typography>
                             <Title>Poh Lin Wei</Title>
-                            <FaGithub style={{ fontSize: "5vh" }} />
-                            <FaLinkedin style={{ fontSize: "5vh" }} />
+                            <FaGithub onClick={() => window.location.assign('https://github.com/pohlinwei')} style={{ fontSize: "5vh" }} />
+                            <FaPortrait onClick={() => window.location.assign('https://pohlinwei.github.io/')} style={{ fontSize: "5vh" }} />
                         </Typography>
                     </div>
                     <div className={s.box}>
                         <Typography>
                             <Title>Eugene Teu</Title>
-                            <FaGithub style={{ fontSize: "5vh" }} />
-                            <FaLinkedin style={{ fontSize: "5vh" }} />
+                            <FaGithub onClick={() => window.location.assign('https://github.com/EugeneTeu')} style={{ fontSize: "5vh" }} />
+                            <FaLinkedin onClick={() => window.location.assign('https://www.linkedin.com/in/eugeneteu/')} style={{ fontSize: "5vh" }} />
                         </Typography>
                     </div>
                 </div>

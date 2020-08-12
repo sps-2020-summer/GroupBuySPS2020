@@ -12,7 +12,7 @@ import {
 } from "antd"
 import { FormInstance } from "antd/lib/form"
 import { MoneyCollectOutlined } from "@ant-design/icons"
-import { FirebaseContext } from "../../../../../context/firebase-context"
+
 import { addRequest } from "../../../../../logic/requestlogic"
 import { Request } from "../../../../../logic/requestlogic"
 import { getCurrentRequests } from "../../../../../logic"
@@ -28,8 +28,7 @@ const UserCreateRequestComponent: FC<Props> = ({
     uid,
     email,
 }) => {
-    const firebaseContext = useContext(FirebaseContext)
-    const { firebaseApp } = firebaseContext
+
     const [loading, setLoading] = useState<boolean>(false)
 
     const formRef = React.createRef<FormInstance>()
@@ -52,6 +51,7 @@ const UserCreateRequestComponent: FC<Props> = ({
             setLoading(false)
         }
     }, [])
+
     useEffect(() => {
         fetchRequests()
     }, [])
@@ -79,8 +79,9 @@ const UserCreateRequestComponent: FC<Props> = ({
             message.success("Request added successfully")
             await fetchRequest()
             await fetchRequests()
-            setLoading(false)
             setVisible(false)
+            setLoading(false)
+
         } catch (err) {
             console.log(err)
         }
